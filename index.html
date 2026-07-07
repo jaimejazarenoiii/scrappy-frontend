@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scrappy Web</title>
+    <script>
+      ;(function () {
+        try {
+          var theme = localStorage.getItem('scrappy-theme')
+          var resolved = theme
+          if (theme === 'system' || !theme) {
+            resolved = window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
+          }
+          if (resolved === 'dark') document.documentElement.classList.add('dark')
+        } catch (e) {}
+      })()
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <div style="padding: 2rem; font-family: system-ui, sans-serif; text-align: center">
+        <h1>Scrappy Web</h1>
+        <p>JavaScript is required to run this application. Please enable JavaScript in your browser.</p>
+      </div>
+    </noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
