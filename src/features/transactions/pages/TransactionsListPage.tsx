@@ -19,6 +19,7 @@ import { PermissionGate } from '@/features/authorization/components/PermissionGa
 import { TransactionDirectionBadge } from '../components/TransactionDirectionBadge'
 import { TransactionStatusBadge } from '../components/TransactionStatusBadge'
 import { useTransactions } from '../hooks/useTransactions'
+import { transactionStatusLabel } from '../lib/transaction-status'
 import { useListQuery } from '@/hooks/useListQuery'
 import type { TransactionSummary, Direction, TransactionStatus } from '../types/transaction.types'
 import { formatDate } from '@/utils/format-date'
@@ -28,7 +29,7 @@ function directionOptionLabel(direction: Direction): string {
 }
 
 function statusOptionLabel(status: TransactionStatus): string {
-  return status === 'DRAFT' ? 'Draft' : 'Cancelled'
+  return transactionStatusLabel(status)
 }
 
 export default function TransactionsListPage() {
@@ -181,12 +182,30 @@ export default function TransactionsListPage() {
                   const value = event.target.value
                   setFilter('status', value ? value : undefined)
                 }}
-                className="w-44"
+                className="w-52"
               >
                 <option value="">All statuses</option>
                 <option value="DRAFT">{statusOptionLabel('DRAFT')}</option>
+                <option value="READY_FOR_PAYMENT">{statusOptionLabel('READY_FOR_PAYMENT')}</option>
+                <option value="PAID">{statusOptionLabel('PAID')}</option>
                 <option value="CANCELLED">{statusOptionLabel('CANCELLED')}</option>
               </Select>
+
+              <Button
+                type="button"
+                variant={params.filters?.status === 'READY_FOR_PAYMENT' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setFilter(
+                    'status',
+                    params.filters?.status === 'READY_FOR_PAYMENT'
+                      ? undefined
+                      : 'READY_FOR_PAYMENT',
+                  )
+                }}
+              >
+                Pending payment
+              </Button>
             </FilterBar>
 
             <DataTable

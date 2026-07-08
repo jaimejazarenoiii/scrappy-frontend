@@ -74,6 +74,12 @@ const TransactionDraftsPage = lazy(
   () => import('@/features/transactions/pages/TransactionDraftsPage'),
 )
 const TransactionEditPage = lazy(() => import('@/features/transactions/pages/TransactionEditPage'))
+const TransactionSettlementPage = lazy(
+  () => import('@/features/transactions/pages/TransactionSettlementPage'),
+)
+const TransactionReceiptPage = lazy(
+  () => import('@/features/transactions/pages/TransactionReceiptPage'),
+)
 
 export const router = createBrowserRouter([
   {
@@ -357,6 +363,14 @@ export const router = createBrowserRouter([
                   {
                     path: ROUTES.transactionDetail,
                     element: <TransactionDetailPage />,
+                  },
+                  {
+                    path: ROUTES.transactionSettlement,
+                    element: <TransactionSettlementPage />,
+                  },
+                  {
+                    path: ROUTES.transactionReceipt,
+                    element: <TransactionReceiptPage />,
                   },
                 ],
               },

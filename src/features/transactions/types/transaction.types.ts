@@ -11,7 +11,7 @@ export type DirectionLabel = 'BUY' | 'SELL'
 /** Accepted on create/update — the API normalizes to `Direction`. */
 export type DirectionInput = Direction | DirectionLabel
 
-export type TransactionStatus = 'DRAFT' | 'CANCELLED'
+export type TransactionStatus = 'DRAFT' | 'READY_FOR_PAYMENT' | 'PAID' | 'CANCELLED'
 export type LocationType = 'BRANCH' | 'WAREHOUSE' | 'OUTSIDE'
 export type ItemUnit = 'KG' | 'G' | 'TON' | 'LB' | 'PIECE' | 'BUNDLE' | 'SACK'
 export type AttachmentType = 'PHOTO'
@@ -54,6 +54,7 @@ interface TransactionBase {
   companyId: string
   createdByUserId: string
   updatedByUserId: string | null
+  transactionNumber: string | null
   direction: Direction
   directionLabel: DirectionLabel
   status: TransactionStatus
@@ -69,6 +70,14 @@ interface TransactionBase {
   notes: string | null
   cancellationReason: string | null
   cancelledAt: string | null
+  cancelledByUserId: string | null
+  submittedAt: string | null
+  submittedByUserId: string | null
+  paidAt: string | null
+  paidByUserId: string | null
+  reopenedAt: string | null
+  reopenedByUserId: string | null
+  reopenReason: string | null
   createdAt: string
   updatedAt: string
   /** Non-null = archived (soft delete). */
@@ -131,6 +140,53 @@ export type UpdateTransactionInput = Partial<
 
 export interface CancelTransactionInput {
   cancellationReason?: string
+}
+
+export interface SettleTransactionInput {
+  settlementNote?: string
+}
+
+export interface ReturnToDraftInput {
+  reason?: string
+}
+
+export interface ReopenTransactionInput {
+  reason: string
+}
+
+export interface TransactionReceiptItem {
+  materialName: string
+  weight: number
+  unit: ItemUnit
+  price: number
+  total: number
+  notes: string | null
+}
+
+export interface TransactionReceipt {
+  transactionNumber: string
+  company: { name: string }
+  direction: Direction
+  directionLabel: DirectionLabel
+  partyName: string
+  transactionDate: string
+  items: TransactionReceiptItem[]
+  grandTotal: number
+  paidByDisplayName: string
+  paidAt: string
+}
+
+export type SettlementTimelineAction =
+  'READY_FOR_PAYMENT' | 'PAID' | 'CANCELLED' | 'RETURNED_TO_DRAFT' | 'REOPENED'
+
+export interface SettlementTimelineEvent {
+  id: string
+  action: SettlementTimelineAction
+  actionLabel: string
+  actorUserId: string | null
+  actorDisplayName: string | null
+  occurredAt: string
+  notes: string | null
 }
 
 export interface TransactionListParams {

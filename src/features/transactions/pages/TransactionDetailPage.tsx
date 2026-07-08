@@ -1,6 +1,6 @@
-import { Edit3 } from 'lucide-react'
+import { Edit3, FileText, Receipt } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 
 import { DescriptionItem, DescriptionList } from '@/components/common/DescriptionList'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -15,6 +15,8 @@ import { PermissionGate } from '@/features/authorization/components/PermissionGa
 import { useFormatRecordEmployee } from '@/features/employees/hooks/useFormatRecordEmployee'
 import { useAuthStore } from '@/store/auth.store'
 import { TransactionDirectionBadge } from '../components/TransactionDirectionBadge'
+import { TransactionSettlementActions } from '../components/TransactionSettlementActions'
+import { TransactionSettlementSummary } from '../components/TransactionSettlementSummary'
 import { TransactionStatusBadge } from '../components/TransactionStatusBadge'
 import { useTransaction } from '../hooks/useTransaction'
 import { transactionAttachmentImageUrl } from '../lib/transaction-attachment-url'
@@ -23,6 +25,12 @@ import {
   formatTransactionDirectionAndParty,
   formatTransactionParty,
 } from '../lib/transaction-format'
+import { isDraftStatus, isPaidStatus } from '../lib/transaction-settlement'
+
+function formatActorLabel(userId: string | null | undefined): string {
+  if (!userId) return '—'
+  return `User ${userId.slice(0, 8)}…`
+}
 
 export default function TransactionDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -31,31 +39,32 @@ export default function TransactionDetailPage() {
   const transactionQuery = useTransaction(id)
   const accessToken = useAuthStore((state) => state.accessToken)
 
+  const tx = transactionQuery.data
+
   useEffect(() => {
-    document.title = 'Transaction Details | Scrappy'
-  }, [])
+    if (!tx) {
+      document.title = 'Transaction Details | Scrappy'
+      return
+    }
+    document.title = `${tx.status === 'READY_FOR_PAYMENT' ? 'Ready for Payment' : 'Transaction Details'} · ${formatTransactionDirectionAndParty(tx)} | Scrappy`
+  }, [tx])
 
   const assignedEmployeeLabels = useMemo(() => {
-    const tx = transactionQuery.data
     if (!tx) return []
     return tx.assignments.map((a) => formatEmployee({ employeeId: a.employeeId }))
-  }, [transactionQuery.data, formatEmployee])
+  }, [tx, formatEmployee])
 
   const locationLabel = useMemo(() => {
-    const tx = transactionQuery.data
     if (!tx) return undefined
 
     if (tx.locationType === 'BRANCH') return tx.branchId ?? '—'
     if (tx.locationType === 'WAREHOUSE') return tx.warehouseId ?? '—'
 
-    // Remaining case: OUTSIDE (type narrowed by the checks above).
     if (tx.outsideLocationName && tx.outsideAddress) {
       return `${tx.outsideLocationName} · ${tx.outsideAddress}`
     }
     return tx.outsideLocationName ?? tx.outsideAddress ?? '—'
-  }, [transactionQuery.data])
-
-  const tx = transactionQuery.data
+  }, [tx])
 
   return (
     <PageContainer maxWidth="lg">
@@ -75,23 +84,47 @@ export default function TransactionDetailPage() {
               title="Transaction details"
               description={formatTransactionDirectionAndParty(tx)}
               actions={
-                <PermissionGate permission={PERMISSIONS.transactions.update}>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      void navigate(buildRoute.transactionEdit(tx.id))
-                    }}
-                  >
-                    <Edit3 className="size-4" />
-                    Edit draft
+                <div className="flex flex-wrap items-center gap-2">
+                  <TransactionStatusBadge status={tx.status} />
+                  <Button type="button" variant="outline" size="sm" asChild>
+                    <Link to={buildRoute.transactionSettlement(tx.id)}>
+                      <FileText className="size-4" />
+                      Settlement
+                    </Link>
                   </Button>
-                </PermissionGate>
+                  {isPaidStatus(tx.status) ? (
+                    <Button type="button" variant="outline" size="sm" asChild>
+                      <Link to={buildRoute.transactionReceipt(tx.id)}>
+                        <Receipt className="size-4" />
+                        Receipt
+                      </Link>
+                    </Button>
+                  ) : null}
+                  <PermissionGate permission={PERMISSIONS.transactions.update}>
+                    {isDraftStatus(tx.status) ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          void navigate(buildRoute.transactionEdit(tx.id))
+                        }}
+                      >
+                        <Edit3 className="size-4" />
+                        Edit draft
+                      </Button>
+                    ) : null}
+                  </PermissionGate>
+                </div>
               }
             />
 
+            <TransactionSettlementActions transaction={tx} />
+
             <DescriptionList>
+              <DescriptionItem label="Transaction number">
+                {tx.transactionNumber ?? '—'}
+              </DescriptionItem>
               <DescriptionItem label="Status">
                 <TransactionStatusBadge status={tx.status} />
               </DescriptionItem>
@@ -111,8 +144,42 @@ export default function TransactionDetailPage() {
               </DescriptionItem>
               <DescriptionItem label="Items">{tx.items.length}</DescriptionItem>
               <DescriptionItem label="Photos">{tx.attachments.length}</DescriptionItem>
+              <DescriptionItem label="Total amount">
+                <span className="font-medium tabular-nums">{tx.totalAmount.toFixed(2)}</span>
+              </DescriptionItem>
+              {tx.submittedAt ? (
+                <DescriptionItem label="Submitted">
+                  {formatDate(tx.submittedAt)}
+                  {tx.submittedByUserId ? ` · ${formatActorLabel(tx.submittedByUserId)}` : null}
+                </DescriptionItem>
+              ) : null}
+              {isPaidStatus(tx.status) ? (
+                <>
+                  <DescriptionItem label="Paid at">
+                    {tx.paidAt ? formatDate(tx.paidAt) : '—'}
+                  </DescriptionItem>
+                  <DescriptionItem label="Paid by">
+                    {formatActorLabel(tx.paidByUserId)}
+                  </DescriptionItem>
+                </>
+              ) : null}
+              {tx.cancellationReason ? (
+                <DescriptionItem label="Cancellation reason">
+                  {tx.cancellationReason}
+                </DescriptionItem>
+              ) : null}
+              {tx.reopenReason ? (
+                <DescriptionItem label="Reopen reason">{tx.reopenReason}</DescriptionItem>
+              ) : null}
               <DescriptionItem label="Notes">{tx.notes?.trim() ? tx.notes : '—'}</DescriptionItem>
             </DescriptionList>
+
+            {isPaidStatus(tx.status) ? (
+              <section className="space-y-3">
+                <h2 className="text-lg font-semibold">Payment summary</h2>
+                <TransactionSettlementSummary transaction={tx} />
+              </section>
+            ) : null}
 
             {tx.attachments.length > 0 ? (
               <section className="space-y-3" aria-labelledby="transaction-detail-photos-heading">

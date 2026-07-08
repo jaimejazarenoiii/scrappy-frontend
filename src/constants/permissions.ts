@@ -70,6 +70,11 @@ export const PERMISSIONS = {
     view: 'transactions.view',
     create: 'transactions.create',
     update: 'transactions.update',
+    finish: 'transactions.finish',
+    settle: 'transactions.settle',
+    cancel: 'transactions.cancel',
+    returnToDraft: 'transactions.returnToDraft',
+    reopen: 'transactions.reopen',
   },
 } as const
 

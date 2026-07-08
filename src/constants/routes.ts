@@ -42,6 +42,8 @@ export const ROUTES = {
   transactionsDrafts: '/transactions/drafts',
   transactionDetail: '/transactions/:id',
   transactionEdit: '/transactions/:id/edit',
+  transactionSettlement: '/transactions/:id/settlement',
+  transactionReceipt: '/transactions/:id/receipt',
 } as const
 
 export const buildRoute = {
@@ -63,4 +65,6 @@ export const buildRoute = {
   payrollDetail: (id: string) => `/payroll/${id}`,
   transactionDetail: (id: string) => `/transactions/${id}`,
   transactionEdit: (id: string) => `/transactions/${id}/edit`,
+  transactionSettlement: (id: string) => `/transactions/${id}/settlement`,
+  transactionReceipt: (id: string) => `/transactions/${id}/receipt`,
 } as const

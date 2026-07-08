@@ -18,6 +18,7 @@ export const transactionKeys = {
   list: (scope: 'mine' | 'company', params: ListQueryParams) =>
     ['transactions', 'list', scope, params] as const,
   detail: (id: string) => ['transactions', 'detail', id] as const,
+  receipt: (id: string) => ['transactions', 'receipt', id] as const,
   drafts: (params: ListQueryParams) => ['transactions', 'drafts', params] as const,
 }
 

@@ -104,6 +104,11 @@ export default function TransactionEditPage() {
   const draftEditingAllowed = tx?.status === 'DRAFT'
 
   useEffect(() => {
+    if (!tx || tx.status === 'DRAFT') return
+    void navigate(buildRoute.transactionDetail(tx.id), { replace: true })
+  }, [tx, navigate])
+
+  useEffect(() => {
     if (!tx) return
     document.title = `Edit Draft · ${formatTransactionDirectionAndParty(tx)} | Scrappy`
   }, [tx])

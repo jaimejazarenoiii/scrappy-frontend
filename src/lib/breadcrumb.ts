@@ -38,6 +38,8 @@ const SEGMENT_LABELS: Record<string, string> = {
   payroll: 'Payroll',
   new: 'New',
   edit: 'Edit',
+  settlement: 'Settlement',
+  receipt: 'Receipt',
 }
 
 const ENTITY_PARENTS: Record<string, BreadcrumbEntityType> = {

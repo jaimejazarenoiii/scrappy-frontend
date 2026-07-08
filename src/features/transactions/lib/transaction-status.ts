@@ -6,6 +6,10 @@ export function transactionStatusLabel(status: TransactionStatus): string {
   switch (status) {
     case 'DRAFT':
       return 'Draft'
+    case 'READY_FOR_PAYMENT':
+      return 'Ready for payment'
+    case 'PAID':
+      return 'Paid'
     case 'CANCELLED':
       return 'Cancelled'
     default:
@@ -17,6 +21,10 @@ export function transactionStatusTone(status: TransactionStatus): StatusTone {
   switch (status) {
     case 'DRAFT':
       return 'neutral'
+    case 'READY_FOR_PAYMENT':
+      return 'archived'
+    case 'PAID':
+      return 'active'
     case 'CANCELLED':
       return 'inactive'
     default:

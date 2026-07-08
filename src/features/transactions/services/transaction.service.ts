@@ -9,10 +9,14 @@ import type {
   CreateTransactionItemInput,
   MaterialSuggestion,
   PriceSuggestion,
+  ReopenTransactionInput,
+  ReturnToDraftInput,
+  SettleTransactionInput,
   TransactionAttachment,
   TransactionDetail,
   TransactionItem,
   TransactionListParams,
+  TransactionReceipt,
   TransactionSummary,
   UpdateTransactionInput,
   UpdateTransactionItemInput,
@@ -26,6 +30,11 @@ export const TRANSACTION_ENDPOINTS = {
   assigned: `${BASE}/assigned`,
   detail: (id: string) => `${BASE}/${id}`,
   cancel: (id: string) => `${BASE}/${id}/cancel`,
+  finish: (id: string) => `${BASE}/${id}/finish`,
+  settle: (id: string) => `${BASE}/${id}/settle`,
+  returnToDraft: (id: string) => `${BASE}/${id}/return-to-draft`,
+  reopen: (id: string) => `${BASE}/${id}/reopen`,
+  receipt: (id: string) => `${BASE}/${id}/receipt`,
   archive: (id: string) => `${BASE}/${id}/archive`,
   items: (id: string) => `${BASE}/${id}/items`,
   item: (id: string, itemId: string) => `${BASE}/${id}/items/${itemId}`,
@@ -87,6 +96,44 @@ export const TransactionService = {
     const response = await apiClient.post<ApiEnvelope<TransactionDetail>>(
       TRANSACTION_ENDPOINTS.cancel(id),
       input,
+    )
+    return unwrap(response)
+  },
+
+  async finish(id: string): Promise<TransactionDetail> {
+    const response = await apiClient.post<ApiEnvelope<TransactionDetail>>(
+      TRANSACTION_ENDPOINTS.finish(id),
+    )
+    return unwrap(response)
+  },
+
+  async settle(id: string, input: SettleTransactionInput = {}): Promise<TransactionDetail> {
+    const response = await apiClient.post<ApiEnvelope<TransactionDetail>>(
+      TRANSACTION_ENDPOINTS.settle(id),
+      input,
+    )
+    return unwrap(response)
+  },
+
+  async returnToDraft(id: string, input: ReturnToDraftInput = {}): Promise<TransactionDetail> {
+    const response = await apiClient.post<ApiEnvelope<TransactionDetail>>(
+      TRANSACTION_ENDPOINTS.returnToDraft(id),
+      input,
+    )
+    return unwrap(response)
+  },
+
+  async reopen(id: string, input: ReopenTransactionInput): Promise<TransactionDetail> {
+    const response = await apiClient.post<ApiEnvelope<TransactionDetail>>(
+      TRANSACTION_ENDPOINTS.reopen(id),
+      input,
+    )
+    return unwrap(response)
+  },
+
+  async getReceipt(id: string): Promise<TransactionReceipt> {
+    const response = await apiClient.get<ApiEnvelope<TransactionReceipt>>(
+      TRANSACTION_ENDPOINTS.receipt(id),
     )
     return unwrap(response)
   },
