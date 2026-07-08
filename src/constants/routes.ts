@@ -13,6 +13,18 @@ export const ROUTES = {
   employeeNew: '/employees/new',
   employeeDetail: '/employees/:id',
   employeeEdit: '/employees/:id/edit',
+  branches: '/branches',
+  branchNew: '/branches/new',
+  branchDetail: '/branches/:id',
+  branchEdit: '/branches/:id/edit',
+  warehouses: '/warehouses',
+  warehouseNew: '/warehouses/new',
+  warehouseDetail: '/warehouses/:id',
+  warehouseEdit: '/warehouses/:id/edit',
+  vehicles: '/vehicles',
+  vehicleNew: '/vehicles/new',
+  vehicleDetail: '/vehicles/:id',
+  vehicleEdit: '/vehicles/:id/edit',
 } as const
 
 export const buildRoute = {
@@ -20,4 +32,10 @@ export const buildRoute = {
   userEdit: (id: string) => `/users/${id}/edit`,
   employeeDetail: (id: string) => `/employees/${id}`,
   employeeEdit: (id: string) => `/employees/${id}/edit`,
+  branchDetail: (id: string) => `/branches/${id}`,
+  branchEdit: (id: string) => `/branches/${id}/edit`,
+  warehouseDetail: (id: string) => `/warehouses/${id}`,
+  warehouseEdit: (id: string) => `/warehouses/${id}/edit`,
+  vehicleDetail: (id: string) => `/vehicles/${id}`,
+  vehicleEdit: (id: string) => `/vehicles/${id}/edit`,
 } as const

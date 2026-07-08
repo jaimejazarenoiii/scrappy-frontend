@@ -22,6 +22,21 @@ const EmployeeCreatePage = lazy(() => import('@/features/employees/pages/Employe
 const EmployeeDetailPage = lazy(() => import('@/features/employees/pages/EmployeeDetailPage'))
 const EmployeeEditPage = lazy(() => import('@/features/employees/pages/EmployeeEditPage'))
 
+const BranchesListPage = lazy(() => import('@/features/branches/pages/BranchesListPage'))
+const BranchCreatePage = lazy(() => import('@/features/branches/pages/BranchCreatePage'))
+const BranchDetailPage = lazy(() => import('@/features/branches/pages/BranchDetailPage'))
+const BranchEditPage = lazy(() => import('@/features/branches/pages/BranchEditPage'))
+
+const WarehousesListPage = lazy(() => import('@/features/warehouses/pages/WarehousesListPage'))
+const WarehouseCreatePage = lazy(() => import('@/features/warehouses/pages/WarehouseCreatePage'))
+const WarehouseDetailPage = lazy(() => import('@/features/warehouses/pages/WarehouseDetailPage'))
+const WarehouseEditPage = lazy(() => import('@/features/warehouses/pages/WarehouseEditPage'))
+
+const VehiclesListPage = lazy(() => import('@/features/vehicles/pages/VehiclesListPage'))
+const VehicleCreatePage = lazy(() => import('@/features/vehicles/pages/VehicleCreatePage'))
+const VehicleDetailPage = lazy(() => import('@/features/vehicles/pages/VehicleDetailPage'))
+const VehicleEditPage = lazy(() => import('@/features/vehicles/pages/VehicleEditPage'))
+
 export const router = createBrowserRouter([
   {
     path: ROUTES.home,
@@ -106,6 +121,99 @@ export const router = createBrowserRouter([
                   {
                     path: ROUTES.employeeEdit,
                     element: <EmployeeEditPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.branch.view]} />,
+                children: [
+                  {
+                    path: ROUTES.branches,
+                    element: <BranchesListPage />,
+                  },
+                  {
+                    path: ROUTES.branchDetail,
+                    element: <BranchDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.branch.create]} />,
+                children: [
+                  {
+                    path: ROUTES.branchNew,
+                    element: <BranchCreatePage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.branch.update]} />,
+                children: [
+                  {
+                    path: ROUTES.branchEdit,
+                    element: <BranchEditPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.warehouse.view]} />,
+                children: [
+                  {
+                    path: ROUTES.warehouses,
+                    element: <WarehousesListPage />,
+                  },
+                  {
+                    path: ROUTES.warehouseDetail,
+                    element: <WarehouseDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.warehouse.create]} />,
+                children: [
+                  {
+                    path: ROUTES.warehouseNew,
+                    element: <WarehouseCreatePage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.warehouse.update]} />,
+                children: [
+                  {
+                    path: ROUTES.warehouseEdit,
+                    element: <WarehouseEditPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.vehicle.view]} />,
+                children: [
+                  {
+                    path: ROUTES.vehicles,
+                    element: <VehiclesListPage />,
+                  },
+                  {
+                    path: ROUTES.vehicleDetail,
+                    element: <VehicleDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.vehicle.create]} />,
+                children: [
+                  {
+                    path: ROUTES.vehicleNew,
+                    element: <VehicleCreatePage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.vehicle.update]} />,
+                children: [
+                  {
+                    path: ROUTES.vehicleEdit,
+                    element: <VehicleEditPage />,
                   },
                 ],
               },

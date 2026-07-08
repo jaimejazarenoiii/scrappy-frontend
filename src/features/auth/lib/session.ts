@@ -16,15 +16,26 @@ const ALL_PERMISSIONS: string[] = [
   ...Object.values(PERMISSIONS.company),
   ...Object.values(PERMISSIONS.user),
   ...Object.values(PERMISSIONS.employee),
+  ...Object.values(PERMISSIONS.branch),
+  ...Object.values(PERMISSIONS.warehouse),
+  ...Object.values(PERMISSIONS.vehicle),
 ]
 
 const MANAGER_PERMISSIONS: string[] = [
   PERMISSIONS.company.view,
   ...Object.values(PERMISSIONS.user),
   ...Object.values(PERMISSIONS.employee),
+  ...Object.values(PERMISSIONS.branch),
+  ...Object.values(PERMISSIONS.warehouse),
+  ...Object.values(PERMISSIONS.vehicle),
 ]
 
-const EMPLOYEE_PERMISSIONS: string[] = [PERMISSIONS.employee.view]
+const EMPLOYEE_PERMISSIONS: string[] = [
+  PERMISSIONS.employee.view,
+  PERMISSIONS.branch.view,
+  PERMISSIONS.warehouse.view,
+  PERMISSIONS.vehicle.view,
+]
 
 const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   OWNER: ALL_PERMISSIONS,

@@ -1,4 +1,4 @@
-import { Building2, Contact, LayoutDashboard } from 'lucide-react'
+import { Building2, Contact, LayoutDashboard, MapPin, Truck, Warehouse } from 'lucide-react'
 
 import { PERMISSIONS } from '@/constants/permissions'
 import { ROUTES } from '@/constants/routes'
@@ -24,5 +24,26 @@ export const navigationItems: NavigationItem[] = [
     href: ROUTES.employees,
     icon: Contact,
     anyOf: [PERMISSIONS.employee.view],
+  },
+  {
+    id: 'branches',
+    label: 'Branches',
+    href: ROUTES.branches,
+    icon: MapPin,
+    anyOf: [PERMISSIONS.branch.view],
+  },
+  {
+    id: 'warehouses',
+    label: 'Warehouses',
+    href: ROUTES.warehouses,
+    icon: Warehouse,
+    anyOf: [PERMISSIONS.warehouse.view],
+  },
+  {
+    id: 'vehicles',
+    label: 'Vehicles',
+    href: ROUTES.vehicles,
+    icon: Truck,
+    anyOf: [PERMISSIONS.vehicle.view],
   },
 ]

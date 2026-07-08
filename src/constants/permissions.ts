@@ -23,9 +23,30 @@ export const PERMISSIONS = {
     update: 'employee.update',
     archive: 'employee.archive',
   },
+  branch: {
+    view: 'branch.view',
+    create: 'branch.create',
+    update: 'branch.update',
+    archive: 'branch.archive',
+  },
+  warehouse: {
+    view: 'warehouse.view',
+    create: 'warehouse.create',
+    update: 'warehouse.update',
+    archive: 'warehouse.archive',
+  },
+  vehicle: {
+    view: 'vehicle.view',
+    create: 'vehicle.create',
+    update: 'vehicle.update',
+    archive: 'vehicle.archive',
+  },
 } as const
 
 export type PermissionKey =
   | (typeof PERMISSIONS.company)[keyof typeof PERMISSIONS.company]
   | (typeof PERMISSIONS.user)[keyof typeof PERMISSIONS.user]
   | (typeof PERMISSIONS.employee)[keyof typeof PERMISSIONS.employee]
+  | (typeof PERMISSIONS.branch)[keyof typeof PERMISSIONS.branch]
+  | (typeof PERMISSIONS.warehouse)[keyof typeof PERMISSIONS.warehouse]
+  | (typeof PERMISSIONS.vehicle)[keyof typeof PERMISSIONS.vehicle]
