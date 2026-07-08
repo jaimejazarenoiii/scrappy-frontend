@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/feedback/EmptyState'
 
 export default function DashboardPage() {
   useEffect(() => {
-    document.title = 'Dashboard | Scrappy Web'
+    document.title = 'Dashboard | Scrappy'
   }, [])
 
   return (
@@ -20,7 +20,7 @@ export default function DashboardPage() {
         />
         <EmptyState
           icon={LayoutDashboard}
-          title="Welcome to Scrappy Web"
+          title="Welcome to Scrappy"
           description="Business modules will appear here as features are implemented."
         />
       </div>

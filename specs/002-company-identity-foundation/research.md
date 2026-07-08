@@ -1,6 +1,6 @@
 # Phase 0 Research: Company & Identity Foundation
 
-All decisions comply with the Scrappy Web Constitution and reuse the Specification 001
+All decisions comply with the Scrappy Constitution and reuse the Specification 001
 foundation. No new dependencies are introduced.
 
 ## R-001 — Token storage & "remember session"

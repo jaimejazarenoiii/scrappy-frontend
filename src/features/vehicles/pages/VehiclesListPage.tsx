@@ -31,7 +31,7 @@ export default function VehiclesListPage() {
   const vehiclesQuery = useVehicles(params)
 
   useEffect(() => {
-    document.title = 'Vehicles | Scrappy Web'
+    document.title = 'Vehicles | Scrappy'
   }, [])
 
   const columns = useMemo<ColumnDef<Vehicle>[]>(

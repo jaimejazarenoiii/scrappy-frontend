@@ -4,7 +4,7 @@ import { LoginForm } from '@/features/auth/components/LoginForm'
 
 export default function LoginPage() {
   useEffect(() => {
-    document.title = 'Sign In | Scrappy Web'
+    document.title = 'Sign In | Scrappy'
   }, [])
 
   return <LoginForm />

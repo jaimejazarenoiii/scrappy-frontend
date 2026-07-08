@@ -1,4 +1,4 @@
-# Feature Specification: Initialize Scrappy Web
+# Feature Specification: Initialize Scrappy
 
 **Feature Branch**: `001-initialize-scrappy-web`
 
@@ -6,11 +6,11 @@
 
 **Status**: Draft
 
-**Input**: User description: "Initialize the Scrappy Web frontend application with a scalable, production-ready architecture following the Scrappy Web Constitution. Foundation only — no business functionality."
+**Input**: User description: "Initialize the Scrappy frontend application with a scalable, production-ready architecture following the Scrappy Constitution. Foundation only — no business functionality."
 
 ## Purpose _(mandatory — Constitution Principle XXII)_
 
-Scrappy Web is the administrative web application for the Scrappy Junkshop Management
+Scrappy is the administrative web application for the Scrappy Junkshop Management
 System. Before any business modules (starting with Company & Identity Foundation in
 Specification 002) can be built, the project needs a consistent, production-ready
 foundation.
@@ -34,7 +34,7 @@ communication, authentication logic, and all business modules.
 
 ### User Story 1 - Developer Bootstraps the Project (Priority: P1)
 
-As a developer joining the Scrappy Web project, I need to clone the repository, install
+As a developer joining the Scrappy project, I need to clone the repository, install
 dependencies, and run the application locally so I can begin building features on a
 verified foundation.
 
@@ -83,7 +83,7 @@ correct layout rendering, browser back/forward, and bookmarkability.
 
 ### User Story 3 - Responsive Layout Adapts Across Devices (Priority: P2)
 
-As a user accessing Scrappy Web from different devices, I need the dashboard shell to
+As a user accessing Scrappy from different devices, I need the dashboard shell to
 adapt its navigation and layout so the application remains usable on mobile, tablet, and
 desktop.
 
@@ -168,7 +168,7 @@ renders user-friendly content.
 ### Functional Requirements
 
 - **FR-001**: The system MUST initialize a production-ready frontend application
-  following the Scrappy Web Constitution feature-based architecture.
+  following the Scrappy Constitution feature-based architecture.
 - **FR-002**: The system MUST configure initial routes at `/`, `/login`, `/dashboard`,
   and a dedicated `/404` (or catch-all) not-found route using URL-based navigation.
 - **FR-003**: The system MUST provide `AuthLayout` for authentication pages and
@@ -246,7 +246,7 @@ No backend API dependencies for this feature.
 ### Empty State Design _(mandatory — Constitution Principle XXXIV)_
 
 - **Dashboard placeholder**: Icon — application logo or dashboard icon; Message — "Welcome
-  to Scrappy Web"; Primary action — none required (foundation only); Guidance — "Business
+  to Scrappy"; Primary action — none required (foundation only); Guidance — "Business
   modules will appear here as features are implemented."
 - **Navigation placeholders**: Message — section labels visible; links may route to
   placeholder pages or show "coming soon" state without breaking layout.

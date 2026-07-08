@@ -31,7 +31,7 @@ export default function BranchesListPage() {
   const branchesQuery = useBranches(params)
 
   useEffect(() => {
-    document.title = 'Branches | Scrappy Web'
+    document.title = 'Branches | Scrappy'
   }, [])
 
   const columns = useMemo<ColumnDef<Branch>[]>(

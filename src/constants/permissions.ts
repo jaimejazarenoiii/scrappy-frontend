@@ -41,6 +41,31 @@ export const PERMISSIONS = {
     update: 'vehicle.update',
     archive: 'vehicle.archive',
   },
+  attendance: {
+    view: 'attendance.view',
+    timeIn: 'attendance.timeIn',
+    timeOut: 'attendance.timeOut',
+    correct: 'attendance.correct',
+  },
+  leave: {
+    view: 'leave.view',
+    create: 'leave.create',
+    update: 'leave.update',
+    cancel: 'leave.cancel',
+    approve: 'leave.approve',
+    reject: 'leave.reject',
+  },
+  cashAdvance: {
+    view: 'cashAdvance.view',
+    create: 'cashAdvance.create',
+    update: 'cashAdvance.update',
+    cancel: 'cashAdvance.cancel',
+    approve: 'cashAdvance.approve',
+    reject: 'cashAdvance.reject',
+  },
+  payroll: {
+    view: 'payroll.view',
+  },
 } as const
 
 export type PermissionKey =
@@ -50,3 +75,7 @@ export type PermissionKey =
   | (typeof PERMISSIONS.branch)[keyof typeof PERMISSIONS.branch]
   | (typeof PERMISSIONS.warehouse)[keyof typeof PERMISSIONS.warehouse]
   | (typeof PERMISSIONS.vehicle)[keyof typeof PERMISSIONS.vehicle]
+  | (typeof PERMISSIONS.attendance)[keyof typeof PERMISSIONS.attendance]
+  | (typeof PERMISSIONS.leave)[keyof typeof PERMISSIONS.leave]
+  | (typeof PERMISSIONS.cashAdvance)[keyof typeof PERMISSIONS.cashAdvance]
+  | (typeof PERMISSIONS.payroll)[keyof typeof PERMISSIONS.payroll]

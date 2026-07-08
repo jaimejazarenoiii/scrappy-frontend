@@ -18,7 +18,7 @@ export default function VehicleCreatePage() {
   const [apiError, setApiError] = useState<NormalizedApiError | null>(null)
 
   useEffect(() => {
-    document.title = 'New vehicle | Scrappy Web'
+    document.title = 'New vehicle | Scrappy'
   }, [])
 
   function handleSubmit(values: VehicleFormValues) {

@@ -18,7 +18,7 @@ export default function BranchCreatePage() {
   const [apiError, setApiError] = useState<NormalizedApiError | null>(null)
 
   useEffect(() => {
-    document.title = 'New branch | Scrappy Web'
+    document.title = 'New branch | Scrappy'
   }, [])
 
   function handleSubmit(values: BranchFormValues) {

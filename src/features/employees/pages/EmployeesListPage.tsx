@@ -18,7 +18,7 @@ import { PERMISSIONS } from '@/constants/permissions'
 import { buildRoute, ROUTES } from '@/constants/routes'
 import { PermissionGate } from '@/features/authorization/components/PermissionGate'
 import { useListQuery } from '@/hooks/useListQuery'
-import { formatEmployeeName, isEmployeeArchived } from '../lib/employee-display'
+import { formatEmployeeBreadcrumbLabel, isEmployeeArchived } from '../lib/employee-display'
 import { useEmployees } from '../hooks/useEmployees'
 import type { Employee } from '../types/employee.types'
 
@@ -32,6 +32,15 @@ function employeeStatusLabel(employee: Employee): string {
   return employee.status.toLowerCase()
 }
 
+function formatEmployeeListLabel(employee: Employee): string {
+  return formatEmployeeBreadcrumbLabel({
+    id: employee.id,
+    firstName: employee.firstName,
+    lastName: employee.lastName,
+    employeeNumber: employee.employeeNumber,
+  })
+}
+
 export default function EmployeesListPage() {
   const navigate = useNavigate()
   const { params, setSearch, setPage, setSort, setFilter } = useListQuery({
@@ -40,7 +49,7 @@ export default function EmployeesListPage() {
   const employeesQuery = useEmployees(params)
 
   useEffect(() => {
-    document.title = 'Employees | Scrappy Web'
+    document.title = 'Employees | Scrappy'
   }, [])
 
   const columns = useMemo<ColumnDef<Employee>[]>(
@@ -49,7 +58,9 @@ export default function EmployeesListPage() {
         id: 'name',
         accessorKey: 'name',
         header: 'Name',
-        cell: ({ row }) => <span className="font-medium">{formatEmployeeName(row.original)}</span>,
+        cell: ({ row }) => (
+          <span className="font-medium">{formatEmployeeListLabel(row.original)}</span>
+        ),
       },
       {
         id: 'employeeNumber',
@@ -84,7 +95,7 @@ export default function EmployeesListPage() {
         header: '',
         enableSorting: false,
         cell: ({ row }) => {
-          const name = formatEmployeeName(row.original)
+          const name = formatEmployeeListLabel(row.original)
           return (
             <div className="flex justify-end gap-1">
               <Button
@@ -196,7 +207,7 @@ export default function EmployeesListPage() {
                 <Card className="gap-3 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate font-medium">{formatEmployeeName(employee)}</p>
+                      <p className="truncate font-medium">{formatEmployeeListLabel(employee)}</p>
                       <p className="text-muted-foreground truncate text-sm">
                         {employee.employeeNumber ?? employee.contactNumber ?? '—'}
                       </p>

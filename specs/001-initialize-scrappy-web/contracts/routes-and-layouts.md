@@ -7,13 +7,13 @@
 
 ## Route Table
 
-| Path           | Component               | Layout            | Lazy | Guard              | Document Title                |
-| -------------- | ----------------------- | ----------------- | ---- | ------------------ | ----------------------------- |
-| `/`            | Redirect → `/dashboard` | —                 | No   | —                  | —                             |
-| `/login`       | `LoginPage`             | `AuthLayout`      | Yes  | —                  | Sign In \| Scrappy Web        |
-| `/dashboard`   | `DashboardPage`         | `DashboardLayout` | Yes  | `AuthGuard` (stub) | Dashboard \| Scrappy Web      |
-| `/coming-soon` | `ComingSoonPage`        | `DashboardLayout` | Yes  | `AuthGuard` (stub) | Coming Soon \| Scrappy Web    |
-| `*`            | `NotFoundPage`          | —                 | Yes  | —                  | Page Not Found \| Scrappy Web |
+| Path           | Component               | Layout            | Lazy | Guard              | Document Title            |
+| -------------- | ----------------------- | ----------------- | ---- | ------------------ | ------------------------- |
+| `/`            | Redirect → `/dashboard` | —                 | No   | —                  | —                         |
+| `/login`       | `LoginPage`             | `AuthLayout`      | Yes  | —                  | Sign In \| Scrappy        |
+| `/dashboard`   | `DashboardPage`         | `DashboardLayout` | Yes  | `AuthGuard` (stub) | Dashboard \| Scrappy      |
+| `/coming-soon` | `ComingSoonPage`        | `DashboardLayout` | Yes  | `AuthGuard` (stub) | Coming Soon \| Scrappy    |
+| `*`            | `NotFoundPage`          | —                 | Yes  | —                  | Page Not Found \| Scrappy |
 
 ---
 

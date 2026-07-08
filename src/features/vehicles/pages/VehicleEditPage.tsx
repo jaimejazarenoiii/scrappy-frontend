@@ -23,7 +23,7 @@ export default function VehicleEditPage() {
   const [apiError, setApiError] = useState<NormalizedApiError | null>(null)
 
   useEffect(() => {
-    document.title = 'Edit vehicle | Scrappy Web'
+    document.title = 'Edit vehicle | Scrappy'
   }, [])
 
   if (vehicleQuery.isLoading) {

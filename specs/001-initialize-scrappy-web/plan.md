@@ -1,4 +1,4 @@
-# Implementation Plan: Initialize Scrappy Web
+# Implementation Plan: Initialize Scrappy
 
 **Branch**: `001-initialize-scrappy-web` | **Date**: 2026-07-07 | **Spec**: [spec.md](./spec.md)
 
@@ -11,7 +11,7 @@ extensible; no placeholder implementations for future business modules are intro
 
 ## Summary
 
-Initialize Scrappy Web as a production-ready React 19 application using Vite, TypeScript
+Initialize Scrappy as a production-ready React 19 application using Vite, TypeScript
 (strict), Tailwind CSS v4, and shadcn/ui. Establish feature-based folder architecture,
 data router with nested layouts, responsive dashboard shell, theme/query/state/API
 foundations, shared UI primitives, error/loading patterns, and development tooling.
@@ -46,7 +46,7 @@ compatible, and constitution-compliant.
 
 **Target Platform**: Modern browsers, mobile-first responsive (320px–1536px+)
 
-**Project Type**: Administrative web application foundation (Scrappy Web)
+**Project Type**: Administrative web application foundation (Scrappy)
 
 **Performance Goals**: Route lazy loading, code splitting, tree shaking, production build
 < 500KB initial JS gzip (target, not blocking)

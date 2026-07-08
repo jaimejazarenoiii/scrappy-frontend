@@ -7,7 +7,7 @@ export function AuthLayout() {
     <div className="from-background via-muted/30 to-background flex min-h-screen items-center justify-center bg-gradient-to-br p-4">
       <Card className="w-full max-w-md shadow-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Scrappy Web</CardTitle>
+          <CardTitle className="text-xl">Scrappy</CardTitle>
         </CardHeader>
         <CardContent>
           <Outlet />

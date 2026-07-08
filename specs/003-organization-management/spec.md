@@ -6,11 +6,11 @@
 
 **Status**: Draft
 
-**Input**: User description: "Create Specification 003 – Organization Management for Scrappy Web, corresponding to Backend P002 – Organization Management (Branches, Warehouses, Vehicles)."
+**Input**: User description: "Create Specification 003 – Organization Management for Scrappy, corresponding to Backend P002 – Organization Management (Branches, Warehouses, Vehicles)."
 
 ## Purpose _(mandatory — Constitution Principle XXII)_
 
-Scrappy Web must model the physical and logistical structure of a junkshop business before
+Scrappy must model the physical and logistical structure of a junkshop business before
 workforce scheduling, transactions, trips, and financial workflows can operate correctly.
 This specification delivers the frontend for **Backend P002 — Organization Management**,
 enabling authorized users to administer **branches**, **warehouses**, and **vehicles**

@@ -11,7 +11,7 @@ export default function ForbiddenPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    document.title = 'Access Denied | Scrappy Web'
+    document.title = 'Access Denied | Scrappy'
   }, [])
 
   return (

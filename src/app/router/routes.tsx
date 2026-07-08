@@ -37,6 +37,30 @@ const VehicleCreatePage = lazy(() => import('@/features/vehicles/pages/VehicleCr
 const VehicleDetailPage = lazy(() => import('@/features/vehicles/pages/VehicleDetailPage'))
 const VehicleEditPage = lazy(() => import('@/features/vehicles/pages/VehicleEditPage'))
 
+const AttendanceDashboardPage = lazy(
+  () => import('@/features/attendance/pages/AttendanceDashboardPage'),
+)
+const AttendanceDetailPage = lazy(() => import('@/features/attendance/pages/AttendanceDetailPage'))
+
+const LeaveListPage = lazy(() => import('@/features/leave/pages/LeaveListPage'))
+const LeaveCreatePage = lazy(() => import('@/features/leave/pages/LeaveCreatePage'))
+const LeaveDetailPage = lazy(() => import('@/features/leave/pages/LeaveDetailPage'))
+const LeaveEditPage = lazy(() => import('@/features/leave/pages/LeaveEditPage'))
+
+const CashAdvancesListPage = lazy(
+  () => import('@/features/cash-advances/pages/CashAdvancesListPage'),
+)
+const CashAdvanceCreatePage = lazy(
+  () => import('@/features/cash-advances/pages/CashAdvanceCreatePage'),
+)
+const CashAdvanceDetailPage = lazy(
+  () => import('@/features/cash-advances/pages/CashAdvanceDetailPage'),
+)
+const CashAdvanceEditPage = lazy(() => import('@/features/cash-advances/pages/CashAdvanceEditPage'))
+
+const PayrollListPage = lazy(() => import('@/features/payroll/pages/PayrollListPage'))
+const PayrollDetailPage = lazy(() => import('@/features/payroll/pages/PayrollDetailPage'))
+
 export const router = createBrowserRouter([
   {
     path: ROUTES.home,
@@ -214,6 +238,94 @@ export const router = createBrowserRouter([
                   {
                     path: ROUTES.vehicleEdit,
                     element: <VehicleEditPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.attendance.view]} />,
+                children: [
+                  {
+                    path: ROUTES.attendance,
+                    element: <AttendanceDashboardPage />,
+                  },
+                  {
+                    path: ROUTES.attendanceDetail,
+                    element: <AttendanceDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.leave.view]} />,
+                children: [
+                  {
+                    path: ROUTES.leave,
+                    element: <LeaveListPage />,
+                  },
+                  {
+                    path: ROUTES.leaveDetail,
+                    element: <LeaveDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.leave.create]} />,
+                children: [
+                  {
+                    path: ROUTES.leaveNew,
+                    element: <LeaveCreatePage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.leave.update]} />,
+                children: [
+                  {
+                    path: ROUTES.leaveEdit,
+                    element: <LeaveEditPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.cashAdvance.view]} />,
+                children: [
+                  {
+                    path: ROUTES.cashAdvances,
+                    element: <CashAdvancesListPage />,
+                  },
+                  {
+                    path: ROUTES.cashAdvanceDetail,
+                    element: <CashAdvanceDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.cashAdvance.create]} />,
+                children: [
+                  {
+                    path: ROUTES.cashAdvanceNew,
+                    element: <CashAdvanceCreatePage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.cashAdvance.update]} />,
+                children: [
+                  {
+                    path: ROUTES.cashAdvanceEdit,
+                    element: <CashAdvanceEditPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.payroll.view]} />,
+                children: [
+                  {
+                    path: ROUTES.payroll,
+                    element: <PayrollListPage />,
+                  },
+                  {
+                    path: ROUTES.payrollDetail,
+                    element: <PayrollDetailPage />,
                   },
                 ],
               },

@@ -14,7 +14,7 @@ export default function EmployeeCreatePage() {
   const createEmployee = useCreateEmployee()
 
   useEffect(() => {
-    document.title = 'New employee | Scrappy Web'
+    document.title = 'New employee | Scrappy'
   }, [])
 
   return (

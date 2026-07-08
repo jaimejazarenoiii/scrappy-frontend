@@ -18,7 +18,7 @@ export default function CompanyPage() {
   const canEdit = has(PERMISSIONS.company.update)
 
   useEffect(() => {
-    document.title = 'Company | Scrappy Web'
+    document.title = 'Company | Scrappy'
   }, [])
 
   if (companyQuery.isLoading) {

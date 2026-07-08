@@ -6,11 +6,11 @@
 
 **Status**: Draft
 
-**Input**: User description: "Create Specification 002 – Company & Identity Foundation for Scrappy Web, corresponding to Backend P001 (Company, Authentication, Authorization/RBAC, Users, Employees, Tenant Isolation)."
+**Input**: User description: "Create Specification 002 – Company & Identity Foundation for Scrappy, corresponding to Backend P001 (Company, Authentication, Authorization/RBAC, Users, Employees, Tenant Isolation)."
 
 ## Purpose _(mandatory — Constitution Principle XXII)_
 
-Scrappy Web needs its first business capability: the identity and company foundation that
+Scrappy needs its first business capability: the identity and company foundation that
 every later module depends on. This specification delivers the frontend for **Backend
 P001 — Company & Identity Foundation**, enabling administrators to sign in securely,
 operate within their company (tenant) context, manage who can access the system and what
@@ -397,7 +397,7 @@ published contract during planning.
 ### Empty State Design _(mandatory — Constitution Principle XXXIV)_
 
 - **Users**: Icon — users/identity icon; Message — "No users yet"; Primary action — "Create
-  User" (if permitted); Guidance — "Add your first user to grant access to Scrappy Web."
+  User" (if permitted); Guidance — "Add your first user to grant access to Scrappy."
 - **Users (filtered)**: Icon — search icon; Message — "No users match your filters";
   Primary action — "Clear filters"; Guidance — "Try adjusting your search or filters."
 - **Employees**: Icon — employee/ID icon; Message — "No employees yet"; Primary action —

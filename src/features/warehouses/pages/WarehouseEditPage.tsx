@@ -23,7 +23,7 @@ export default function WarehouseEditPage() {
   const [apiError, setApiError] = useState<NormalizedApiError | null>(null)
 
   useEffect(() => {
-    document.title = 'Edit warehouse | Scrappy Web'
+    document.title = 'Edit warehouse | Scrappy'
   }, [])
 
   if (warehouseQuery.isLoading) {

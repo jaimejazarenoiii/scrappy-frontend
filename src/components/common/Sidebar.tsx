@@ -65,7 +65,7 @@ function DesktopSidebar() {
     >
       <div className="flex h-14 items-center border-b px-4">
         {!sidebarCollapsed || !isTablet ? (
-          <span className="font-semibold">Scrappy Web</span>
+          <span className="font-semibold">Scrappy</span>
         ) : (
           <span className="mx-auto font-bold">S</span>
         )}
@@ -103,7 +103,7 @@ function MobileSidebar() {
     >
       <SheetContent side="left" className="bg-sidebar text-sidebar-foreground w-72 p-0">
         <SheetHeader className="border-b">
-          <SheetTitle>Scrappy Web</SheetTitle>
+          <SheetTitle>Scrappy</SheetTitle>
         </SheetHeader>
         <NavItems onNavigate={closeMobileNav} />
       </SheetContent>

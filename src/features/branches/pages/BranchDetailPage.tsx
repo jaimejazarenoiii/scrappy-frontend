@@ -28,7 +28,7 @@ export default function BranchDetailPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   useEffect(() => {
-    document.title = 'Branch details | Scrappy Web'
+    document.title = 'Branch details | Scrappy'
   }, [])
 
   if (branchQuery.isLoading) {

@@ -20,7 +20,7 @@ description: 'Task list template for feature implementation'
 
 ## Path Conventions
 
-Scrappy Web uses feature-based paths at repository root:
+Scrappy uses feature-based paths at repository root:
 
 - Feature code: `src/features/[feature-name]/`
 - Shared UI: `src/components/ui/`

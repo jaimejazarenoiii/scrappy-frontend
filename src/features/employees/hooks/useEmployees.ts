@@ -8,6 +8,7 @@ export const employeeKeys = {
   all: ['employees'] as const,
   list: (params: ListQueryParams) => ['employees', 'list', params] as const,
   detail: (id: string) => ['employees', 'detail', id] as const,
+  picker: ['employees', 'picker'] as const,
 }
 
 export function useEmployees(params: ListQueryParams) {

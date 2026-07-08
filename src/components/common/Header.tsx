@@ -33,7 +33,7 @@ export function Header() {
         >
           <Menu className="size-5" />
         </Button>
-        <div className="font-semibold lg:hidden">Scrappy Web</div>
+        <div className="font-semibold lg:hidden">Scrappy</div>
         {tenant?.companyName ? (
           <span className="text-muted-foreground hidden text-sm lg:inline">
             {tenant.companyName}

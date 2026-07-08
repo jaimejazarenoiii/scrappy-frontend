@@ -6,7 +6,7 @@ import { ROUTES } from '@/constants/routes'
 
 export default function NotFoundPage() {
   useEffect(() => {
-    document.title = 'Page Not Found | Scrappy Web'
+    document.title = 'Page Not Found | Scrappy'
   }, [])
 
   return (

@@ -1,4 +1,4 @@
-# Quickstart: Initialize Scrappy Web
+# Quickstart: Initialize Scrappy
 
 **Feature**: 001-initialize-scrappy-web
 **Date**: 2026-07-07

@@ -18,7 +18,7 @@ export default function WarehouseCreatePage() {
   const [apiError, setApiError] = useState<NormalizedApiError | null>(null)
 
   useEffect(() => {
-    document.title = 'New warehouse | Scrappy Web'
+    document.title = 'New warehouse | Scrappy'
   }, [])
 
   function handleSubmit(values: WarehouseFormValues) {

@@ -31,7 +31,7 @@ export default function WarehousesListPage() {
   const warehousesQuery = useWarehouses(params)
 
   useEffect(() => {
-    document.title = 'Warehouses | Scrappy Web'
+    document.title = 'Warehouses | Scrappy'
   }, [])
 
   const columns = useMemo<ColumnDef<Warehouse>[]>(

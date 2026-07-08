@@ -32,7 +32,7 @@ export default function WarehouseDetailPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   useEffect(() => {
-    document.title = 'Warehouse details | Scrappy Web'
+    document.title = 'Warehouse details | Scrappy'
   }, [])
 
   if (warehouseQuery.isLoading) {

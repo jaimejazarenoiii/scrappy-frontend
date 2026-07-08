@@ -1,4 +1,15 @@
-import { Building2, Contact, LayoutDashboard, MapPin, Truck, Warehouse } from 'lucide-react'
+import {
+  Banknote,
+  Building2,
+  CalendarDays,
+  Clock,
+  Contact,
+  LayoutDashboard,
+  MapPin,
+  Truck,
+  Wallet,
+  Warehouse,
+} from 'lucide-react'
 
 import { PERMISSIONS } from '@/constants/permissions'
 import { ROUTES } from '@/constants/routes'
@@ -45,5 +56,33 @@ export const navigationItems: NavigationItem[] = [
     href: ROUTES.vehicles,
     icon: Truck,
     anyOf: [PERMISSIONS.vehicle.view],
+  },
+  {
+    id: 'attendance',
+    label: 'Attendance',
+    href: ROUTES.attendance,
+    icon: Clock,
+    anyOf: [PERMISSIONS.attendance.view],
+  },
+  {
+    id: 'leave',
+    label: 'Leave',
+    href: ROUTES.leave,
+    icon: CalendarDays,
+    anyOf: [PERMISSIONS.leave.view],
+  },
+  {
+    id: 'cash-advances',
+    label: 'Cash Advances',
+    href: ROUTES.cashAdvances,
+    icon: Wallet,
+    anyOf: [PERMISSIONS.cashAdvance.view],
+  },
+  {
+    id: 'payroll',
+    label: 'Payroll',
+    href: ROUTES.payroll,
+    icon: Banknote,
+    anyOf: [PERMISSIONS.payroll.view],
   },
 ]

@@ -1,5 +1,12 @@
 export type EmployeeStatus = 'ACTIVE' | 'INACTIVE'
 
+export interface EmployeeSummary {
+  id: string
+  firstName: string
+  lastName: string
+  employeeNumber?: string | null
+}
+
 export interface Employee {
   id: string
   companyId: string

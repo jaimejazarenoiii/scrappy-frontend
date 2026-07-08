@@ -12,13 +12,23 @@ import type { CurrentUser, UserRole } from '../types/auth.types'
  * The API exposes a single `role` on the identity, not an explicit permission list. Until the
  * backend returns permissions, map the role to P001 permission keys for menu gating and guards.
  */
-const ALL_PERMISSIONS: string[] = [
+const OWNER_PERMISSIONS: string[] = [
   ...Object.values(PERMISSIONS.company),
   ...Object.values(PERMISSIONS.user),
   ...Object.values(PERMISSIONS.employee),
   ...Object.values(PERMISSIONS.branch),
   ...Object.values(PERMISSIONS.warehouse),
   ...Object.values(PERMISSIONS.vehicle),
+  PERMISSIONS.attendance.view,
+  PERMISSIONS.attendance.correct,
+  PERMISSIONS.leave.view,
+  PERMISSIONS.leave.create,
+  PERMISSIONS.leave.update,
+  PERMISSIONS.leave.approve,
+  PERMISSIONS.leave.reject,
+  PERMISSIONS.leave.cancel,
+  ...Object.values(PERMISSIONS.cashAdvance),
+  ...Object.values(PERMISSIONS.payroll),
 ]
 
 const MANAGER_PERMISSIONS: string[] = [
@@ -28,6 +38,15 @@ const MANAGER_PERMISSIONS: string[] = [
   ...Object.values(PERMISSIONS.branch),
   ...Object.values(PERMISSIONS.warehouse),
   ...Object.values(PERMISSIONS.vehicle),
+  ...Object.values(PERMISSIONS.attendance),
+  PERMISSIONS.leave.view,
+  PERMISSIONS.leave.create,
+  PERMISSIONS.leave.update,
+  PERMISSIONS.leave.cancel,
+  PERMISSIONS.leave.approve,
+  PERMISSIONS.leave.reject,
+  ...Object.values(PERMISSIONS.cashAdvance),
+  ...Object.values(PERMISSIONS.payroll),
 ]
 
 const EMPLOYEE_PERMISSIONS: string[] = [
@@ -35,10 +54,18 @@ const EMPLOYEE_PERMISSIONS: string[] = [
   PERMISSIONS.branch.view,
   PERMISSIONS.warehouse.view,
   PERMISSIONS.vehicle.view,
+  PERMISSIONS.attendance.view,
+  PERMISSIONS.attendance.timeIn,
+  PERMISSIONS.attendance.timeOut,
+  PERMISSIONS.leave.view,
+  PERMISSIONS.leave.create,
+  PERMISSIONS.leave.cancel,
+  PERMISSIONS.cashAdvance.view,
+  PERMISSIONS.payroll.view,
 ]
 
 const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  OWNER: ALL_PERMISSIONS,
+  OWNER: OWNER_PERMISSIONS,
   MANAGER: MANAGER_PERMISSIONS,
   EMPLOYEE: EMPLOYEE_PERMISSIONS,
 }

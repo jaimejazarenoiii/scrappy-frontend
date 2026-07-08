@@ -23,7 +23,7 @@ export default function BranchEditPage() {
   const [apiError, setApiError] = useState<NormalizedApiError | null>(null)
 
   useEffect(() => {
-    document.title = 'Edit branch | Scrappy Web'
+    document.title = 'Edit branch | Scrappy'
   }, [])
 
   if (branchQuery.isLoading) {

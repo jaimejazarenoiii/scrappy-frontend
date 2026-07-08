@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Initialize Scrappy Web
+# Specification Quality Checklist: Initialize Scrappy
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-07-07

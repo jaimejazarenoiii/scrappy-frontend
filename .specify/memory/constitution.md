@@ -22,11 +22,11 @@ scope (roadmap) that governs all future specifications.
 Follow-up TODOs: None
 -->
 
-# Scrappy Web Constitution
+# Scrappy Constitution
 
 ## Purpose
 
-Scrappy Web is the administrative web application for the Scrappy Junkshop Management
+Scrappy is the administrative web application for the Scrappy Junkshop Management
 System.
 
 The application communicates exclusively with the Scrappy Backend through REST APIs.
@@ -445,7 +445,7 @@ backend models.
 
 ### XXVII. Responsive-First Design
 
-Scrappy Web MUST be fully responsive and provide an excellent user experience across
+Scrappy MUST be fully responsive and provide an excellent user experience across
 desktop, tablet, and mobile devices.
 
 **Supported breakpoints**:
@@ -744,7 +744,7 @@ Every generated UI MUST satisfy the following checklist before completion:
 
 ## Constitution Goal
 
-Every feature added to Scrappy Web MUST be maintainable, scalable, type-safe,
+Every feature added to Scrappy MUST be maintainable, scalable, type-safe,
 accessible, responsive, reusable, testable, performant, and production-ready while
 following modern React, TypeScript, and enterprise frontend best practices.
 
@@ -753,7 +753,7 @@ understand for both human developers and AI coding assistants.
 
 ## Governance
 
-This constitution supersedes ad-hoc conventions for Scrappy Web development.
+This constitution supersedes ad-hoc conventions for Scrappy development.
 
 **Amendment procedure**:
 

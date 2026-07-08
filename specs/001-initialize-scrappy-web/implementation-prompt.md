@@ -1,4 +1,4 @@
-# Implementation Prompt: Initialize Scrappy Web (Specification 001)
+# Implementation Prompt: Initialize Scrappy (Specification 001)
 
 **Branch**: `001-initialize-scrappy-web` | **Spec**: [spec.md](./spec.md) | **Plan**: [plan.md](./plan.md)
 
@@ -9,7 +9,7 @@ what the AI may and may not build during the project initialization phase.
 
 ## Objective
 
-Implement **only** the Scrappy Web frontend foundation. The result must be a
+Implement **only** the Scrappy frontend foundation. The result must be a
 production-ready application shell that is immediately ready to begin **Specification 002
 — Company & Identity Foundation (Backend P001)** without any architectural refactoring.
 
@@ -98,7 +98,7 @@ design system and best practices.
 
 - **Package manager**: pnpm only. Use `pnpm install` and `pnpm <script>`. Commit
   `pnpm-lock.yaml`; never commit `package-lock.json` or `yarn.lock`.
-- Follow every applicable principle in the Scrappy Web Constitution.
+- Follow every applicable principle in the Scrappy Constitution.
 - No `any`; TypeScript strict mode; runtime validation via Zod where forms exist.
 
 ---

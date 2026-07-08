@@ -1,4 +1,4 @@
-# Scrappy Web
+# Scrappy
 
 Administrative web application for the Scrappy Junkshop Management System.
 

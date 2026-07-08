@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/feedback/EmptyState'
 
 export default function ComingSoonPage() {
   useEffect(() => {
-    document.title = 'Coming Soon | Scrappy Web'
+    document.title = 'Coming Soon | Scrappy'
   }, [])
 
   return (

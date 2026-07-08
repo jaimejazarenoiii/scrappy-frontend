@@ -20,7 +20,7 @@ export default function EmployeeEditPage() {
   const updateEmployee = useUpdateEmployee(id ?? '')
 
   useEffect(() => {
-    document.title = 'Edit employee | Scrappy Web'
+    document.title = 'Edit employee | Scrappy'
   }, [])
 
   if (employeeQuery.isLoading) {

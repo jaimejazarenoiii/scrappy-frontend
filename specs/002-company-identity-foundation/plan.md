@@ -46,7 +46,7 @@ for testability.
 
 **Target Platform**: Modern browsers (mobile-first responsive web: 320px–1536px+)
 
-**Project Type**: Administrative web application (Scrappy Web frontend)
+**Project Type**: Administrative web application (Scrappy frontend)
 
 **Performance Goals**: Lazy-loaded, code-split feature routes; cached lists with
 server-driven pagination; optimistic updates for status/archive actions; single-flight

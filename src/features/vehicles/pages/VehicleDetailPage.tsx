@@ -32,7 +32,7 @@ export default function VehicleDetailPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   useEffect(() => {
-    document.title = 'Vehicle details | Scrappy Web'
+    document.title = 'Vehicle details | Scrappy'
   }, [])
 
   if (vehicleQuery.isLoading) {

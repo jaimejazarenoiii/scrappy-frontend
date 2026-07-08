@@ -1,4 +1,4 @@
-# Data Model: Initialize Scrappy Web
+# Data Model: Initialize Scrappy
 
 **Feature**: 001-initialize-scrappy-web
 **Date**: 2026-07-07

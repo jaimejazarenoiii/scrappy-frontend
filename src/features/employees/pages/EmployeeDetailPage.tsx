@@ -27,7 +27,7 @@ export default function EmployeeDetailPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   useEffect(() => {
-    document.title = 'Employee details | Scrappy Web'
+    document.title = 'Employee details | Scrappy'
   }, [])
 
   if (employeeQuery.isLoading) {

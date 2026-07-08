@@ -39,7 +39,7 @@ no new dependencies)
 
 **Target Platform**: Modern browsers (mobile-first: 320px–1536px+)
 
-**Project Type**: Administrative web application (Scrappy Web frontend)
+**Project Type**: Administrative web application (Scrappy frontend)
 
 **Performance Goals**: Lazy-loaded organization routes; TanStack Query caching with
 `keepPreviousData` on lists; optimistic archive with rollback; no unnecessary re-renders

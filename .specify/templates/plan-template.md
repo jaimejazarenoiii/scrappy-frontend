@@ -28,7 +28,7 @@
 
 **Target Platform**: Modern browsers (mobile-first responsive web: 320px–1536px+)
 
-**Project Type**: Administrative web application (Scrappy Web frontend)
+**Project Type**: Administrative web application (Scrappy frontend)
 
 **Performance Goals**: Lazy-loaded routes, route-based code splitting, responsive interactions on admin workflows
 
@@ -111,7 +111,7 @@ tests/
 └── unit/
 ```
 
-**Structure Decision**: Feature-based Scrappy Web layout per constitution Principle
+**Structure Decision**: Feature-based Scrappy layout per constitution Principle
 III. Each feature owns its pages, components, hooks, services, validation, and types.
 Shared UI primitives live in `components/ui/`; cross-cutting API clients in
 `services/`.

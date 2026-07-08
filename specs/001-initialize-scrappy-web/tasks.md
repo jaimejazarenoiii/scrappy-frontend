@@ -1,8 +1,8 @@
 ---
-description: 'Task list for Initialize Scrappy Web foundation'
+description: 'Task list for Initialize Scrappy foundation'
 ---
 
-# Tasks: Initialize Scrappy Web
+# Tasks: Initialize Scrappy
 
 **Input**: Design documents from `specs/001-initialize-scrappy-web/`
 

@@ -1,6 +1,6 @@
 # Phase 0 Research: Organization Management
 
-All decisions comply with the Scrappy Web Constitution, Specification 003, and reuse the
+All decisions comply with the Scrappy Constitution, Specification 003, and reuse the
 Specification 001/002 foundations. No new dependencies are introduced.
 
 ## R-001 — Feature module pattern (clone Employees, not reinvent)
