@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { QueryProvider } from '@/app/providers/QueryProvider'
+import { SessionProvider } from '@/app/providers/SessionProvider'
 import { ThemeProvider } from '@/app/providers/ThemeProvider'
 import { ToastProvider } from '@/app/providers/ToastProvider'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -14,7 +15,9 @@ export function AppProviders({ children }: AppProvidersProps) {
     <ThemeProvider>
       <QueryProvider>
         <TooltipProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <SessionProvider>{children}</SessionProvider>
+          </ToastProvider>
         </TooltipProvider>
       </QueryProvider>
     </ThemeProvider>

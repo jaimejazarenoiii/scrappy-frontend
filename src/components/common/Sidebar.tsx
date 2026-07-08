@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { navigationItems } from '@/constants/navigation'
+import { usePermissions } from '@/features/authorization/hooks/usePermissions'
 import { useIsMobile, useIsTablet } from '@/hooks/useMediaQuery'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/store/ui.store'
@@ -15,9 +16,12 @@ function NavItems({
   collapsed?: boolean
   onNavigate?: () => void
 }) {
+  const { hasAny } = usePermissions()
+  const visibleItems = navigationItems.filter((item) => !item.anyOf || hasAny(item.anyOf))
+
   return (
     <nav className="flex flex-col gap-1 p-2">
-      {navigationItems.map((item) => {
+      {visibleItems.map((item) => {
         const Icon = item.icon
         return (
           <NavLink key={item.id} to={item.href} onClick={onNavigate}>

@@ -7,5 +7,7 @@ export interface NavigationItem {
   icon: LucideIcon
   disabled?: boolean
   badge?: string
+  /** Item is shown only if the identity has ANY of these permissions. Omit for always-visible items. */
+  anyOf?: string[]
   children?: NavigationItem[]
 }

@@ -1,5 +1,6 @@
-import { LayoutDashboard, Settings, Shield } from 'lucide-react'
+import { Building2, Contact, LayoutDashboard } from 'lucide-react'
 
+import { PERMISSIONS } from '@/constants/permissions'
 import { ROUTES } from '@/constants/routes'
 import type { NavigationItem } from '@/types/navigation.types'
 
@@ -11,17 +12,17 @@ export const navigationItems: NavigationItem[] = [
     icon: LayoutDashboard,
   },
   {
-    id: 'administration',
-    label: 'Administration',
-    href: ROUTES.comingSoon,
-    icon: Shield,
-    disabled: true,
+    id: 'company',
+    label: 'Company',
+    href: ROUTES.company,
+    icon: Building2,
+    anyOf: [PERMISSIONS.company.view],
   },
   {
-    id: 'settings',
-    label: 'Settings',
-    href: ROUTES.comingSoon,
-    icon: Settings,
-    disabled: true,
+    id: 'employees',
+    label: 'Employees',
+    href: ROUTES.employees,
+    icon: Contact,
+    anyOf: [PERMISSIONS.employee.view],
   },
 ]
