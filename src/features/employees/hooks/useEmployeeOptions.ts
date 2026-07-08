@@ -4,13 +4,21 @@ import { formatEmployeeBreadcrumbLabel } from '../lib/employee-display'
 import { EmployeeService } from '../services/employee.service'
 import { employeeKeys } from './useEmployees'
 
-/** Active employees for select pickers in leave/cash-advance forms. */
+export interface EmployeeOption {
+  value: string
+  label: string
+}
+
+/** Active employees for select pickers in leave/cash-advance/transaction forms. */
 export function useEmployeeOptions() {
   return useQuery({
     queryKey: employeeKeys.picker,
-    queryFn: async () => {
-      const employees = await EmployeeService.listAll()
-      return employees
+    queryFn: () => EmployeeService.listAll(),
+    staleTime: 60_000,
+    // Use `select` so the cached query data stays `Employee[]` for other hooks
+    // (e.g. `useEmployeeLabelMap`) that share `employeeKeys.picker`.
+    select: (employees): EmployeeOption[] =>
+      employees
         .filter((employee) => employee.deletedAt == null && employee.status === 'ACTIVE')
         .map((employee) => ({
           value: employee.id,
@@ -20,8 +28,6 @@ export function useEmployeeOptions() {
             lastName: employee.lastName,
             employeeNumber: employee.employeeNumber,
           }),
-        }))
-    },
-    staleTime: 60_000,
+        })),
   })
 }

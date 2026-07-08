@@ -15,6 +15,7 @@ import { useLeave } from '@/features/leave/hooks/useLeave'
 import { usePayroll } from '@/features/payroll/hooks/usePayroll'
 import { useVehicle } from '@/features/vehicles/hooks/useVehicle'
 import { useWarehouse } from '@/features/warehouses/hooks/useWarehouse'
+import { useTransaction } from '@/features/transactions/hooks/useTransaction'
 import {
   baseBreadcrumbItems,
   buildBreadcrumbPath,
@@ -24,6 +25,8 @@ import {
   type BreadcrumbItem,
 } from '@/lib/breadcrumb'
 import { formatDate } from '@/utils/format-date'
+
+import { transactionDirectionLabel } from '@/features/transactions/lib/transaction-direction'
 
 function resolveEntityLabel(
   entityType: BreadcrumbEntityType,
@@ -71,6 +74,24 @@ function resolveEntityLabel(
 
       return `${employeeLabel} · ${formatDate(payroll.payPeriodStart)} – ${formatDate(payroll.payPeriodEnd)}`
     }
+    case 'transaction': {
+      const tx = data as {
+        direction?: 'INBOUND' | 'OUTBOUND'
+        directionLabel?: 'BUY' | 'SELL'
+        partyName?: string
+      }
+
+      if (tx.direction) {
+        return `${transactionDirectionLabel(tx.direction)} · ${tx.partyName ?? 'Details'}`
+      }
+
+      if (tx.directionLabel) {
+        const inferredDirection = tx.directionLabel === 'BUY' ? 'INBOUND' : 'OUTBOUND'
+        return `${transactionDirectionLabel(inferredDirection)} · ${tx.partyName ?? 'Details'}`
+      }
+
+      return tx.partyName
+    }
     case 'employee': {
       const employee = data as {
         id: string
@@ -104,6 +125,7 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
   const leaveQuery = useLeave(entityType === 'leave' ? entityId : undefined)
   const cashAdvanceQuery = useCashAdvance(entityType === 'cash-advance' ? entityId : undefined)
   const payrollQuery = usePayroll(entityType === 'payroll' ? entityId : undefined)
+  const transactionQuery = useTransaction(entityType === 'transaction' ? entityId : undefined)
   const payrollEmployeeQuery = useEmployee(
     entityType === 'payroll' && payrollQuery.data?.employeeId
       ? payrollQuery.data.employeeId
@@ -119,6 +141,7 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
     (entityType === 'leave' && leaveQuery.isLoading) ||
     (entityType === 'cash-advance' && cashAdvanceQuery.isLoading) ||
     (entityType === 'payroll' && (payrollQuery.isLoading || payrollEmployeeQuery.isLoading)) ||
+    (entityType === 'transaction' && transactionQuery.isLoading) ||
     (entityType === 'employee' && employeeQuery.isLoading) ||
     (entityType === 'branch' && branchQuery.isLoading) ||
     (entityType === 'warehouse' && warehouseQuery.isLoading) ||
@@ -135,6 +158,7 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
         employee: payrollEmployeeQuery.data ?? payrollQuery.data.employee,
       }
     }
+    if (entityType === 'transaction') return transactionQuery.data
     if (entityType === 'employee') return employeeQuery.data
     if (entityType === 'branch') return branchQuery.data
     if (entityType === 'warehouse') return warehouseQuery.data
@@ -146,6 +170,7 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
     leaveQuery.data,
     cashAdvanceQuery.data,
     payrollQuery.data,
+    transactionQuery.data,
     payrollEmployeeQuery.data,
     employeeQuery.data,
     branchQuery.data,

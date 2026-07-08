@@ -31,6 +31,8 @@ export const TRANSACTION_ENDPOINTS = {
   item: (id: string, itemId: string) => `${BASE}/${id}/items/${itemId}`,
   attachments: (id: string) => `${BASE}/${id}/attachments`,
   attachment: (id: string, attachmentId: string) => `${BASE}/${id}/attachments/${attachmentId}`,
+  attachmentContent: (id: string, attachmentId: string) =>
+    `${BASE}/${id}/attachments/${attachmentId}/content`,
   materialSuggestions: `${BASE}/suggestions/materials`,
   priceSuggestions: `${BASE}/suggestions/prices`,
 } as const
@@ -139,14 +141,24 @@ export const TransactionService = {
     return unwrap(response)
   },
 
-  async uploadAttachment(id: string, file: File): Promise<TransactionAttachment> {
+  async uploadAttachment(
+    id: string,
+    file: File,
+    onProgress?: (percent: number) => void,
+  ): Promise<TransactionAttachment> {
     const form = new FormData()
     form.append('file', file, file.name)
-    // Let Axios set the multipart boundary; do not force application/json here.
     const response = await apiClient.post<ApiEnvelope<TransactionAttachment>>(
       TRANSACTION_ENDPOINTS.attachments(id),
       form,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (event) => {
+          if (event.total) {
+            onProgress?.(Math.round((event.loaded * 100) / event.total))
+          }
+        },
+      },
     )
     return unwrap(response)
   },

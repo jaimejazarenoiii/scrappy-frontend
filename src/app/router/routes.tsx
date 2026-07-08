@@ -61,6 +61,20 @@ const CashAdvanceEditPage = lazy(() => import('@/features/cash-advances/pages/Ca
 const PayrollListPage = lazy(() => import('@/features/payroll/pages/PayrollListPage'))
 const PayrollDetailPage = lazy(() => import('@/features/payroll/pages/PayrollDetailPage'))
 
+const TransactionsDashboardPage = lazy(
+  () => import('@/features/transactions/pages/TransactionsDashboardPage'),
+)
+const TransactionDetailPage = lazy(
+  () => import('@/features/transactions/pages/TransactionDetailPage'),
+)
+const TransactionCreatePage = lazy(
+  () => import('@/features/transactions/pages/TransactionCreatePage'),
+)
+const TransactionDraftsPage = lazy(
+  () => import('@/features/transactions/pages/TransactionDraftsPage'),
+)
+const TransactionEditPage = lazy(() => import('@/features/transactions/pages/TransactionEditPage'))
+
 export const router = createBrowserRouter([
   {
     path: ROUTES.home,
@@ -326,6 +340,41 @@ export const router = createBrowserRouter([
                   {
                     path: ROUTES.payrollDetail,
                     element: <PayrollDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.transactions.view]} />,
+                children: [
+                  {
+                    path: ROUTES.transactions,
+                    element: <TransactionsDashboardPage />,
+                  },
+                  {
+                    path: ROUTES.transactionsDrafts,
+                    element: <TransactionDraftsPage />,
+                  },
+                  {
+                    path: ROUTES.transactionDetail,
+                    element: <TransactionDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.transactions.create]} />,
+                children: [
+                  {
+                    path: ROUTES.transactionNew,
+                    element: <TransactionCreatePage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.transactions.update]} />,
+                children: [
+                  {
+                    path: ROUTES.transactionEdit,
+                    element: <TransactionEditPage />,
                   },
                 ],
               },

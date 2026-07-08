@@ -39,6 +39,8 @@ export interface TransactionAttachment {
   mimeType: string
   fileSize: number
   uploadedByUserId: string
+  /** API-provided path for fetching bytes; append `?access_token=` for `<img>` usage. */
+  downloadUrl: string
   createdAt: string
 }
 

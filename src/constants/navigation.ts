@@ -85,4 +85,11 @@ export const navigationItems: NavigationItem[] = [
     icon: Banknote,
     anyOf: [PERMISSIONS.payroll.view],
   },
+  {
+    id: 'transactions',
+    label: 'Transactions',
+    href: ROUTES.transactions,
+    icon: Banknote,
+    anyOf: [PERMISSIONS.transactions.view],
+  },
 ]

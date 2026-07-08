@@ -12,6 +12,7 @@ export type BreadcrumbEntityType =
   | 'leave'
   | 'cash-advance'
   | 'payroll'
+  | 'transaction'
   | 'employee'
   | 'branch'
   | 'warehouse'
@@ -44,6 +45,7 @@ const ENTITY_PARENTS: Record<string, BreadcrumbEntityType> = {
   leave: 'leave',
   'cash-advances': 'cash-advance',
   payroll: 'payroll',
+  transactions: 'transaction',
   employees: 'employee',
   branches: 'branch',
   warehouses: 'warehouse',

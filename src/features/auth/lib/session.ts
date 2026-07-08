@@ -29,6 +29,7 @@ const OWNER_PERMISSIONS: string[] = [
   PERMISSIONS.leave.cancel,
   ...Object.values(PERMISSIONS.cashAdvance),
   ...Object.values(PERMISSIONS.payroll),
+  ...Object.values(PERMISSIONS.transactions),
 ]
 
 const MANAGER_PERMISSIONS: string[] = [
@@ -47,6 +48,7 @@ const MANAGER_PERMISSIONS: string[] = [
   PERMISSIONS.leave.reject,
   ...Object.values(PERMISSIONS.cashAdvance),
   ...Object.values(PERMISSIONS.payroll),
+  ...Object.values(PERMISSIONS.transactions),
 ]
 
 const EMPLOYEE_PERMISSIONS: string[] = [
@@ -62,6 +64,9 @@ const EMPLOYEE_PERMISSIONS: string[] = [
   PERMISSIONS.leave.cancel,
   PERMISSIONS.cashAdvance.view,
   PERMISSIONS.payroll.view,
+  PERMISSIONS.transactions.view,
+  PERMISSIONS.transactions.create,
+  PERMISSIONS.transactions.update,
 ]
 
 const ROLE_PERMISSIONS: Record<UserRole, string[]> = {

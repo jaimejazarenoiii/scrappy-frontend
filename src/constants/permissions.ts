@@ -66,6 +66,11 @@ export const PERMISSIONS = {
   payroll: {
     view: 'payroll.view',
   },
+  transactions: {
+    view: 'transactions.view',
+    create: 'transactions.create',
+    update: 'transactions.update',
+  },
 } as const
 
 export type PermissionKey =
@@ -79,3 +84,4 @@ export type PermissionKey =
   | (typeof PERMISSIONS.leave)[keyof typeof PERMISSIONS.leave]
   | (typeof PERMISSIONS.cashAdvance)[keyof typeof PERMISSIONS.cashAdvance]
   | (typeof PERMISSIONS.payroll)[keyof typeof PERMISSIONS.payroll]
+  | (typeof PERMISSIONS.transactions)[keyof typeof PERMISSIONS.transactions]

@@ -37,6 +37,11 @@ export const ROUTES = {
   cashAdvanceEdit: '/cash-advances/:id/edit',
   payroll: '/payroll',
   payrollDetail: '/payroll/:id',
+  transactions: '/transactions',
+  transactionNew: '/transactions/new',
+  transactionsDrafts: '/transactions/drafts',
+  transactionDetail: '/transactions/:id',
+  transactionEdit: '/transactions/:id/edit',
 } as const
 
 export const buildRoute = {
@@ -56,4 +61,6 @@ export const buildRoute = {
   cashAdvanceDetail: (id: string) => `/cash-advances/${id}`,
   cashAdvanceEdit: (id: string) => `/cash-advances/${id}/edit`,
   payrollDetail: (id: string) => `/payroll/${id}`,
+  transactionDetail: (id: string) => `/transactions/${id}`,
+  transactionEdit: (id: string) => `/transactions/${id}/edit`,
 } as const
