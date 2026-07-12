@@ -1,6 +1,6 @@
 # Scrappy
 
-Administrative web application for the Scrappy Junkshop Management System.
+Administrative web application for scrap trading operations.
 
 ## Prerequisites
 
@@ -48,9 +48,12 @@ See [`.specify/memory/constitution.md`](.specify/memory/constitution.md) for gov
 
 ## Environment
 
-| Variable            | Description          | Default                     |
-| ------------------- | -------------------- | --------------------------- |
-| `VITE_API_BASE_URL` | Backend API base URL | `http://localhost:3000/api` |
+| Variable            | Description                                                                  | Default                        |
+| ------------------- | ---------------------------------------------------------------------------- | ------------------------------ |
+| `VITE_API_BASE_URL` | Backend API base URL                                                         | `http://localhost:3000/api/v1` |
+| `VITE_APP_URL`      | Public site origin for Open Graph / Twitter share images (no trailing slash) | `http://localhost:5173`        |
+
+Brand assets live in `public/brand/` (`favicon.ico`, `scrappy-og-banner.png`, logo icons).
 
 ## Validation
 
