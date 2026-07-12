@@ -1,0 +1,31 @@
+/* Landing-only visual system — does not override app dashboard tokens. */
+.landing-root {
+  --landing-bg: #f4f7f5;
+  --landing-fg: #10241a;
+  --landing-muted: #5b6b62;
+  --landing-border: #d5e0d9;
+  --landing-surface: #ffffff;
+  --landing-ink: #0b1a12;
+  --landing-primary: #1b7a4a;
+  --landing-primary-fg: #f4f7f5;
+  --landing-accent: #e08a1e;
+  --landing-accent-fg: #1a1205;
+  --font-landing-display: 'Syne', ui-sans-serif, system-ui, sans-serif;
+  --font-landing-body: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-landing-body);
+}
+
+.landing-root h1,
+.landing-root h2,
+.landing-root h3 {
+  font-family: var(--font-landing-display);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-root * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

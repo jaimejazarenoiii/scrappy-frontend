@@ -1,5 +1,6 @@
 import { LogOut, Menu, Moon, Sun, User as UserIcon } from 'lucide-react'
 
+import { BrandLogo } from '@/components/common/BrandLogo'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -21,27 +22,32 @@ export function Header() {
   const logout = useLogout()
 
   return (
-    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b px-4 backdrop-blur md:px-6">
-      <div className="flex items-center gap-3">
+    <header className="bg-background/90 supports-[backdrop-filter]:bg-background/70 sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b px-4 backdrop-blur-md md:px-6">
+      <div className="flex min-w-0 items-center gap-3">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="lg:hidden"
+          className="cursor-pointer lg:hidden"
           onClick={toggleMobileNav}
           aria-label="Open navigation menu"
         >
           <Menu className="size-5" />
         </Button>
-        <div className="font-semibold lg:hidden">Scrappy</div>
+        <div className="lg:hidden">
+          <BrandLogo className="size-7" withWordmark plate="dark" wordmarkClassName="text-base" />
+        </div>
         {tenant?.companyName ? (
-          <span className="text-muted-foreground hidden text-sm lg:inline">
-            {tenant.companyName}
-          </span>
+          <div className="hidden min-w-0 lg:block">
+            <p className="text-muted-foreground text-[11px] font-medium tracking-wide uppercase">
+              Business
+            </p>
+            <p className="truncate text-sm font-medium">{tenant.companyName}</p>
+          </div>
         ) : null}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -49,14 +55,15 @@ export function Header() {
               variant="ghost"
               size="icon"
               aria-label="Toggle theme"
-              className="relative"
+              className="relative cursor-pointer"
             >
-              <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-              <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+              <Sun className="size-4 scale-100 rotate-0 transition-all duration-200 dark:scale-0 dark:-rotate-90" />
+              <Moon className="absolute size-4 scale-0 rotate-90 transition-all duration-200 dark:scale-100 dark:rotate-0" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
+              className="cursor-pointer"
               onClick={() => {
                 setMode('light')
               }}
@@ -64,6 +71,7 @@ export function Header() {
               Light {mode === 'light' ? '✓' : ''}
             </DropdownMenuItem>
             <DropdownMenuItem
+              className="cursor-pointer"
               onClick={() => {
                 setMode('dark')
               }}
@@ -71,6 +79,7 @@ export function Header() {
               Dark {mode === 'dark' ? '✓' : ''}
             </DropdownMenuItem>
             <DropdownMenuItem
+              className="cursor-pointer"
               onClick={() => {
                 setMode('system')
               }}
@@ -82,7 +91,13 @@ export function Header() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="button" variant="ghost" size="icon" aria-label="Open account menu">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label="Open account menu"
+              className="cursor-pointer"
+            >
               <UserIcon className="size-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -99,6 +114,7 @@ export function Header() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem
+              className="cursor-pointer"
               disabled={logout.isPending}
               onClick={() => {
                 logout.mutate()

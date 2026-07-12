@@ -44,6 +44,22 @@ export const ROUTES = {
   transactionEdit: '/transactions/:id/edit',
   transactionSettlement: '/transactions/:id/settlement',
   transactionReceipt: '/transactions/:id/receipt',
+  trips: '/trips',
+  tripsNew: '/trips/new',
+  tripDetail: '/trips/:id',
+  tripEdit: '/trips/:id/edit',
+  expenses: '/expenses',
+  expensesNew: '/expenses/new',
+  expenseDetail: '/expenses/:id',
+  expenseEdit: '/expenses/:id/edit',
+  analytics: '/analytics',
+  analyticsDashboard: '/analytics/dashboard',
+  reports: '/reports',
+  reportsTransactions: '/reports/transactions',
+  reportsTrips: '/reports/trips',
+  reportsExpenses: '/reports/expenses',
+  reportsPayroll: '/reports/payroll',
+  reportsAttendance: '/reports/attendance',
 } as const
 
 export const buildRoute = {
@@ -67,4 +83,8 @@ export const buildRoute = {
   transactionEdit: (id: string) => `/transactions/${id}/edit`,
   transactionSettlement: (id: string) => `/transactions/${id}/settlement`,
   transactionReceipt: (id: string) => `/transactions/${id}/receipt`,
+  tripDetail: (id: string) => `/trips/${id}`,
+  tripEdit: (id: string) => `/trips/${id}/edit`,
+  expenseDetail: (id: string) => `/expenses/${id}`,
+  expenseEdit: (id: string) => `/expenses/${id}/edit`,
 } as const

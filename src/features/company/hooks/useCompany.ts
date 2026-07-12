@@ -35,10 +35,10 @@ export function useUpdateCompany() {
       if (tenant) {
         useAuthStore.setState({ tenant: { ...tenant, companyName: company.name } })
       }
-      toast.success('Company updated')
+      toast.success('Business updated')
     },
     onError: (error: NormalizedApiError) => {
-      toast.error(error.message || 'Could not update company')
+      toast.error(error.message || 'Could not update business')
     },
   })
 }

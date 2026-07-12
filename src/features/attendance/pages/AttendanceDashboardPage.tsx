@@ -138,7 +138,7 @@ export default function AttendanceDashboardPage() {
           title="Attendance"
           description={
             isManagerView
-              ? 'Monitor company attendance and correct records when needed.'
+              ? 'Monitor business attendance and correct records when needed.'
               : 'View your attendance history and clock in or out.'
           }
         />

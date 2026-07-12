@@ -104,7 +104,7 @@ export function AttendanceCompanyDashboard({
       <div className="flex items-center gap-2">
         <Users className="text-muted-foreground size-4" />
         <p className="text-muted-foreground text-sm">
-          Company attendance for {formatDate(dashboard.date)}
+          Business attendance for {formatDate(dashboard.date)}
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

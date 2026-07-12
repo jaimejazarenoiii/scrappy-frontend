@@ -11,7 +11,12 @@ const optionalString = z
 
 const directionSchema = z.enum(['INBOUND', 'OUTBOUND', 'BUY', 'SELL']) as z.ZodType<DirectionInput>
 
-const locationTypeSchema = z.enum(['BRANCH', 'WAREHOUSE', 'OUTSIDE']) as z.ZodType<LocationType>
+const locationTypeSchema = z.enum([
+  'BRANCH',
+  'WAREHOUSE',
+  'OUTSIDE',
+  'TRIP',
+]) as z.ZodType<LocationType>
 
 export const transactionDraftSchema = z
   .object({
@@ -28,6 +33,7 @@ export const transactionDraftSchema = z
     warehouseId: z.string().optional().or(z.literal('')),
     outsideLocationName: z.string().optional().or(z.literal('')),
     outsideAddress: z.string().optional().or(z.literal('')),
+    tripId: z.string().optional().or(z.literal('')),
     notes: optionalString,
     assignedEmployeeIds: z
       .array(z.string().min(1))
@@ -58,6 +64,14 @@ export const transactionDraftSchema = z
         code: z.ZodIssueCode.custom,
         message: 'Outside location name and address are required',
         path: ['outsideLocationName'],
+      })
+    }
+
+    if (values.locationType === 'TRIP' && !values.tripId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Select a started trip for trip transactions',
+        path: ['tripId'],
       })
     }
   })

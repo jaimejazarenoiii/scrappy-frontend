@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { ColumnDef } from '@tanstack/react-table'
+import { useQueryClient } from '@tanstack/react-query'
 import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { DataTable } from '@/components/common/DataTable'
@@ -11,21 +13,23 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import type { ColumnDef } from '@tanstack/react-table'
 
 import {
   useAddTransactionItem,
-  useDeleteTransactionItem,
   useUpdateTransactionItem,
 } from '../hooks/useTransactionItemsMutations'
-import { useTransactionItems } from '../hooks/useTransactionItems'
+import { transactionItemsKeys, useTransactionItems } from '../hooks/useTransactionItems'
+import { groupTransactionItems, type TransactionItemGroup } from '../lib/transaction-item-groups'
+import { TransactionService } from '../services/transaction.service'
 import type { TransactionItem } from '../types/transaction.types'
 import {
   transactionItemSchema,
   type TransactionItemValues,
 } from '../validation/transaction-item.schema'
+import { transactionKeys } from '../hooks/useTransactions'
 import { MaterialSuggestionsPicker } from './MaterialSuggestionsPicker'
 import { PriceSuggestionsPanel } from './PriceSuggestionsPanel'
+import { TransactionAddQuantityDialog } from './TransactionAddQuantityDialog'
 
 interface TransactionItemsEditorProps {
   transactionId: string
@@ -44,19 +48,35 @@ const defaultItemValues: TransactionItemValues = {
   notes: '',
 }
 
+function itemFormValues(item: TransactionItem): TransactionItemValues {
+  return {
+    materialName: item.materialName,
+    weight: item.weight,
+    unit: item.unit,
+    price: item.price,
+    notes: item.notes ?? '',
+  }
+}
+
 export function TransactionItemsEditor({
   transactionId,
   disabled = false,
 }: TransactionItemsEditorProps) {
+  const queryClient = useQueryClient()
   const itemsQuery = useTransactionItems(transactionId)
   const addItem = useAddTransactionItem(transactionId)
 
   const [editingItem, setEditingItem] = useState<TransactionItem | null>(null)
-  const [deletingItem, setDeletingItem] = useState<TransactionItem | null>(null)
+  const [editingGroup, setEditingGroup] = useState<TransactionItemGroup | null>(null)
+  const [addingQuantityGroup, setAddingQuantityGroup] = useState<TransactionItemGroup | null>(null)
+  const [deletingGroup, setDeletingGroup] = useState<TransactionItemGroup | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [isAddingQuantity, setIsAddingQuantity] = useState(false)
+  const [isRemovingGroup, setIsRemovingGroup] = useState(false)
 
   const updateItem = useUpdateTransactionItem(transactionId, editingItem?.id ?? '')
-  const deleteItem = useDeleteTransactionItem(transactionId, deletingItem?.id ?? '')
+  const quantityItemId = addingQuantityGroup?.primaryItem.id ?? ''
+  const updateQuantityItem = useUpdateTransactionItem(transactionId, quantityItemId)
 
   const {
     register,
@@ -71,17 +91,92 @@ export function TransactionItemsEditor({
   })
 
   const materialName = watch('materialName')
+  const items = useMemo(() => itemsQuery.data ?? [], [itemsQuery.data])
+  const itemGroups = useMemo(() => groupTransactionItems(items), [items])
 
-  const columns: ColumnDef<TransactionItem>[] = [
+  async function refreshItems() {
+    await queryClient.invalidateQueries({ queryKey: transactionItemsKeys.list(transactionId) })
+    await queryClient.invalidateQueries({ queryKey: transactionKeys.detail(transactionId) })
+  }
+
+  function openAddItemForm() {
+    setEditingGroup(null)
+    setEditingItem(null)
+    setShowForm(true)
+    reset(defaultItemValues)
+  }
+
+  function openEditItemForm(group: TransactionItemGroup) {
+    setEditingGroup(group)
+    setEditingItem(group.primaryItem)
+    setShowForm(true)
+    reset({
+      ...itemFormValues(group.primaryItem),
+      weight: group.totalWeight,
+    })
+  }
+
+  function closeItemForm() {
+    setShowForm(false)
+    setEditingItem(null)
+    setEditingGroup(null)
+    reset(defaultItemValues)
+  }
+
+  async function consolidateExtraItems(group: TransactionItemGroup) {
+    const extraItems = group.items.filter((item) => item.id !== group.primaryItem.id)
+    if (extraItems.length === 0) return
+
+    await Promise.all(
+      extraItems.map((item) => TransactionService.deleteItem(transactionId, item.id)),
+    )
+    await refreshItems()
+  }
+
+  async function addQuantityToGroup(group: TransactionItemGroup, quantity: number) {
+    const nextWeight = group.totalWeight + quantity
+    await updateQuantityItem.mutateAsync({ weight: nextWeight })
+    await consolidateExtraItems(group)
+  }
+
+  async function removeItemGroup(group: TransactionItemGroup) {
+    await Promise.all(
+      group.items.map((item) => TransactionService.deleteItem(transactionId, item.id)),
+    )
+    await refreshItems()
+  }
+
+  const onSubmit = handleSubmit(async (values) => {
+    const payload = {
+      materialName: values.materialName,
+      weight: values.weight,
+      unit: values.unit,
+      price: values.price,
+      notes: values.notes?.trim() ? values.notes : undefined,
+    }
+
+    if (editingItem) {
+      await updateItem.mutateAsync(payload)
+      if (editingGroup) {
+        await consolidateExtraItems(editingGroup)
+      }
+    } else {
+      await addItem.mutateAsync(payload)
+    }
+
+    closeItemForm()
+  })
+
+  const columns: ColumnDef<TransactionItemGroup>[] = [
     {
       id: 'materialName',
       header: 'Material',
       cell: ({ row }) => <span className="font-medium">{row.original.materialName}</span>,
     },
     {
-      id: 'weight',
-      header: 'Weight',
-      cell: ({ row }) => `${String(row.original.weight)} ${row.original.unit}`,
+      id: 'quantity',
+      header: 'Quantity',
+      cell: ({ row }) => `${String(row.original.totalWeight)} ${row.original.unit}`,
     },
     {
       id: 'price',
@@ -91,7 +186,7 @@ export function TransactionItemsEditor({
     {
       id: 'total',
       header: 'Total',
-      cell: ({ row }) => formatCurrency(row.original.total),
+      cell: ({ row }) => formatCurrency(row.original.totalAmount),
     },
     {
       id: 'actions',
@@ -105,15 +200,19 @@ export function TransactionItemsEditor({
             size="sm"
             disabled={disabled}
             onClick={() => {
-              setEditingItem(row.original)
-              setShowForm(true)
-              reset({
-                materialName: row.original.materialName,
-                weight: row.original.weight,
-                unit: row.original.unit,
-                price: row.original.price,
-                notes: row.original.notes ?? '',
-              })
+              setAddingQuantityGroup(row.original)
+            }}
+          >
+            <Plus className="size-4" />
+            Add qty
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={disabled}
+            onClick={() => {
+              openEditItemForm(row.original)
             }}
           >
             <Pencil className="size-4" />
@@ -125,7 +224,7 @@ export function TransactionItemsEditor({
             size="sm"
             disabled={disabled}
             onClick={() => {
-              setDeletingItem(row.original)
+              setDeletingGroup(row.original)
             }}
           >
             <Trash2 className="size-4" />
@@ -136,26 +235,6 @@ export function TransactionItemsEditor({
     },
   ]
 
-  const onSubmit = handleSubmit(async (values) => {
-    const payload = {
-      materialName: values.materialName,
-      weight: values.weight,
-      unit: values.unit,
-      price: values.price,
-      notes: values.notes?.trim() ? values.notes : undefined,
-    }
-
-    if (editingItem) {
-      await updateItem.mutateAsync(payload)
-    } else {
-      await addItem.mutateAsync(payload)
-    }
-
-    setShowForm(false)
-    setEditingItem(null)
-    reset(defaultItemValues)
-  })
-
   return (
     <section className="space-y-4" aria-labelledby="transaction-items-heading">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -164,19 +243,11 @@ export function TransactionItemsEditor({
             Items
           </h2>
           <p className="text-muted-foreground text-sm">
-            Add materials, weights, and prices to this draft.
+            Add an item once, then use Add qty when you need another scale reading for the same
+            material.
           </p>
         </div>
-        <Button
-          type="button"
-          size="sm"
-          disabled={disabled}
-          onClick={() => {
-            setEditingItem(null)
-            setShowForm(true)
-            reset(defaultItemValues)
-          }}
-        >
+        <Button type="button" size="sm" disabled={disabled} onClick={openAddItemForm}>
           <Plus className="size-4" />
           Add item
         </Button>
@@ -184,20 +255,20 @@ export function TransactionItemsEditor({
 
       <DataTable
         columns={columns}
-        data={itemsQuery.data ?? []}
+        data={itemGroups}
         isLoading={itemsQuery.isLoading}
         emptyMessage="No items yet. Add your first item to this draft."
-        getRowId={(row) => row.id}
-        renderMobileCard={(item) => (
+        getRowId={(row) => row.key}
+        renderMobileCard={(group) => (
           <Card className="gap-3 p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="font-medium">{item.materialName}</p>
+                <p className="font-medium">{group.materialName}</p>
                 <p className="text-muted-foreground text-sm">
-                  {item.weight} {item.unit} · {formatCurrency(item.price)}
+                  {group.totalWeight} {group.unit} · {formatCurrency(group.price)}
                 </p>
               </div>
-              <p className="font-medium">{formatCurrency(item.total)}</p>
+              <p className="font-medium">{formatCurrency(group.totalAmount)}</p>
             </div>
             <div className="flex gap-2">
               <Button
@@ -207,15 +278,19 @@ export function TransactionItemsEditor({
                 className="flex-1"
                 disabled={disabled}
                 onClick={() => {
-                  setEditingItem(item)
-                  setShowForm(true)
-                  reset({
-                    materialName: item.materialName,
-                    weight: item.weight,
-                    unit: item.unit,
-                    price: item.price,
-                    notes: item.notes ?? '',
-                  })
+                  setAddingQuantityGroup(group)
+                }}
+              >
+                Add qty
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                disabled={disabled}
+                onClick={() => {
+                  openEditItemForm(group)
                 }}
               >
                 Edit
@@ -227,7 +302,7 @@ export function TransactionItemsEditor({
                 className="flex-1"
                 disabled={disabled}
                 onClick={() => {
-                  setDeletingItem(item)
+                  setDeletingGroup(group)
                 }}
               >
                 Remove
@@ -263,7 +338,7 @@ export function TransactionItemsEditor({
               />
             </FormField>
 
-            <FormField label="Weight" htmlFor="weight" error={errors.weight?.message} required>
+            <FormField label="Quantity" htmlFor="weight" error={errors.weight?.message} required>
               <Input
                 id="weight"
                 type="number"
@@ -317,15 +392,7 @@ export function TransactionItemsEditor({
             </FormField>
 
             <div className="flex justify-end gap-2 sm:col-span-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setShowForm(false)
-                  setEditingItem(null)
-                  reset(defaultItemValues)
-                }}
-              >
+              <Button type="button" variant="outline" onClick={closeItemForm}>
                 Cancel
               </Button>
               <Button
@@ -348,21 +415,47 @@ export function TransactionItemsEditor({
         </Card>
       ) : null}
 
-      <ConfirmDialog
-        open={Boolean(deletingItem)}
+      <TransactionAddQuantityDialog
+        open={Boolean(addingQuantityGroup)}
         onOpenChange={(open) => {
-          if (!open) setDeletingItem(null)
+          if (!open) setAddingQuantityGroup(null)
+        }}
+        item={addingQuantityGroup}
+        currentQuantity={addingQuantityGroup?.totalWeight ?? 0}
+        isLoading={isAddingQuantity || updateQuantityItem.isPending}
+        onSubmit={(quantity) => {
+          if (!addingQuantityGroup) return
+          setIsAddingQuantity(true)
+          void addQuantityToGroup(addingQuantityGroup, quantity)
+            .then(() => {
+              setAddingQuantityGroup(null)
+            })
+            .finally(() => {
+              setIsAddingQuantity(false)
+            })
+        }}
+      />
+
+      <ConfirmDialog
+        open={Boolean(deletingGroup)}
+        onOpenChange={(open) => {
+          if (!open) setDeletingGroup(null)
         }}
         title="Remove item?"
-        description="This item will be removed from the draft transaction."
+        description="This material line will be removed from the draft transaction."
         confirmLabel="Remove"
         variant="destructive"
-        isLoading={deleteItem.isPending}
+        isLoading={isRemovingGroup}
         onConfirm={() => {
-          if (!deletingItem) return
-          void deleteItem.mutateAsync().then(() => {
-            setDeletingItem(null)
-          })
+          if (!deletingGroup) return
+          setIsRemovingGroup(true)
+          void removeItemGroup(deletingGroup)
+            .then(() => {
+              setDeletingGroup(null)
+            })
+            .finally(() => {
+              setIsRemovingGroup(false)
+            })
         }}
       />
     </section>

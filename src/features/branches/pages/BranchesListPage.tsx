@@ -116,7 +116,7 @@ export default function BranchesListPage() {
       <div className="space-y-6">
         <PageHeader
           title="Branches"
-          description="Manage your company branch locations."
+          description="Manage your business branch locations."
           actions={
             <PermissionGate permission={PERMISSIONS.branch.create}>
               <Button

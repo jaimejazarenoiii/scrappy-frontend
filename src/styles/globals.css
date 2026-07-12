@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './tokens.css';
+@import './landing.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -8,6 +9,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Syne', ui-sans-serif, system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -44,13 +47,49 @@
   }
 
   body {
-    @apply bg-background text-foreground min-h-screen antialiased;
+    @apply bg-background text-foreground min-h-screen font-sans antialiased;
     font-feature-settings:
       'rlig' 1,
       'calt' 1;
   }
 
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
   :focus-visible {
     @apply ring-ring ring-offset-background ring-2 ring-offset-2 outline-none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .report-print-root {
+    background: white !important;
+    color: black !important;
+  }
+
+  .report-print-root a {
+    color: black !important;
+    text-decoration: none !important;
   }
 }

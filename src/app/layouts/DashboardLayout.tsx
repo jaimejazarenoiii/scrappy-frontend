@@ -7,11 +7,11 @@ import { Sidebar } from '@/components/common/Sidebar'
 
 export function DashboardLayout() {
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="bg-background flex min-h-screen w-full">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Header />
-        <div className="border-b px-4 py-3 md:px-6">
+        <div className="bg-muted/30 border-b px-4 py-2.5 md:px-6">
           <Breadcrumb />
         </div>
         <main className="flex-1 overflow-x-hidden">

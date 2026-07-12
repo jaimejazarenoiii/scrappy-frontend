@@ -81,6 +81,28 @@ const TransactionReceiptPage = lazy(
   () => import('@/features/transactions/pages/TransactionReceiptPage'),
 )
 
+const TripsDashboardPage = lazy(() => import('@/features/trips/pages/TripsDashboardPage'))
+const TripCreatePage = lazy(() => import('@/features/trips/pages/TripCreatePage'))
+const TripDetailPage = lazy(() => import('@/features/trips/pages/TripDetailPage'))
+const TripEditPage = lazy(() => import('@/features/trips/pages/TripEditPage'))
+
+const ExpensesDashboardPage = lazy(() => import('@/features/expenses/pages/ExpensesDashboardPage'))
+const ExpenseCreatePage = lazy(() => import('@/features/expenses/pages/ExpenseCreatePage'))
+const ExpenseDetailPage = lazy(() => import('@/features/expenses/pages/ExpenseDetailPage'))
+const ExpenseEditPage = lazy(() => import('@/features/expenses/pages/ExpenseEditPage'))
+
+const AnalyticsDashboardPage = lazy(
+  () => import('@/features/analytics/pages/AnalyticsDashboardPage'),
+)
+
+const ReportsHubPage = lazy(() => import('@/features/reports/pages/ReportsHubPage'))
+const TransactionReportsPage = lazy(() => import('@/features/reports/pages/TransactionReportsPage'))
+const TripReportsPage = lazy(() => import('@/features/reports/pages/TripReportsPage'))
+const ExpenseReportsPage = lazy(() => import('@/features/reports/pages/ExpenseReportsPage'))
+const PayrollReportsPage = lazy(() => import('@/features/reports/pages/PayrollReportsPage'))
+const AttendanceReportsPage = lazy(() => import('@/features/reports/pages/AttendanceReportsPage'))
+const LandingPage = lazy(() => import('@/features/landing/pages/LandingPage'))
+
 export const router = createBrowserRouter([
   {
     path: ROUTES.home,
@@ -88,7 +110,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to={ROUTES.dashboard} replace />,
+        element: <LandingPage />,
       },
       {
         element: <AuthLayout />,
@@ -389,6 +411,110 @@ export const router = createBrowserRouter([
                   {
                     path: ROUTES.transactionEdit,
                     element: <TransactionEditPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.trips.view]} />,
+                children: [
+                  {
+                    path: ROUTES.trips,
+                    element: <TripsDashboardPage />,
+                  },
+                  {
+                    path: ROUTES.tripDetail,
+                    element: <TripDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.trips.create]} />,
+                children: [
+                  {
+                    path: ROUTES.tripsNew,
+                    element: <TripCreatePage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.trips.update]} />,
+                children: [
+                  {
+                    path: ROUTES.tripEdit,
+                    element: <TripEditPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.expenses.view]} />,
+                children: [
+                  {
+                    path: ROUTES.expenses,
+                    element: <ExpensesDashboardPage />,
+                  },
+                  {
+                    path: ROUTES.expenseDetail,
+                    element: <ExpenseDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.expenses.create]} />,
+                children: [
+                  {
+                    path: ROUTES.expensesNew,
+                    element: <ExpenseCreatePage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.expenses.update]} />,
+                children: [
+                  {
+                    path: ROUTES.expenseEdit,
+                    element: <ExpenseEditPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.analytics.view]} />,
+                children: [
+                  {
+                    path: ROUTES.analytics,
+                    element: <Navigate to={ROUTES.analyticsDashboard} replace />,
+                  },
+                  {
+                    path: ROUTES.analyticsDashboard,
+                    element: <AnalyticsDashboardPage />,
+                  },
+                ],
+              },
+              {
+                element: <PermissionGuard permissions={[PERMISSIONS.reports.view]} />,
+                children: [
+                  {
+                    path: ROUTES.reports,
+                    element: <ReportsHubPage />,
+                  },
+                  {
+                    path: ROUTES.reportsTransactions,
+                    element: <TransactionReportsPage />,
+                  },
+                  {
+                    path: ROUTES.reportsTrips,
+                    element: <TripReportsPage />,
+                  },
+                  {
+                    path: ROUTES.reportsExpenses,
+                    element: <ExpenseReportsPage />,
+                  },
+                  {
+                    path: ROUTES.reportsPayroll,
+                    element: <PayrollReportsPage />,
+                  },
+                  {
+                    path: ROUTES.reportsAttendance,
+                    element: <AttendanceReportsPage />,
                   },
                 ],
               },

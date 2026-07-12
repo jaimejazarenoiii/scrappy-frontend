@@ -69,6 +69,51 @@ export function displayTimeOut(attendance: Attendance): string | null {
   return attendance.adjustedTimeOutAt ?? attendance.timeOutAt
 }
 
+/** Elapsed working time from a start ISO timestamp to `nowMs` (defaults to now). */
+export function formatElapsedWorkingTime(startedAt: string, nowMs = Date.now()): string {
+  const startMs = Date.parse(startedAt)
+  if (Number.isNaN(startMs) || startMs > nowMs) return '0h 00m 00s'
+
+  const totalSeconds = Math.floor((nowMs - startMs) / 1000)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+
+  return `${String(hours)}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`
+}
+
+export function formatAttendanceDateTime(value: string | null | undefined): string {
+  if (!value) return '—'
+  return new Intl.DateTimeFormat('en-PH', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(new Date(value))
+}
+
+export function formatAttendanceDate(value: string | null | undefined): string {
+  if (!value) return '—'
+  return new Intl.DateTimeFormat('en-PH', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(new Date(value))
+}
+
+export function formatAttendanceTime(value: string | null | undefined): string {
+  if (!value) return '—'
+  return new Intl.DateTimeFormat('en-PH', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(new Date(value))
+}
+
 export function formatEmployeeDisplayName(
   employee: WorkforceEmployeeRecord,
   labelById?: ReadonlyMap<string, string>,

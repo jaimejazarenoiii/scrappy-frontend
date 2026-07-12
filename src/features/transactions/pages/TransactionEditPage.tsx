@@ -16,6 +16,7 @@ import { useWarehouseOptions } from '@/features/warehouses/hooks/useWarehouseOpt
 import { applyApiValidationErrors } from '@/utils/form-errors'
 import type { NormalizedApiError } from '@/lib/axios'
 import { TransactionEmployeePicker } from '../components/TransactionEmployeePicker'
+import { TransactionTripPicker } from '../components/TransactionTripPicker'
 import { TransactionDraftIndicator } from '../components/TransactionDraftIndicator'
 import { TransactionDirectionBadge } from '../components/TransactionDirectionBadge'
 import { TransactionStatusBadge } from '../components/TransactionStatusBadge'
@@ -80,6 +81,7 @@ export default function TransactionEditPage() {
       warehouseId: '',
       outsideLocationName: '',
       outsideAddress: '',
+      tripId: '',
       notes: '',
       assignedEmployeeIds: [],
     },
@@ -97,6 +99,7 @@ export default function TransactionEditPage() {
 
   const locationType = watch('locationType')
   const assignedEmployeeIds = watch('assignedEmployeeIds')
+  const tripId = watch('tripId')
 
   const navigationBlocker = useUnsavedChangesPrompt(isDirty && !isSaving)
 
@@ -129,6 +132,7 @@ export default function TransactionEditPage() {
       warehouseId: tx.locationType === 'WAREHOUSE' ? toFormValue(tx.warehouseId) : '',
       outsideLocationName: tx.locationType === 'OUTSIDE' ? toFormValue(tx.outsideLocationName) : '',
       outsideAddress: tx.locationType === 'OUTSIDE' ? toFormValue(tx.outsideAddress) : '',
+      tripId: tx.locationType === 'TRIP' ? toFormValue(tx.tripId) : '',
       notes: toFormValue(tx.notes),
       assignedEmployeeIds: tx.assignedEmployeeIds,
     })
@@ -145,15 +149,24 @@ export default function TransactionEditPage() {
       setValue('warehouseId', '')
       setValue('outsideLocationName', '')
       setValue('outsideAddress', '')
+      setValue('tripId', '')
     }
     if (locationType === 'WAREHOUSE') {
       setValue('branchId', '')
       setValue('outsideLocationName', '')
       setValue('outsideAddress', '')
+      setValue('tripId', '')
     }
     if (locationType === 'OUTSIDE') {
       setValue('branchId', '')
       setValue('warehouseId', '')
+      setValue('tripId', '')
+    }
+    if (locationType === 'TRIP') {
+      setValue('branchId', '')
+      setValue('warehouseId', '')
+      setValue('outsideLocationName', '')
+      setValue('outsideAddress', '')
     }
   }, [hydrated, locationType, setValue])
 
@@ -323,6 +336,7 @@ export default function TransactionEditPage() {
                 <option value="BRANCH">Branch</option>
                 <option value="WAREHOUSE">Warehouse</option>
                 <option value="OUTSIDE">Outside</option>
+                <option value="TRIP">Trip</option>
               </Select>
             </FormField>
 
@@ -400,6 +414,24 @@ export default function TransactionEditPage() {
                   />
                 </FormField>
               </>
+            ) : null}
+
+            {locationType === 'TRIP' ? (
+              <FormField
+                label="Trip"
+                htmlFor="tripId"
+                error={errors.tripId?.message}
+                required
+                className="sm:col-span-2"
+              >
+                <TransactionTripPicker
+                  value={tripId ?? ''}
+                  disabled={!draftEditingAllowed}
+                  onChange={(nextTripId) => {
+                    setValue('tripId', nextTripId, { shouldValidate: true, shouldDirty: true })
+                  }}
+                />
+              </FormField>
             ) : null}
 
             <FormField

@@ -52,7 +52,7 @@ export function TransactionSettlementActions({ transaction }: TransactionSettlem
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
-        <PermissionGate permission={PERMISSIONS.transactions.finish}>
+        <PermissionGate anyOf={[PERMISSIONS.transactions.finish, PERMISSIONS.transactions.update]}>
           {isDraftStatus(transaction.status) ? (
             <Button
               type="button"

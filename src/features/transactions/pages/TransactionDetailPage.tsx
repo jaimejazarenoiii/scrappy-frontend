@@ -13,6 +13,7 @@ import { PERMISSIONS } from '@/constants/permissions'
 import { buildRoute } from '@/constants/routes'
 import { PermissionGate } from '@/features/authorization/components/PermissionGate'
 import { useFormatRecordEmployee } from '@/features/employees/hooks/useFormatRecordEmployee'
+import { useTrip } from '@/features/trips/hooks/useTrip'
 import { useAuthStore } from '@/store/auth.store'
 import { TransactionDirectionBadge } from '../components/TransactionDirectionBadge'
 import { TransactionSettlementActions } from '../components/TransactionSettlementActions'
@@ -40,6 +41,10 @@ export default function TransactionDetailPage() {
   const accessToken = useAuthStore((state) => state.accessToken)
 
   const tx = transactionQuery.data
+  const linkedTripQuery = useTrip(
+    tx?.locationType === 'TRIP' ? (tx.tripId ?? undefined) : undefined,
+  )
+  const linkedTrip = linkedTripQuery.data
 
   useEffect(() => {
     if (!tx) {
@@ -60,11 +65,19 @@ export default function TransactionDetailPage() {
     if (tx.locationType === 'BRANCH') return tx.branchId ?? '—'
     if (tx.locationType === 'WAREHOUSE') return tx.warehouseId ?? '—'
 
+    if (tx.locationType === 'TRIP') {
+      if (linkedTrip) {
+        const route = `${linkedTrip.origin} → ${linkedTrip.destination}`
+        return linkedTrip.tripNumber ? `${linkedTrip.tripNumber} · ${route}` : route
+      }
+      return tx.tripId ? 'Linked trip' : '—'
+    }
+
     if (tx.outsideLocationName && tx.outsideAddress) {
       return `${tx.outsideLocationName} · ${tx.outsideAddress}`
     }
     return tx.outsideLocationName ?? tx.outsideAddress ?? '—'
-  }, [tx])
+  }, [tx, linkedTrip])
 
   return (
     <PageContainer maxWidth="lg">
@@ -138,7 +151,17 @@ export default function TransactionDetailPage() {
               <DescriptionItem label="Transaction date">
                 {formatDate(tx.transactionDate)}
               </DescriptionItem>
-              <DescriptionItem label="Location">{locationLabel}</DescriptionItem>
+              <DescriptionItem label="Location">
+                {tx.locationType === 'TRIP' && tx.tripId ? (
+                  <PermissionGate permission={PERMISSIONS.trips.view}>
+                    <Button type="button" variant="link" className="h-auto p-0" asChild>
+                      <Link to={buildRoute.tripDetail(tx.tripId)}>{locationLabel}</Link>
+                    </Button>
+                  </PermissionGate>
+                ) : (
+                  locationLabel
+                )}
+              </DescriptionItem>
               <DescriptionItem label="Assigned employees">
                 {assignedEmployeeLabels.length ? assignedEmployeeLabels.join(', ') : '—'}
               </DescriptionItem>

@@ -22,7 +22,9 @@ export function PageHeader({
       {breadcrumbs ? <div className="text-muted-foreground text-sm">{breadcrumbs}</div> : null}
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{title}</h1>
+          <h1 className="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight md:text-3xl">
+            {title}
+          </h1>
           {description ? (
             <p className="text-muted-foreground text-sm md:text-base">{description}</p>
           ) : null}

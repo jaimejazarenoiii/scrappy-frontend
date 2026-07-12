@@ -54,7 +54,7 @@ export function CompanyForm({ company, canEdit, isSubmitting, onSubmit }: Compan
       <Card>
         <CardHeader className="flex flex-row items-start justify-between gap-4">
           <div>
-            <CardTitle>Company profile</CardTitle>
+            <CardTitle>Business profile</CardTitle>
             <CardDescription>Information for your organization.</CardDescription>
           </div>
           <StatusBadge
@@ -64,7 +64,7 @@ export function CompanyForm({ company, canEdit, isSubmitting, onSubmit }: Compan
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-6 sm:grid-cols-2">
-            <FormField label="Company name" htmlFor="name" error={errors.name?.message} required>
+            <FormField label="Business name" htmlFor="name" error={errors.name?.message} required>
               <Input
                 id="name"
                 disabled={disabled}

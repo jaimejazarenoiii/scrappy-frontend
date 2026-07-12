@@ -16,6 +16,7 @@ import type { NormalizedApiError } from '@/lib/axios'
 import { useBranchOptions } from '@/features/branches/hooks/useBranchOptions'
 import { useWarehouseOptions } from '@/features/warehouses/hooks/useWarehouseOptions'
 import { TransactionEmployeePicker } from '../components/TransactionEmployeePicker'
+import { TransactionTripPicker } from '../components/TransactionTripPicker'
 import { useCreateTransactionDraft } from '../hooks/useTransactionMutations'
 import {
   transactionDraftSchema,
@@ -51,6 +52,7 @@ export default function TransactionCreatePage() {
       warehouseId: '',
       outsideLocationName: '',
       outsideAddress: '',
+      tripId: '',
       notes: '',
       assignedEmployeeIds: [],
     },
@@ -70,15 +72,24 @@ export default function TransactionCreatePage() {
       setValue('warehouseId', '')
       setValue('outsideLocationName', '')
       setValue('outsideAddress', '')
+      setValue('tripId', '')
     }
     if (locationType === 'WAREHOUSE') {
       setValue('branchId', '')
       setValue('outsideLocationName', '')
       setValue('outsideAddress', '')
+      setValue('tripId', '')
     }
     if (locationType === 'OUTSIDE') {
       setValue('branchId', '')
       setValue('warehouseId', '')
+      setValue('tripId', '')
+    }
+    if (locationType === 'TRIP') {
+      setValue('branchId', '')
+      setValue('warehouseId', '')
+      setValue('outsideLocationName', '')
+      setValue('outsideAddress', '')
     }
   }, [locationType, setValue])
 
@@ -107,6 +118,7 @@ export default function TransactionCreatePage() {
         values.locationType === 'OUTSIDE' && values.outsideAddress
           ? values.outsideAddress
           : undefined,
+      tripId: values.locationType === 'TRIP' && values.tripId ? values.tripId : undefined,
       // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       notes: values.notes?.trim() || undefined,
       assignedEmployeeIds: values.assignedEmployeeIds,
@@ -118,6 +130,7 @@ export default function TransactionCreatePage() {
   })
 
   const assignedEmployeeIds = watch('assignedEmployeeIds')
+  const tripId = watch('tripId')
 
   return (
     <PageContainer maxWidth="lg">
@@ -198,6 +211,7 @@ export default function TransactionCreatePage() {
                 <option value="BRANCH">Branch</option>
                 <option value="WAREHOUSE">Warehouse</option>
                 <option value="OUTSIDE">Outside</option>
+                <option value="TRIP">Trip</option>
               </Select>
             </FormField>
 
@@ -267,6 +281,23 @@ export default function TransactionCreatePage() {
                   <Input id="outsideAddress" {...register('outsideAddress')} />
                 </FormField>
               </>
+            ) : null}
+
+            {locationType === 'TRIP' ? (
+              <FormField
+                label="Trip"
+                htmlFor="tripId"
+                error={errors.tripId?.message}
+                required
+                className="sm:col-span-2"
+              >
+                <TransactionTripPicker
+                  value={tripId ?? ''}
+                  onChange={(nextTripId) => {
+                    setValue('tripId', nextTripId, { shouldValidate: true, shouldDirty: true })
+                  }}
+                />
+              </FormField>
             ) : null}
 
             <FormField

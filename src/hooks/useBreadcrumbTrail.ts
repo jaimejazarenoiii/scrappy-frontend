@@ -15,6 +15,8 @@ import { useLeave } from '@/features/leave/hooks/useLeave'
 import { usePayroll } from '@/features/payroll/hooks/usePayroll'
 import { useVehicle } from '@/features/vehicles/hooks/useVehicle'
 import { useWarehouse } from '@/features/warehouses/hooks/useWarehouse'
+import { useTrip } from '@/features/trips/hooks/useTrip'
+import { useExpense } from '@/features/expenses/hooks/useExpense'
 import { useTransaction } from '@/features/transactions/hooks/useTransaction'
 import {
   baseBreadcrumbItems,
@@ -92,6 +94,29 @@ function resolveEntityLabel(
 
       return tx.partyName
     }
+    case 'trip': {
+      const trip = data as {
+        tripNumber?: string | null
+        origin?: string
+        destination?: string
+      }
+      if (trip.tripNumber) return trip.tripNumber
+      if (trip.origin && trip.destination) return `${trip.origin} → ${trip.destination}`
+      return 'Trip details'
+    }
+    case 'expense': {
+      const expense = data as {
+        expenseNumber?: string | null
+        description?: string
+      }
+      if (expense.expenseNumber) return expense.expenseNumber
+      if (expense.description) {
+        return expense.description.length > 40
+          ? `${expense.description.slice(0, 40)}…`
+          : expense.description
+      }
+      return 'Expense details'
+    }
     case 'employee': {
       const employee = data as {
         id: string
@@ -126,6 +151,8 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
   const cashAdvanceQuery = useCashAdvance(entityType === 'cash-advance' ? entityId : undefined)
   const payrollQuery = usePayroll(entityType === 'payroll' ? entityId : undefined)
   const transactionQuery = useTransaction(entityType === 'transaction' ? entityId : undefined)
+  const tripQuery = useTrip(entityType === 'trip' ? entityId : undefined)
+  const expenseQuery = useExpense(entityType === 'expense' ? entityId : undefined)
   const payrollEmployeeQuery = useEmployee(
     entityType === 'payroll' && payrollQuery.data?.employeeId
       ? payrollQuery.data.employeeId
@@ -142,6 +169,8 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
     (entityType === 'cash-advance' && cashAdvanceQuery.isLoading) ||
     (entityType === 'payroll' && (payrollQuery.isLoading || payrollEmployeeQuery.isLoading)) ||
     (entityType === 'transaction' && transactionQuery.isLoading) ||
+    (entityType === 'trip' && tripQuery.isLoading) ||
+    (entityType === 'expense' && expenseQuery.isLoading) ||
     (entityType === 'employee' && employeeQuery.isLoading) ||
     (entityType === 'branch' && branchQuery.isLoading) ||
     (entityType === 'warehouse' && warehouseQuery.isLoading) ||
@@ -159,6 +188,8 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
       }
     }
     if (entityType === 'transaction') return transactionQuery.data
+    if (entityType === 'trip') return tripQuery.data
+    if (entityType === 'expense') return expenseQuery.data
     if (entityType === 'employee') return employeeQuery.data
     if (entityType === 'branch') return branchQuery.data
     if (entityType === 'warehouse') return warehouseQuery.data
@@ -171,6 +202,8 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
     cashAdvanceQuery.data,
     payrollQuery.data,
     transactionQuery.data,
+    tripQuery.data,
+    expenseQuery.data,
     payrollEmployeeQuery.data,
     employeeQuery.data,
     branchQuery.data,

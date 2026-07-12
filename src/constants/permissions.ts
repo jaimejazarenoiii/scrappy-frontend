@@ -76,6 +76,29 @@ export const PERMISSIONS = {
     returnToDraft: 'transactions.returnToDraft',
     reopen: 'transactions.reopen',
   },
+  trips: {
+    view: 'trips.view',
+    create: 'trips.create',
+    update: 'trips.update',
+    schedule: 'trips.schedule',
+    start: 'trips.start',
+    complete: 'trips.complete',
+    cancel: 'trips.cancel',
+  },
+  expenses: {
+    view: 'expenses.view',
+    create: 'expenses.create',
+    update: 'expenses.update',
+    delete: 'expenses.delete',
+    archive: 'expenses.archive',
+  },
+  analytics: {
+    view: 'analytics.view',
+  },
+  reports: {
+    view: 'reports.view',
+    export: 'reports.export',
+  },
 } as const
 
 export type PermissionKey =
@@ -90,3 +113,7 @@ export type PermissionKey =
   | (typeof PERMISSIONS.cashAdvance)[keyof typeof PERMISSIONS.cashAdvance]
   | (typeof PERMISSIONS.payroll)[keyof typeof PERMISSIONS.payroll]
   | (typeof PERMISSIONS.transactions)[keyof typeof PERMISSIONS.transactions]
+  | (typeof PERMISSIONS.trips)[keyof typeof PERMISSIONS.trips]
+  | (typeof PERMISSIONS.expenses)[keyof typeof PERMISSIONS.expenses]
+  | (typeof PERMISSIONS.analytics)[keyof typeof PERMISSIONS.analytics]
+  | (typeof PERMISSIONS.reports)[keyof typeof PERMISSIONS.reports]

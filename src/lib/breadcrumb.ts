@@ -13,6 +13,8 @@ export type BreadcrumbEntityType =
   | 'cash-advance'
   | 'payroll'
   | 'transaction'
+  | 'trip'
+  | 'expense'
   | 'employee'
   | 'branch'
   | 'warehouse'
@@ -26,7 +28,7 @@ const ROOT_SEGMENT_LABELS = Object.fromEntries(
 const SEGMENT_LABELS: Record<string, string> = {
   ...ROOT_SEGMENT_LABELS,
   dashboard: 'Dashboard',
-  company: 'Company',
+  company: 'Business',
   users: 'Users',
   employees: 'Employees',
   branches: 'Branches',
@@ -40,6 +42,11 @@ const SEGMENT_LABELS: Record<string, string> = {
   edit: 'Edit',
   settlement: 'Settlement',
   receipt: 'Receipt',
+  analytics: 'Analytics',
+  reports: 'Reports',
+  transactions: 'Transactions',
+  trips: 'Trips',
+  expenses: 'Expenses',
 }
 
 const ENTITY_PARENTS: Record<string, BreadcrumbEntityType> = {
@@ -48,6 +55,8 @@ const ENTITY_PARENTS: Record<string, BreadcrumbEntityType> = {
   'cash-advances': 'cash-advance',
   payroll: 'payroll',
   transactions: 'transaction',
+  trips: 'trip',
+  expenses: 'expense',
   employees: 'employee',
   branches: 'branch',
   warehouses: 'warehouse',

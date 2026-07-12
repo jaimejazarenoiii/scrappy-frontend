@@ -57,10 +57,12 @@ export function LoginForm() {
       className="space-y-5"
       noValidate
     >
-      <div className="space-y-1 text-center">
-        <h1 className="text-xl font-semibold tracking-tight">Sign in to Scrappy</h1>
+      <div className="space-y-1.5 text-center sm:text-left">
+        <h1 className="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight">
+          Sign in
+        </h1>
         <p className="text-muted-foreground text-sm">
-          Enter your credentials to access your workspace.
+          Enter your credentials to access your business workspace.
         </p>
       </div>
 
@@ -109,7 +111,7 @@ export function LoginForm() {
             onClick={() => {
               setShowPassword((prev) => !prev)
             }}
-            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer rounded-sm p-1 transition-colors"
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}

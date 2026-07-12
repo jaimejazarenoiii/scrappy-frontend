@@ -18,7 +18,7 @@ export default function CompanyPage() {
   const canEdit = has(PERMISSIONS.company.update)
 
   useEffect(() => {
-    document.title = 'Company | Scrappy'
+    document.title = 'Business | Scrappy'
   }, [])
 
   if (companyQuery.isLoading) {
@@ -28,7 +28,7 @@ export default function CompanyPage() {
   if (companyQuery.isError || !companyQuery.data) {
     return (
       <PageContainer maxWidth="lg">
-        <ErrorState description="We couldn't load your company information. Please try again." />
+        <ErrorState description="We couldn't load your business information. Please try again." />
       </PageContainer>
     )
   }
@@ -39,8 +39,8 @@ export default function CompanyPage() {
     <PageContainer maxWidth="lg">
       <div className="space-y-6">
         <PageHeader
-          title="Company"
-          description="View and manage your company profile."
+          title="Business"
+          description="View and manage your business profile."
           actions={!canEdit ? <Badge variant="secondary">Read only</Badge> : null}
         />
         <CompanyForm

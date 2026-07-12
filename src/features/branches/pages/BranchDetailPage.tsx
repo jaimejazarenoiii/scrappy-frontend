@@ -105,7 +105,7 @@ export default function BranchDetailPage() {
                   tone={orgEntityStatusTone(branch.status, branch.deletedAt)}
                 />
               </DescriptionItem>
-              <DescriptionItem label="Company ID">{branch.companyId}</DescriptionItem>
+              <DescriptionItem label="Business ID">{branch.companyId}</DescriptionItem>
               <DescriptionItem label="Created">{formatDate(branch.createdAt)}</DescriptionItem>
               <DescriptionItem label="Last updated">{formatDate(branch.updatedAt)}</DescriptionItem>
             </DescriptionList>

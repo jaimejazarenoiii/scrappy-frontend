@@ -25,6 +25,8 @@ export function toUpdateTransactionInput(values: TransactionDraftValues): Update
       values.locationType === 'OUTSIDE' && values.outsideAddress?.trim()
         ? values.outsideAddress
         : undefined,
+    tripId:
+      values.locationType === 'TRIP' && values.tripId?.trim() ? values.tripId.trim() : undefined,
     notes: values.notes?.trim() ? values.notes : undefined,
     assignedEmployeeIds: values.assignedEmployeeIds,
   }

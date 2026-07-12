@@ -42,7 +42,7 @@ export function LeaveDashboardKpis({ dashboard, isLoading }: LeaveDashboardKpisP
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <CalendarDays className="text-muted-foreground size-4" />
-        <p className="text-muted-foreground text-sm">Company leave overview</p>
+        <p className="text-muted-foreground text-sm">Business leave overview</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-3">
         {items.map((item) => (

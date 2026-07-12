@@ -30,6 +30,12 @@ const OWNER_PERMISSIONS: string[] = [
   ...Object.values(PERMISSIONS.cashAdvance),
   ...Object.values(PERMISSIONS.payroll),
   ...Object.values(PERMISSIONS.transactions),
+  PERMISSIONS.transactions.finish,
+  PERMISSIONS.transactions.cancel,
+  ...Object.values(PERMISSIONS.trips),
+  ...Object.values(PERMISSIONS.expenses),
+  ...Object.values(PERMISSIONS.analytics),
+  ...Object.values(PERMISSIONS.reports),
 ]
 
 const MANAGER_PERMISSIONS: string[] = [
@@ -49,13 +55,18 @@ const MANAGER_PERMISSIONS: string[] = [
   ...Object.values(PERMISSIONS.cashAdvance),
   ...Object.values(PERMISSIONS.payroll),
   ...Object.values(PERMISSIONS.transactions),
+  PERMISSIONS.transactions.finish,
+  PERMISSIONS.transactions.cancel,
+  ...Object.values(PERMISSIONS.trips),
+  ...Object.values(PERMISSIONS.expenses),
+  ...Object.values(PERMISSIONS.analytics),
+  ...Object.values(PERMISSIONS.reports),
 ]
 
 const EMPLOYEE_PERMISSIONS: string[] = [
-  PERMISSIONS.employee.view,
-  PERMISSIONS.branch.view,
-  PERMISSIONS.warehouse.view,
-  PERMISSIONS.vehicle.view,
+  // Day-to-day ops only — no org admin (employees/branches/warehouses/vehicles),
+  // analytics, or reports. Branch/warehouse/vehicle list APIs remain available for
+  // transaction pickers via backend role authorize, not nav permissions.
   PERMISSIONS.attendance.view,
   PERMISSIONS.attendance.timeIn,
   PERMISSIONS.attendance.timeOut,

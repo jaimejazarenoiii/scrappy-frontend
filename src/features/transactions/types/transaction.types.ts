@@ -12,7 +12,7 @@ export type DirectionLabel = 'BUY' | 'SELL'
 export type DirectionInput = Direction | DirectionLabel
 
 export type TransactionStatus = 'DRAFT' | 'READY_FOR_PAYMENT' | 'PAID' | 'CANCELLED'
-export type LocationType = 'BRANCH' | 'WAREHOUSE' | 'OUTSIDE'
+export type LocationType = 'BRANCH' | 'WAREHOUSE' | 'OUTSIDE' | 'TRIP'
 export type ItemUnit = 'KG' | 'G' | 'TON' | 'LB' | 'PIECE' | 'BUNDLE' | 'SACK'
 export type AttachmentType = 'PHOTO'
 
@@ -202,6 +202,7 @@ export interface TransactionListParams {
   warehouseId?: string
   fromDate?: string
   toDate?: string
+  tripId?: string
   includeArchived?: boolean
 }
 

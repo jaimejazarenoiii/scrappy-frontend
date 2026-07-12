@@ -37,6 +37,7 @@ function toTransactionListParams(params: ListQueryParams): TransactionListParams
     locationType: filters.locationType as LocationType | undefined,
     branchId: filters.branchId,
     warehouseId: filters.warehouseId,
+    tripId: filters.tripId,
 
     fromDate: filters.fromDate,
     toDate: filters.toDate,

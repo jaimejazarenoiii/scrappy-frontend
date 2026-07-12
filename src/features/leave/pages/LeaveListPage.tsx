@@ -113,7 +113,7 @@ export default function LeaveListPage() {
           title="Leave"
           description={
             isManagerView
-              ? 'Review company leave requests and approve or reject them.'
+              ? 'Review business leave requests and approve or reject them.'
               : 'Submit and track your leave requests.'
           }
           actions={
