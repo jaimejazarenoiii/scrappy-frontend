@@ -42,6 +42,7 @@ import { Button } from '@/components/ui/button'
 import { PERMISSIONS } from '@/constants/permissions'
 import { buildRoute } from '@/constants/routes'
 import { formatTransactionDirectionAndParty } from '../lib/transaction-format'
+import { toDateInputValue } from '@/utils/format-date'
 
 function toFormValue(value: string | null | undefined): string {
   return value ?? ''
@@ -126,7 +127,7 @@ export default function TransactionEditPage() {
       direction: tx.direction,
       partyName: tx.partyName,
       partyContactNumber: toFormValue(tx.partyContactNumber),
-      transactionDate: toFormValue(tx.transactionDate),
+      transactionDate: toDateInputValue(tx.transactionDate),
       locationType: tx.locationType,
       branchId: tx.locationType === 'BRANCH' ? toFormValue(tx.branchId) : '',
       warehouseId: tx.locationType === 'WAREHOUSE' ? toFormValue(tx.warehouseId) : '',

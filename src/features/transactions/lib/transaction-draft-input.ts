@@ -1,15 +1,21 @@
 import type { UpdateTransactionInput } from '../types/transaction.types'
 import type { TransactionDraftValues } from '../validation/transaction.schema'
+import { toDateInputValue } from '@/utils/format-date'
 
 /** Maps draft form values to a PATCH payload compatible with Backend P004. */
 export function toUpdateTransactionInput(values: TransactionDraftValues): UpdateTransactionInput {
+  const transactionDate = values.transactionDate?.trim()
+    ? toDateInputValue(values.transactionDate)
+    : undefined
+
   return {
     direction: values.direction,
     partyName: values.partyName,
     partyContactNumber: values.partyContactNumber?.trim()
       ? values.partyContactNumber.trim()
       : undefined,
-    transactionDate: values.transactionDate?.trim() ? values.transactionDate.trim() : undefined,
+    // Send date-only YYYY-MM-DD; never an empty string that clears the field.
+    ...(transactionDate ? { transactionDate } : {}),
     locationType: values.locationType,
     branchId:
       values.locationType === 'BRANCH' && values.branchId?.trim() ? values.branchId : undefined,

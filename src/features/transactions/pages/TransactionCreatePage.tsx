@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { applyApiValidationErrors } from '@/utils/form-errors'
+import { toDateInputValue } from '@/utils/format-date'
 import type { NormalizedApiError } from '@/lib/axios'
 import { useBranchOptions } from '@/features/branches/hooks/useBranchOptions'
 import { useWarehouseOptions } from '@/features/warehouses/hooks/useWarehouseOptions'
@@ -102,10 +103,11 @@ export default function TransactionCreatePage() {
       direction: values.direction,
       partyName: values.partyName,
       // API treats missing fields differently from empty strings; normalize "" -> undefined.
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty string must become undefined
       partyContactNumber: values.partyContactNumber?.trim() || undefined,
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      transactionDate: values.transactionDate?.trim() || undefined,
+      transactionDate: values.transactionDate?.trim()
+        ? toDateInputValue(values.transactionDate)
+        : undefined,
       locationType: values.locationType,
       branchId: values.locationType === 'BRANCH' && values.branchId ? values.branchId : undefined,
       warehouseId:
