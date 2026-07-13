@@ -98,45 +98,47 @@ export default function EmployeeDetailPage() {
                   </Button>
                 </PermissionGate>
               ) : null}
+              {!archived && hasLogin ? (
+                <PermissionGate permission={PERMISSIONS.employee.update}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setResetOpen(true)
+                    }}
+                  >
+                    <RotateCcw className="size-4" />
+                    Reset password
+                  </Button>
+                </PermissionGate>
+              ) : null}
               {!archived && hasLogin && linkedUser ? (
                 <PermissionGate permission={PERMISSIONS.employee.update}>
-                  <>
+                  {loginActive ? (
                     <Button
                       type="button"
                       variant="outline"
+                      disabled={disableAccess.isPending}
                       onClick={() => {
-                        setResetOpen(true)
+                        disableAccess.mutate()
                       }}
                     >
-                      <RotateCcw className="size-4" />
-                      Reset password
+                      <ShieldOff className="size-4" />
+                      Disable login
                     </Button>
-                    {loginActive ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        disabled={disableAccess.isPending}
-                        onClick={() => {
-                          disableAccess.mutate()
-                        }}
-                      >
-                        <ShieldOff className="size-4" />
-                        Disable login
-                      </Button>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        disabled={enableAccess.isPending}
-                        onClick={() => {
-                          enableAccess.mutate()
-                        }}
-                      >
-                        <ShieldCheck className="size-4" />
-                        Enable login
-                      </Button>
-                    )}
-                  </>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={enableAccess.isPending}
+                      onClick={() => {
+                        enableAccess.mutate()
+                      }}
+                    >
+                      <ShieldCheck className="size-4" />
+                      Enable login
+                    </Button>
+                  )}
                 </PermissionGate>
               ) : null}
               {!archived ? (
@@ -186,10 +188,25 @@ export default function EmployeeDetailPage() {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
             <CardTitle>System access</CardTitle>
+            {!archived && hasLogin ? (
+              <PermissionGate permission={PERMISSIONS.employee.update}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setResetOpen(true)
+                  }}
+                >
+                  <RotateCcw className="size-4" />
+                  Reset password
+                </Button>
+              </PermissionGate>
+            ) : null}
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             {linkedUser ? (
               <DescriptionList>
                 <DescriptionItem label="Email">{linkedUser.email}</DescriptionItem>
@@ -203,12 +220,28 @@ export default function EmployeeDetailPage() {
               </DescriptionList>
             ) : hasLogin ? (
               <p className="text-muted-foreground text-sm">
-                Linked to user {employee.userId}. Account details are unavailable.
+                This employee has a login account. You can reset their password for a one-time
+                temporary password.
               </p>
             ) : (
-              <p className="text-muted-foreground text-sm">
-                No login account. Create one so this employee can sign in.
-              </p>
+              <div className="space-y-3">
+                <p className="text-muted-foreground text-sm">
+                  No login account. Create one so this employee can sign in.
+                </p>
+                <PermissionGate permission={PERMISSIONS.employee.update}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setGrantOpen(true)
+                    }}
+                  >
+                    <KeyRound className="size-4" />
+                    Create login
+                  </Button>
+                </PermissionGate>
+              </div>
             )}
           </CardContent>
         </Card>
