@@ -1,4 +1,5 @@
-import { LogOut, Menu, Moon, Sun, User as UserIcon } from 'lucide-react'
+import { KeyRound, LogOut, Menu, Moon, Sun, User as UserIcon } from 'lucide-react'
+import { Link } from 'react-router'
 
 import { BrandLogo } from '@/components/common/BrandLogo'
 import { Button } from '@/components/ui/button'
@@ -10,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { ROUTES } from '@/constants/routes'
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser'
 import { useLogout } from '@/features/auth/hooks/useLogout'
 import { useTheme } from '@/hooks/useTheme'
@@ -113,6 +115,12 @@ export function Header() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link to={ROUTES.changePassword}>
+                <KeyRound className="size-4" />
+                Change password
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer"
               disabled={logout.isPending}

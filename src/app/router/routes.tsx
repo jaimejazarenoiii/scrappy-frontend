@@ -2,6 +2,7 @@ import { lazy } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router'
 
 import { AuthGuard } from '@/app/guards/AuthGuard'
+import { PasswordChangeGuard } from '@/app/guards/PasswordChangeGuard'
 import { PermissionGuard } from '@/app/guards/PermissionGuard'
 import { AppShell } from '@/app/layouts/AppShell'
 import { AuthLayout } from '@/app/layouts/AuthLayout'
@@ -103,6 +104,7 @@ const ExpenseReportsPage = lazy(() => import('@/features/reports/pages/ExpenseRe
 const PayrollReportsPage = lazy(() => import('@/features/reports/pages/PayrollReportsPage'))
 const AttendanceReportsPage = lazy(() => import('@/features/reports/pages/AttendanceReportsPage'))
 const LandingPage = lazy(() => import('@/features/landing/pages/LandingPage'))
+const ChangePasswordPage = lazy(() => import('@/features/users/pages/ChangePasswordPage'))
 
 export const router = createBrowserRouter([
   {
@@ -127,396 +129,410 @@ export const router = createBrowserRouter([
         element: <AuthGuard />,
         children: [
           {
-            element: <DashboardLayout />,
+            element: <AuthLayout />,
             children: [
               {
-                path: ROUTES.dashboard,
-                element: <DashboardPage />,
+                path: ROUTES.changePassword,
+                element: <ChangePasswordPage />,
               },
+            ],
+          },
+          {
+            element: <PasswordChangeGuard />,
+            children: [
               {
-                path: ROUTES.comingSoon,
-                element: <ComingSoonPage />,
-              },
-              {
-                path: ROUTES.forbidden,
-                element: <ForbiddenPage />,
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.company.view]} />,
+                element: <DashboardLayout />,
                 children: [
                   {
-                    path: ROUTES.company,
-                    element: <CompanyPage />,
+                    path: ROUTES.dashboard,
+                    element: <DashboardPage />,
                   },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.user.view]} />,
-                children: [
                   {
-                    path: ROUTES.users,
+                    path: ROUTES.comingSoon,
                     element: <ComingSoonPage />,
                   },
                   {
-                    path: ROUTES.userNew,
-                    element: <ComingSoonPage />,
+                    path: ROUTES.forbidden,
+                    element: <ForbiddenPage />,
                   },
                   {
-                    path: ROUTES.userDetail,
-                    element: <ComingSoonPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.company.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.company,
+                        element: <CompanyPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.userEdit,
-                    element: <ComingSoonPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.employee.view]} />,
-                children: [
-                  {
-                    path: ROUTES.employees,
-                    element: <EmployeesListPage />,
-                  },
-                  {
-                    path: ROUTES.employeeNew,
-                    element: <EmployeeCreatePage />,
-                  },
-                  {
-                    path: ROUTES.employeeDetail,
-                    element: <EmployeeDetailPage />,
-                  },
-                  {
-                    path: ROUTES.employeeEdit,
-                    element: <EmployeeEditPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.branch.view]} />,
-                children: [
-                  {
-                    path: ROUTES.branches,
-                    element: <BranchesListPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.user.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.users,
+                        element: <ComingSoonPage />,
+                      },
+                      {
+                        path: ROUTES.userNew,
+                        element: <ComingSoonPage />,
+                      },
+                      {
+                        path: ROUTES.userDetail,
+                        element: <ComingSoonPage />,
+                      },
+                      {
+                        path: ROUTES.userEdit,
+                        element: <ComingSoonPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.branchDetail,
-                    element: <BranchDetailPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.branch.create]} />,
-                children: [
-                  {
-                    path: ROUTES.branchNew,
-                    element: <BranchCreatePage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.branch.update]} />,
-                children: [
-                  {
-                    path: ROUTES.branchEdit,
-                    element: <BranchEditPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.warehouse.view]} />,
-                children: [
-                  {
-                    path: ROUTES.warehouses,
-                    element: <WarehousesListPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.employee.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.employees,
+                        element: <EmployeesListPage />,
+                      },
+                      {
+                        path: ROUTES.employeeNew,
+                        element: <EmployeeCreatePage />,
+                      },
+                      {
+                        path: ROUTES.employeeDetail,
+                        element: <EmployeeDetailPage />,
+                      },
+                      {
+                        path: ROUTES.employeeEdit,
+                        element: <EmployeeEditPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.warehouseDetail,
-                    element: <WarehouseDetailPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.warehouse.create]} />,
-                children: [
-                  {
-                    path: ROUTES.warehouseNew,
-                    element: <WarehouseCreatePage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.warehouse.update]} />,
-                children: [
-                  {
-                    path: ROUTES.warehouseEdit,
-                    element: <WarehouseEditPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.vehicle.view]} />,
-                children: [
-                  {
-                    path: ROUTES.vehicles,
-                    element: <VehiclesListPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.branch.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.branches,
+                        element: <BranchesListPage />,
+                      },
+                      {
+                        path: ROUTES.branchDetail,
+                        element: <BranchDetailPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.vehicleDetail,
-                    element: <VehicleDetailPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.vehicle.create]} />,
-                children: [
-                  {
-                    path: ROUTES.vehicleNew,
-                    element: <VehicleCreatePage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.vehicle.update]} />,
-                children: [
-                  {
-                    path: ROUTES.vehicleEdit,
-                    element: <VehicleEditPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.attendance.view]} />,
-                children: [
-                  {
-                    path: ROUTES.attendance,
-                    element: <AttendanceDashboardPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.branch.create]} />,
+                    children: [
+                      {
+                        path: ROUTES.branchNew,
+                        element: <BranchCreatePage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.attendanceDetail,
-                    element: <AttendanceDetailPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.leave.view]} />,
-                children: [
-                  {
-                    path: ROUTES.leave,
-                    element: <LeaveListPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.branch.update]} />,
+                    children: [
+                      {
+                        path: ROUTES.branchEdit,
+                        element: <BranchEditPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.leaveDetail,
-                    element: <LeaveDetailPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.leave.create]} />,
-                children: [
-                  {
-                    path: ROUTES.leaveNew,
-                    element: <LeaveCreatePage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.leave.update]} />,
-                children: [
-                  {
-                    path: ROUTES.leaveEdit,
-                    element: <LeaveEditPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.cashAdvance.view]} />,
-                children: [
-                  {
-                    path: ROUTES.cashAdvances,
-                    element: <CashAdvancesListPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.warehouse.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.warehouses,
+                        element: <WarehousesListPage />,
+                      },
+                      {
+                        path: ROUTES.warehouseDetail,
+                        element: <WarehouseDetailPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.cashAdvanceDetail,
-                    element: <CashAdvanceDetailPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.cashAdvance.create]} />,
-                children: [
-                  {
-                    path: ROUTES.cashAdvanceNew,
-                    element: <CashAdvanceCreatePage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.cashAdvance.update]} />,
-                children: [
-                  {
-                    path: ROUTES.cashAdvanceEdit,
-                    element: <CashAdvanceEditPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.payroll.view]} />,
-                children: [
-                  {
-                    path: ROUTES.payroll,
-                    element: <PayrollListPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.warehouse.create]} />,
+                    children: [
+                      {
+                        path: ROUTES.warehouseNew,
+                        element: <WarehouseCreatePage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.payrollDetail,
-                    element: <PayrollDetailPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.transactions.view]} />,
-                children: [
-                  {
-                    path: ROUTES.transactions,
-                    element: <TransactionsDashboardPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.warehouse.update]} />,
+                    children: [
+                      {
+                        path: ROUTES.warehouseEdit,
+                        element: <WarehouseEditPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.transactionsDrafts,
-                    element: <TransactionDraftsPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.vehicle.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.vehicles,
+                        element: <VehiclesListPage />,
+                      },
+                      {
+                        path: ROUTES.vehicleDetail,
+                        element: <VehicleDetailPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.transactionDetail,
-                    element: <TransactionDetailPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.vehicle.create]} />,
+                    children: [
+                      {
+                        path: ROUTES.vehicleNew,
+                        element: <VehicleCreatePage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.transactionSettlement,
-                    element: <TransactionSettlementPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.vehicle.update]} />,
+                    children: [
+                      {
+                        path: ROUTES.vehicleEdit,
+                        element: <VehicleEditPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.transactionReceipt,
-                    element: <TransactionReceiptPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.transactions.create]} />,
-                children: [
-                  {
-                    path: ROUTES.transactionNew,
-                    element: <TransactionCreatePage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.transactions.update]} />,
-                children: [
-                  {
-                    path: ROUTES.transactionEdit,
-                    element: <TransactionEditPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.trips.view]} />,
-                children: [
-                  {
-                    path: ROUTES.trips,
-                    element: <TripsDashboardPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.attendance.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.attendance,
+                        element: <AttendanceDashboardPage />,
+                      },
+                      {
+                        path: ROUTES.attendanceDetail,
+                        element: <AttendanceDetailPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.tripDetail,
-                    element: <TripDetailPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.trips.create]} />,
-                children: [
-                  {
-                    path: ROUTES.tripsNew,
-                    element: <TripCreatePage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.trips.update]} />,
-                children: [
-                  {
-                    path: ROUTES.tripEdit,
-                    element: <TripEditPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.expenses.view]} />,
-                children: [
-                  {
-                    path: ROUTES.expenses,
-                    element: <ExpensesDashboardPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.leave.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.leave,
+                        element: <LeaveListPage />,
+                      },
+                      {
+                        path: ROUTES.leaveDetail,
+                        element: <LeaveDetailPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.expenseDetail,
-                    element: <ExpenseDetailPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.expenses.create]} />,
-                children: [
-                  {
-                    path: ROUTES.expensesNew,
-                    element: <ExpenseCreatePage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.expenses.update]} />,
-                children: [
-                  {
-                    path: ROUTES.expenseEdit,
-                    element: <ExpenseEditPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.analytics.view]} />,
-                children: [
-                  {
-                    path: ROUTES.analytics,
-                    element: <Navigate to={ROUTES.analyticsDashboard} replace />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.leave.create]} />,
+                    children: [
+                      {
+                        path: ROUTES.leaveNew,
+                        element: <LeaveCreatePage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.analyticsDashboard,
-                    element: <AnalyticsDashboardPage />,
-                  },
-                ],
-              },
-              {
-                element: <PermissionGuard permissions={[PERMISSIONS.reports.view]} />,
-                children: [
-                  {
-                    path: ROUTES.reports,
-                    element: <ReportsHubPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.leave.update]} />,
+                    children: [
+                      {
+                        path: ROUTES.leaveEdit,
+                        element: <LeaveEditPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.reportsTransactions,
-                    element: <TransactionReportsPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.cashAdvance.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.cashAdvances,
+                        element: <CashAdvancesListPage />,
+                      },
+                      {
+                        path: ROUTES.cashAdvanceDetail,
+                        element: <CashAdvanceDetailPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.reportsTrips,
-                    element: <TripReportsPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.cashAdvance.create]} />,
+                    children: [
+                      {
+                        path: ROUTES.cashAdvanceNew,
+                        element: <CashAdvanceCreatePage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.reportsExpenses,
-                    element: <ExpenseReportsPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.cashAdvance.update]} />,
+                    children: [
+                      {
+                        path: ROUTES.cashAdvanceEdit,
+                        element: <CashAdvanceEditPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.reportsPayroll,
-                    element: <PayrollReportsPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.payroll.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.payroll,
+                        element: <PayrollListPage />,
+                      },
+                      {
+                        path: ROUTES.payrollDetail,
+                        element: <PayrollDetailPage />,
+                      },
+                    ],
                   },
                   {
-                    path: ROUTES.reportsAttendance,
-                    element: <AttendanceReportsPage />,
+                    element: <PermissionGuard permissions={[PERMISSIONS.transactions.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.transactions,
+                        element: <TransactionsDashboardPage />,
+                      },
+                      {
+                        path: ROUTES.transactionsDrafts,
+                        element: <TransactionDraftsPage />,
+                      },
+                      {
+                        path: ROUTES.transactionDetail,
+                        element: <TransactionDetailPage />,
+                      },
+                      {
+                        path: ROUTES.transactionSettlement,
+                        element: <TransactionSettlementPage />,
+                      },
+                      {
+                        path: ROUTES.transactionReceipt,
+                        element: <TransactionReceiptPage />,
+                      },
+                    ],
+                  },
+                  {
+                    element: <PermissionGuard permissions={[PERMISSIONS.transactions.create]} />,
+                    children: [
+                      {
+                        path: ROUTES.transactionNew,
+                        element: <TransactionCreatePage />,
+                      },
+                    ],
+                  },
+                  {
+                    element: <PermissionGuard permissions={[PERMISSIONS.transactions.update]} />,
+                    children: [
+                      {
+                        path: ROUTES.transactionEdit,
+                        element: <TransactionEditPage />,
+                      },
+                    ],
+                  },
+                  {
+                    element: <PermissionGuard permissions={[PERMISSIONS.trips.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.trips,
+                        element: <TripsDashboardPage />,
+                      },
+                      {
+                        path: ROUTES.tripDetail,
+                        element: <TripDetailPage />,
+                      },
+                    ],
+                  },
+                  {
+                    element: <PermissionGuard permissions={[PERMISSIONS.trips.create]} />,
+                    children: [
+                      {
+                        path: ROUTES.tripsNew,
+                        element: <TripCreatePage />,
+                      },
+                    ],
+                  },
+                  {
+                    element: <PermissionGuard permissions={[PERMISSIONS.trips.update]} />,
+                    children: [
+                      {
+                        path: ROUTES.tripEdit,
+                        element: <TripEditPage />,
+                      },
+                    ],
+                  },
+                  {
+                    element: <PermissionGuard permissions={[PERMISSIONS.expenses.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.expenses,
+                        element: <ExpensesDashboardPage />,
+                      },
+                      {
+                        path: ROUTES.expenseDetail,
+                        element: <ExpenseDetailPage />,
+                      },
+                    ],
+                  },
+                  {
+                    element: <PermissionGuard permissions={[PERMISSIONS.expenses.create]} />,
+                    children: [
+                      {
+                        path: ROUTES.expensesNew,
+                        element: <ExpenseCreatePage />,
+                      },
+                    ],
+                  },
+                  {
+                    element: <PermissionGuard permissions={[PERMISSIONS.expenses.update]} />,
+                    children: [
+                      {
+                        path: ROUTES.expenseEdit,
+                        element: <ExpenseEditPage />,
+                      },
+                    ],
+                  },
+                  {
+                    element: <PermissionGuard permissions={[PERMISSIONS.analytics.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.analytics,
+                        element: <Navigate to={ROUTES.analyticsDashboard} replace />,
+                      },
+                      {
+                        path: ROUTES.analyticsDashboard,
+                        element: <AnalyticsDashboardPage />,
+                      },
+                    ],
+                  },
+                  {
+                    element: <PermissionGuard permissions={[PERMISSIONS.reports.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.reports,
+                        element: <ReportsHubPage />,
+                      },
+                      {
+                        path: ROUTES.reportsTransactions,
+                        element: <TransactionReportsPage />,
+                      },
+                      {
+                        path: ROUTES.reportsTrips,
+                        element: <TripReportsPage />,
+                      },
+                      {
+                        path: ROUTES.reportsExpenses,
+                        element: <ExpenseReportsPage />,
+                      },
+                      {
+                        path: ROUTES.reportsPayroll,
+                        element: <PayrollReportsPage />,
+                      },
+                      {
+                        path: ROUTES.reportsAttendance,
+                        element: <AttendanceReportsPage />,
+                      },
+                    ],
                   },
                 ],
               },

@@ -98,6 +98,13 @@ apiClient.interceptors.response.use(
       toast.error('Your session has expired. Please sign in again.')
     }
 
+    if (status === 403 && normalized.code === 'PASSWORD_CHANGE_REQUIRED') {
+      const { currentUser, setCurrentUser } = useAuthStore.getState()
+      if (currentUser && !currentUser.passwordChangeRequired) {
+        setCurrentUser({ ...currentUser, passwordChangeRequired: true })
+      }
+    }
+
     return Promise.reject(normalized)
   },
 )

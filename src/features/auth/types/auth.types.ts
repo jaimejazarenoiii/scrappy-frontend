@@ -24,6 +24,7 @@ export interface AuthUser {
   id: string
   email: string
   role: UserRole
+  passwordChangeRequired?: boolean
 }
 
 /** `POST /auth/login` and `POST /auth/refresh` response data. */
@@ -53,6 +54,7 @@ export interface CurrentUser {
   permissions: string[]
   tenant: TenantContext
   status: 'active' | 'inactive'
+  passwordChangeRequired: boolean
 }
 
 export type SessionStatus = 'idle' | 'loading' | 'authenticated' | 'unauthenticated'

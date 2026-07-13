@@ -15,7 +15,7 @@ export function useLogin() {
     mutationFn: async (credentials: Credentials) => {
       const login = await AuthService.login(credentials)
       useAuthStore.getState().setTokens(login.accessToken, login.refreshToken ?? undefined)
-      const user = await hydrateSession()
+      const user = await hydrateSession({ fallbackCompany: login.company })
       return { login, user, remember: credentials.remember }
     },
     onSuccess: ({ login, user, remember }) => {

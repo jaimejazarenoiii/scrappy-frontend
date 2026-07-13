@@ -11,4 +11,18 @@ export interface UserMe {
   role: UserRole
   status: UserStatus
   lastLoginAt: string | null
+  passwordChangeRequired?: boolean
+}
+
+/** `GET /users/me/password-status` */
+export interface PasswordStatus {
+  passwordChangeRequired: boolean
+  passwordChangedAt: string | null
+}
+
+/** `POST /users/me/password` */
+export interface ChangePasswordInput {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
 }

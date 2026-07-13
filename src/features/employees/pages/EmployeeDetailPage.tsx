@@ -1,4 +1,4 @@
-import { Archive, KeyRound, Pencil, ShieldOff, ShieldCheck } from 'lucide-react'
+import { Archive, KeyRound, Pencil, RotateCcw, ShieldOff, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
@@ -16,6 +16,7 @@ import { buildRoute } from '@/constants/routes'
 import { PermissionGate } from '@/features/authorization/components/PermissionGate'
 import { formatDate } from '@/utils/format-date'
 import { GrantSystemAccessDialog } from '../components/GrantSystemAccessDialog'
+import { ResetEmployeePasswordDialog } from '../components/ResetEmployeePasswordDialog'
 import { formatEmployeeName, isEmployeeArchived } from '../lib/employee-display'
 import { useEmployee } from '../hooks/useEmployee'
 import {
@@ -33,6 +34,7 @@ export default function EmployeeDetailPage() {
   const enableAccess = useEnableSystemAccess(id ?? '')
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [grantOpen, setGrantOpen] = useState(false)
+  const [resetOpen, setResetOpen] = useState(false)
 
   useEffect(() => {
     document.title = 'Employee details | Scrappy'
@@ -98,31 +100,43 @@ export default function EmployeeDetailPage() {
               ) : null}
               {!archived && hasLogin && linkedUser ? (
                 <PermissionGate permission={PERMISSIONS.employee.update}>
-                  {loginActive ? (
+                  <>
                     <Button
                       type="button"
                       variant="outline"
-                      disabled={disableAccess.isPending}
                       onClick={() => {
-                        disableAccess.mutate()
+                        setResetOpen(true)
                       }}
                     >
-                      <ShieldOff className="size-4" />
-                      Disable login
+                      <RotateCcw className="size-4" />
+                      Reset password
                     </Button>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={enableAccess.isPending}
-                      onClick={() => {
-                        enableAccess.mutate()
-                      }}
-                    >
-                      <ShieldCheck className="size-4" />
-                      Enable login
-                    </Button>
-                  )}
+                    {loginActive ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={disableAccess.isPending}
+                        onClick={() => {
+                          disableAccess.mutate()
+                        }}
+                      >
+                        <ShieldOff className="size-4" />
+                        Disable login
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={enableAccess.isPending}
+                        onClick={() => {
+                          enableAccess.mutate()
+                        }}
+                      >
+                        <ShieldCheck className="size-4" />
+                        Enable login
+                      </Button>
+                    )}
+                  </>
                 </PermissionGate>
               ) : null}
               {!archived ? (
@@ -205,6 +219,13 @@ export default function EmployeeDetailPage() {
         employeeName={displayName}
         open={grantOpen}
         onOpenChange={setGrantOpen}
+      />
+
+      <ResetEmployeePasswordDialog
+        employeeId={employee.id}
+        employeeName={displayName}
+        open={resetOpen}
+        onOpenChange={setResetOpen}
       />
 
       <ConfirmDialog

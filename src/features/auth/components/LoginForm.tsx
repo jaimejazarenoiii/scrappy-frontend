@@ -24,6 +24,9 @@ export function LoginForm() {
   const login = useLogin()
   const location = useLocation()
   const status = useAuthStore((state) => state.status)
+  const passwordChangeRequired = useAuthStore(
+    (state) => state.currentUser?.passwordChangeRequired === true,
+  )
   const [showPassword, setShowPassword] = useState(false)
 
   const redirectTo = (location.state as LocationState | null)?.from?.pathname ?? ROUTES.dashboard
@@ -38,6 +41,9 @@ export function LoginForm() {
   })
 
   if (status === 'authenticated') {
+    if (passwordChangeRequired) {
+      return <Navigate to={ROUTES.changePassword} replace />
+    }
     return <Navigate to={redirectTo} replace />
   }
 

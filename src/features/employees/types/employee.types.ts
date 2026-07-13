@@ -65,3 +65,11 @@ export interface LinkEmployeeUserInput {
 
 /** `POST /employees/{id}/system-access` — create User + link. */
 export type GrantSystemAccessInput = CreateEmployeeAccountInput
+
+/** `POST /employees/{id}/password-reset` — one-time temporary password. */
+export interface EmployeePasswordResetResult {
+  employeeId: string
+  userId: string
+  passwordChangeRequired: true
+  temporaryPassword: string
+}

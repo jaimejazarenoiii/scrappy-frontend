@@ -3,8 +3,9 @@ import { CompanyService } from '@/features/company/services/company.service'
 import type { Company } from '@/features/company/types/company.types'
 import { UserService } from '@/features/users/services/user.service'
 import type { UserMe } from '@/features/users/types/user.types'
+import type { NormalizedApiError } from '@/types/api.types'
 
-import type { CurrentUser, UserRole } from '../types/auth.types'
+import type { AuthCompany, CurrentUser, UserRole } from '../types/auth.types'
 
 /**
  * Client-side role → permission derivation.
@@ -108,11 +109,66 @@ export function buildCurrentUser(me: UserMe, company: Company): CurrentUser {
       companyName: company.name,
     },
     status: me.status === 'ACTIVE' ? 'active' : 'inactive',
+    passwordChangeRequired: me.passwordChangeRequired === true,
   }
 }
 
-/** Resolves the session identity from token-scoped convenience endpoints. */
-export async function hydrateSession(): Promise<CurrentUser> {
-  const [me, company] = await Promise.all([UserService.me(), CompanyService.getMe()])
-  return buildCurrentUser(me, company)
+function companyFromAuth(company: AuthCompany): Company {
+  return {
+    id: company.id,
+    name: company.name,
+    logoUrl: null,
+    contactNumber: null,
+    email: null,
+    address: null,
+    status: company.status,
+  }
+}
+
+function stubCompany(companyId: string): Company {
+  return {
+    id: companyId,
+    name: 'Your business',
+    logoUrl: null,
+    contactNumber: null,
+    email: null,
+    address: null,
+    status: 'ACTIVE',
+  }
+}
+
+function isPasswordChangeRequiredError(error: unknown): boolean {
+  const normalized = error as NormalizedApiError | undefined
+  return normalized?.code === 'PASSWORD_CHANGE_REQUIRED' || normalized?.status === 403
+}
+
+/**
+ * Resolves the session identity from token-scoped convenience endpoints.
+ * When a password change is required, `/companies/me` is not allowlisted — use the
+ * login/refresh company snapshot instead.
+ */
+export async function hydrateSession(options?: {
+  fallbackCompany?: AuthCompany
+}): Promise<CurrentUser> {
+  const me = await UserService.me()
+
+  if (me.passwordChangeRequired) {
+    const company = options?.fallbackCompany
+      ? companyFromAuth(options.fallbackCompany)
+      : stubCompany(me.companyId)
+    return buildCurrentUser(me, company)
+  }
+
+  try {
+    const company = await CompanyService.getMe()
+    return buildCurrentUser(me, company)
+  } catch (error) {
+    if (isPasswordChangeRequiredError(error) && options?.fallbackCompany) {
+      return buildCurrentUser(
+        { ...me, passwordChangeRequired: true },
+        companyFromAuth(options.fallbackCompany),
+      )
+    }
+    throw error
+  }
 }

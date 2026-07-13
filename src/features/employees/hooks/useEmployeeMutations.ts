@@ -93,6 +93,15 @@ export function useEnableSystemAccess(id: string) {
   })
 }
 
+export function useResetEmployeePassword(id: string) {
+  return useMutation({
+    mutationFn: () => EmployeeService.resetPassword(id),
+    onError: (error: NormalizedApiError) => {
+      toast.error(error.message || 'Could not reset password')
+    },
+  })
+}
+
 export function useArchiveEmployee(id: string) {
   const queryClient = useQueryClient()
 

@@ -31,7 +31,7 @@ export function useSessionBootstrap(): void {
       try {
         const login = await AuthService.refresh(storedRefreshToken)
         setTokens(login.accessToken, login.refreshToken ?? undefined)
-        const user = await hydrateSession()
+        const user = await hydrateSession({ fallbackCompany: login.company })
         setCurrentUser(user)
       } catch {
         clearSession()

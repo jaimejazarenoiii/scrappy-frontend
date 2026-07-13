@@ -7,6 +7,7 @@ import { formatEmployeeName } from '../lib/employee-display'
 import type {
   CreateEmployeeInput,
   Employee,
+  EmployeePasswordResetResult,
   GrantSystemAccessInput,
   LinkEmployeeUserInput,
   UpdateEmployeeInput,
@@ -21,6 +22,7 @@ export const EMPLOYEE_ENDPOINTS = {
   systemAccess: (employeeId: string) => `/employees/${employeeId}/system-access`,
   systemAccessDisable: (employeeId: string) => `/employees/${employeeId}/system-access/disable`,
   systemAccessEnable: (employeeId: string) => `/employees/${employeeId}/system-access/enable`,
+  passwordReset: (employeeId: string) => `/employees/${employeeId}/password-reset`,
 } as const
 
 function filterAndPaginate(
@@ -151,6 +153,14 @@ export const EmployeeService = {
   async enableSystemAccess(employeeId: string): Promise<Employee> {
     const response = await apiClient.post<ApiEnvelope<Employee>>(
       EMPLOYEE_ENDPOINTS.systemAccessEnable(employeeId),
+    )
+    return unwrap(response)
+  },
+
+  async resetPassword(employeeId: string): Promise<EmployeePasswordResetResult> {
+    const response = await apiClient.post<ApiEnvelope<EmployeePasswordResetResult>>(
+      EMPLOYEE_ENDPOINTS.passwordReset(employeeId),
+      {},
     )
     return unwrap(response)
   },
