@@ -1,4 +1,4 @@
-import { Archive, Pencil } from 'lucide-react'
+import { Archive, KeyRound, Pencil, ShieldOff, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
@@ -15,16 +15,24 @@ import { PERMISSIONS } from '@/constants/permissions'
 import { buildRoute } from '@/constants/routes'
 import { PermissionGate } from '@/features/authorization/components/PermissionGate'
 import { formatDate } from '@/utils/format-date'
+import { GrantSystemAccessDialog } from '../components/GrantSystemAccessDialog'
 import { formatEmployeeName, isEmployeeArchived } from '../lib/employee-display'
 import { useEmployee } from '../hooks/useEmployee'
-import { useArchiveEmployee } from '../hooks/useEmployeeMutations'
+import {
+  useArchiveEmployee,
+  useDisableSystemAccess,
+  useEnableSystemAccess,
+} from '../hooks/useEmployeeMutations'
 
 export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const employeeQuery = useEmployee(id)
   const archiveEmployee = useArchiveEmployee(id ?? '')
+  const disableAccess = useDisableSystemAccess(id ?? '')
+  const enableAccess = useEnableSystemAccess(id ?? '')
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [grantOpen, setGrantOpen] = useState(false)
 
   useEffect(() => {
     document.title = 'Employee details | Scrappy'
@@ -50,6 +58,9 @@ export default function EmployeeDetailPage() {
   const archived = isEmployeeArchived(employee)
   const statusTone = archived ? 'archived' : employee.status === 'ACTIVE' ? 'active' : 'inactive'
   const statusLabel = archived ? 'archived' : employee.status.toLowerCase()
+  const linkedUser = employee.linkedUser
+  const hasLogin = Boolean(employee.userId ?? linkedUser?.id)
+  const loginActive = linkedUser?.status === 'ACTIVE'
 
   return (
     <PageContainer maxWidth="lg">
@@ -58,7 +69,7 @@ export default function EmployeeDetailPage() {
           title={displayName}
           description={employee.employeeNumber ?? 'Employee record'}
           actions={
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <PermissionGate permission={PERMISSIONS.employee.update}>
                 <Button
                   type="button"
@@ -71,6 +82,49 @@ export default function EmployeeDetailPage() {
                   Edit
                 </Button>
               </PermissionGate>
+              {!archived && !hasLogin ? (
+                <PermissionGate permission={PERMISSIONS.employee.update}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setGrantOpen(true)
+                    }}
+                  >
+                    <KeyRound className="size-4" />
+                    Create login
+                  </Button>
+                </PermissionGate>
+              ) : null}
+              {!archived && hasLogin && linkedUser ? (
+                <PermissionGate permission={PERMISSIONS.employee.update}>
+                  {loginActive ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={disableAccess.isPending}
+                      onClick={() => {
+                        disableAccess.mutate()
+                      }}
+                    >
+                      <ShieldOff className="size-4" />
+                      Disable login
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={enableAccess.isPending}
+                      onClick={() => {
+                        enableAccess.mutate()
+                      }}
+                    >
+                      <ShieldCheck className="size-4" />
+                      Enable login
+                    </Button>
+                  )}
+                </PermissionGate>
+              ) : null}
               {!archived ? (
                 <PermissionGate permission={PERMISSIONS.employee.archive}>
                   <Button
@@ -109,9 +163,6 @@ export default function EmployeeDetailPage() {
               <DescriptionItem label="Status">
                 <StatusBadge label={statusLabel} tone={statusTone} />
               </DescriptionItem>
-              <DescriptionItem label="Linked user">
-                {employee.userId ?? 'Not linked'}
-              </DescriptionItem>
               <DescriptionItem label="Created">{formatDate(employee.createdAt)}</DescriptionItem>
               <DescriptionItem label="Last updated">
                 {formatDate(employee.updatedAt)}
@@ -119,7 +170,42 @@ export default function EmployeeDetailPage() {
             </DescriptionList>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>System access</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {linkedUser ? (
+              <DescriptionList>
+                <DescriptionItem label="Email">{linkedUser.email}</DescriptionItem>
+                <DescriptionItem label="Role">{linkedUser.role}</DescriptionItem>
+                <DescriptionItem label="Login status">
+                  <StatusBadge
+                    label={linkedUser.status.toLowerCase()}
+                    tone={linkedUser.status === 'ACTIVE' ? 'active' : 'inactive'}
+                  />
+                </DescriptionItem>
+              </DescriptionList>
+            ) : hasLogin ? (
+              <p className="text-muted-foreground text-sm">
+                Linked to user {employee.userId}. Account details are unavailable.
+              </p>
+            ) : (
+              <p className="text-muted-foreground text-sm">
+                No login account. Create one so this employee can sign in.
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
+
+      <GrantSystemAccessDialog
+        employeeId={employee.id}
+        employeeName={displayName}
+        open={grantOpen}
+        onOpenChange={setGrantOpen}
+      />
 
       <ConfirmDialog
         open={confirmOpen}

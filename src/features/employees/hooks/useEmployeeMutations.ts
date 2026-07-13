@@ -4,7 +4,12 @@ import { toast } from 'sonner'
 import type { NormalizedApiError } from '@/lib/axios'
 
 import { EmployeeService } from '../services/employee.service'
-import type { CreateEmployeeInput, Employee, UpdateEmployeeInput } from '../types/employee.types'
+import type {
+  CreateEmployeeInput,
+  Employee,
+  GrantSystemAccessInput,
+  UpdateEmployeeInput,
+} from '../types/employee.types'
 import { employeeKeys } from './useEmployees'
 
 export function useCreateEmployee() {
@@ -39,6 +44,51 @@ export function useUpdateEmployee(id: string) {
     },
     onError: (error: NormalizedApiError) => {
       toast.error(error.message || 'Could not update employee')
+    },
+  })
+}
+
+export function useGrantSystemAccess(id: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: GrantSystemAccessInput) => EmployeeService.grantSystemAccess(id, input),
+    onSuccess: (employee) => {
+      queryClient.setQueryData(employeeKeys.detail(id), employee)
+      void queryClient.invalidateQueries({ queryKey: employeeKeys.all })
+      toast.success('Login account created')
+    },
+    onError: (error: NormalizedApiError) => {
+      toast.error(error.message || 'Could not create login account')
+    },
+  })
+}
+
+export function useDisableSystemAccess(id: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => EmployeeService.disableSystemAccess(id),
+    onSuccess: (employee) => {
+      queryClient.setQueryData(employeeKeys.detail(id), employee)
+      void queryClient.invalidateQueries({ queryKey: employeeKeys.all })
+      toast.success('Login disabled')
+    },
+    onError: (error: NormalizedApiError) => {
+      toast.error(error.message || 'Could not disable login')
+    },
+  })
+}
+
+export function useEnableSystemAccess(id: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => EmployeeService.enableSystemAccess(id),
+    onSuccess: (employee) => {
+      queryClient.setQueryData(employeeKeys.detail(id), employee)
+      void queryClient.invalidateQueries({ queryKey: employeeKeys.all })
+      toast.success('Login enabled')
+    },
+    onError: (error: NormalizedApiError) => {
+      toast.error(error.message || 'Could not enable login')
     },
   })
 }

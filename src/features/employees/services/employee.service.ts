@@ -7,6 +7,7 @@ import { formatEmployeeName } from '../lib/employee-display'
 import type {
   CreateEmployeeInput,
   Employee,
+  GrantSystemAccessInput,
   LinkEmployeeUserInput,
   UpdateEmployeeInput,
 } from '../types/employee.types'
@@ -17,6 +18,9 @@ export const EMPLOYEE_ENDPOINTS = {
   detail: (employeeId: string) => `/employees/${employeeId}`,
   archive: (employeeId: string) => `/employees/${employeeId}/archive`,
   userLink: (employeeId: string) => `/employees/${employeeId}/user-link`,
+  systemAccess: (employeeId: string) => `/employees/${employeeId}/system-access`,
+  systemAccessDisable: (employeeId: string) => `/employees/${employeeId}/system-access/disable`,
+  systemAccessEnable: (employeeId: string) => `/employees/${employeeId}/system-access/enable`,
 } as const
 
 function filterAndPaginate(
@@ -125,6 +129,28 @@ export const EmployeeService = {
     const response = await apiClient.post<ApiEnvelope<Employee>>(
       EMPLOYEE_ENDPOINTS.userLink(employeeId),
       input,
+    )
+    return unwrap(response)
+  },
+
+  async grantSystemAccess(employeeId: string, input: GrantSystemAccessInput): Promise<Employee> {
+    const response = await apiClient.post<ApiEnvelope<Employee>>(
+      EMPLOYEE_ENDPOINTS.systemAccess(employeeId),
+      input,
+    )
+    return unwrap(response)
+  },
+
+  async disableSystemAccess(employeeId: string): Promise<Employee> {
+    const response = await apiClient.post<ApiEnvelope<Employee>>(
+      EMPLOYEE_ENDPOINTS.systemAccessDisable(employeeId),
+    )
+    return unwrap(response)
+  },
+
+  async enableSystemAccess(employeeId: string): Promise<Employee> {
+    const response = await apiClient.post<ApiEnvelope<Employee>>(
+      EMPLOYEE_ENDPOINTS.systemAccessEnable(employeeId),
     )
     return unwrap(response)
   },

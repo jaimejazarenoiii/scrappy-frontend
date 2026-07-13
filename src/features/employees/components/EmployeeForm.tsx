@@ -4,8 +4,17 @@ import { useForm } from 'react-hook-form'
 
 import { FormField } from '@/components/common/FormField'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
-import { employeeSchema, type EmployeeFormValues } from '../validation/employee.schema'
+import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
+import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser'
+import type { UserRole } from '@/features/auth/types/auth.types'
+import {
+  assignableAccountRoles,
+  employeeSchema,
+  type EmployeeFormValues,
+} from '../validation/employee.schema'
 
 interface EmployeeFormProps {
   mode: 'create' | 'edit'
@@ -15,6 +24,12 @@ interface EmployeeFormProps {
   isSubmitting: boolean
 }
 
+const ROLE_LABELS: Record<UserRole, string> = {
+  OWNER: 'Owner',
+  MANAGER: 'Manager',
+  EMPLOYEE: 'Employee',
+}
+
 export function EmployeeForm({
   mode,
   defaultValues,
@@ -22,9 +37,14 @@ export function EmployeeForm({
   onCancel,
   isSubmitting,
 }: EmployeeFormProps) {
+  const { currentUser } = useCurrentUser()
+  const roleOptions = assignableAccountRoles(currentUser?.role)
+
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeSchema),
@@ -37,8 +57,15 @@ export function EmployeeForm({
       contactNumber: defaultValues?.contactNumber ?? '',
       weeklySalary: defaultValues?.weeklySalary ?? 0,
       linkUserId: defaultValues?.linkUserId ?? '',
+      createAccount: defaultValues?.createAccount ?? false,
+      accountEmail: defaultValues?.accountEmail ?? '',
+      accountPassword: defaultValues?.accountPassword ?? '',
+      accountConfirmPassword: defaultValues?.accountConfirmPassword ?? '',
+      accountRole: defaultValues?.accountRole ?? 'EMPLOYEE',
     },
   })
+
+  const createAccount = watch('createAccount')
 
   const submitHandler = handleSubmit((values) => {
     onSubmit(values)
@@ -112,15 +139,110 @@ export function EmployeeForm({
 
         {mode === 'edit' ? (
           <FormField
-            label="Link user account"
+            label="Link existing user"
             htmlFor="linkUserId"
-            hint="User UUID to associate with this employee (POST /employees/{id}/user-link)."
+            hint="Optional. Paste an existing user UUID to link without creating a new login."
             className="sm:col-span-2"
           >
             <Input id="linkUserId" placeholder="User UUID" {...register('linkUserId')} />
           </FormField>
         ) : null}
       </div>
+
+      {mode === 'create' ? (
+        <div className="space-y-4 rounded-lg border p-4">
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="createAccount"
+              checked={createAccount}
+              onChange={(event) => {
+                setValue('createAccount', event.target.checked, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }}
+            />
+            <div className="space-y-1">
+              <Label htmlFor="createAccount" className="cursor-pointer font-medium">
+                Create login account
+              </Label>
+              <p className="text-muted-foreground text-sm">
+                Lets this employee sign in. Leave unchecked to save workforce details only.
+              </p>
+            </div>
+          </div>
+
+          {createAccount ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                label="Email"
+                htmlFor="accountEmail"
+                error={errors.accountEmail?.message}
+                required
+                className="sm:col-span-2"
+              >
+                <Input
+                  id="accountEmail"
+                  type="email"
+                  autoComplete="off"
+                  aria-invalid={Boolean(errors.accountEmail)}
+                  {...register('accountEmail')}
+                />
+              </FormField>
+
+              <FormField
+                label="Password"
+                htmlFor="accountPassword"
+                error={errors.accountPassword?.message}
+                required
+              >
+                <Input
+                  id="accountPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  aria-invalid={Boolean(errors.accountPassword)}
+                  {...register('accountPassword')}
+                />
+              </FormField>
+
+              <FormField
+                label="Confirm password"
+                htmlFor="accountConfirmPassword"
+                error={errors.accountConfirmPassword?.message}
+                required
+              >
+                <Input
+                  id="accountConfirmPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  aria-invalid={Boolean(errors.accountConfirmPassword)}
+                  {...register('accountConfirmPassword')}
+                />
+              </FormField>
+
+              <FormField
+                label="Role"
+                htmlFor="accountRole"
+                error={errors.accountRole?.message}
+                required
+                className="sm:col-span-2"
+              >
+                <Select
+                  id="accountRole"
+                  aria-invalid={Boolean(errors.accountRole)}
+                  {...register('accountRole')}
+                >
+                  {roleOptions.map((role) => (
+                    <option key={role} value={role}>
+                      {ROLE_LABELS[role]}
+                    </option>
+                  ))}
+                </Select>
+              </FormField>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="flex justify-end gap-2 border-t pt-4">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
