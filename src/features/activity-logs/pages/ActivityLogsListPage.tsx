@@ -24,7 +24,9 @@ import { useActivityLogs } from '../hooks/useActivityLogs'
 import {
   activityEventTypeLabel,
   activityEventTypeTone,
+  activityRoleLabel,
   formatActivityAction,
+  formatPerformedBy,
 } from '../lib/activity-log-display'
 import {
   ACTIVITY_EVENT_TYPES,
@@ -111,6 +113,21 @@ export default function ActivityLogsListPage() {
         header: 'Actor',
         enableSorting: true,
         cell: ({ row }) => {
+          const performedBy = row.original.performedBy
+          if (performedBy) {
+            const employeeLabel = performedBy.employeeId
+              ? formatEmployee({ employeeId: performedBy.employeeId })
+              : null
+            return (
+              <div className="min-w-0">
+                <p className="truncate text-sm">{formatPerformedBy(performedBy)}</p>
+                <p className="text-muted-foreground text-xs">
+                  {activityRoleLabel(performedBy.role)}
+                  {employeeLabel ? ` · ${employeeLabel}` : null}
+                </p>
+              </div>
+            )
+          }
           if (row.original.employeeId) {
             return formatEmployee({ employeeId: row.original.employeeId })
           }
@@ -279,6 +296,12 @@ export default function ActivityLogsListPage() {
                       <p className="text-muted-foreground text-xs">
                         {formatDateTime(log.createdAt)}
                       </p>
+                      {log.performedBy ? (
+                        <p className="text-muted-foreground mt-1 truncate text-xs">
+                          {formatPerformedBy(log.performedBy)} ·{' '}
+                          {activityRoleLabel(log.performedBy.role)}
+                        </p>
+                      ) : null}
                     </div>
                     <StatusBadge
                       label={activityEventTypeLabel(log.eventType)}

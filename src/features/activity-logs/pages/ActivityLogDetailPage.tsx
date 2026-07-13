@@ -18,7 +18,9 @@ import { useActivityLog } from '../hooks/useActivityLogs'
 import {
   activityEventTypeLabel,
   activityEventTypeTone,
+  activityRoleLabel,
   formatActivityAction,
+  formatPerformedBy,
 } from '../lib/activity-log-display'
 
 export default function ActivityLogDetailPage() {
@@ -58,9 +60,9 @@ export default function ActivityLogDetailPage() {
   }
 
   const log = logQuery.data
-  const actorLabel = log.employeeId
-    ? formatEmployee({ employeeId: log.employeeId })
-    : (log.userId ?? '—')
+  const performedBy = log.performedBy
+  const linkedEmployeeId = performedBy?.employeeId ?? log.employeeId
+  const employeeLabel = linkedEmployeeId ? formatEmployee({ employeeId: linkedEmployeeId }) : null
   const metadataJson =
     log.metadata && Object.keys(log.metadata).length > 0
       ? JSON.stringify(log.metadata, null, 2)
@@ -112,13 +114,31 @@ export default function ActivityLogDetailPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Actor & resource</CardTitle>
+            <CardTitle>Performed by</CardTitle>
           </CardHeader>
           <CardContent>
             <DescriptionList>
-              <DescriptionItem label="Actor">{actorLabel}</DescriptionItem>
-              <DescriptionItem label="User ID">{log.userId ?? '—'}</DescriptionItem>
-              <DescriptionItem label="Employee ID">{log.employeeId ?? '—'}</DescriptionItem>
+              <DescriptionItem label="Email">
+                {performedBy ? formatPerformedBy(performedBy) : (log.userId ?? '—')}
+              </DescriptionItem>
+              <DescriptionItem label="Role">
+                {performedBy ? activityRoleLabel(performedBy.role) : '—'}
+              </DescriptionItem>
+              <DescriptionItem label="Employee">{employeeLabel ?? '—'}</DescriptionItem>
+              <DescriptionItem label="User ID">
+                {performedBy?.id ?? log.userId ?? '—'}
+              </DescriptionItem>
+              <DescriptionItem label="Employee ID">{linkedEmployeeId ?? '—'}</DescriptionItem>
+            </DescriptionList>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Resource</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DescriptionList>
               <DescriptionItem label="Resource type">{log.resourceType ?? '—'}</DescriptionItem>
               <DescriptionItem label="Resource ID">{log.resourceId ?? '—'}</DescriptionItem>
               <DescriptionItem label="Resource number">{log.resourceNumber ?? '—'}</DescriptionItem>

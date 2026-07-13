@@ -1,3 +1,5 @@
+import type { UserRole } from '@/features/auth/types/auth.types'
+
 export type ActivityEventType =
   | 'AUTHENTICATION'
   | 'COMPANY'
@@ -12,6 +14,13 @@ export type ActivitySearchBy =
   'employeeName' | 'transactionNumber' | 'tripNumber' | 'expenseNumber' | 'user' | 'action'
 
 export type ActivitySortBy = 'createdAt' | 'module' | 'user'
+
+export interface ActivityPerformedBy {
+  id: string
+  employeeId: string | null
+  email: string
+  role: UserRole
+}
 
 export interface ActivityLog {
   id: string
@@ -29,6 +38,7 @@ export interface ActivityLog {
   userAgent: string | null
   metadata: Record<string, unknown> | null
   createdAt: string
+  performedBy: ActivityPerformedBy | null
 }
 
 export interface ActivityLogListParams {
