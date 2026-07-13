@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from 'react-router'
 
 import { AuthGuard } from '@/app/guards/AuthGuard'
 import { PermissionGuard } from '@/app/guards/PermissionGuard'
+import { AppShell } from '@/app/layouts/AppShell'
 import { AuthLayout } from '@/app/layouts/AuthLayout'
 import { DashboardLayout } from '@/app/layouts/DashboardLayout'
 import { ErrorFallback } from '@/components/feedback/ErrorFallback'
@@ -106,6 +107,7 @@ const LandingPage = lazy(() => import('@/features/landing/pages/LandingPage'))
 export const router = createBrowserRouter([
   {
     path: ROUTES.home,
+    element: <AppShell />,
     errorElement: <ErrorFallback />,
     children: [
       {
