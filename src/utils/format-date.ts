@@ -10,6 +10,26 @@ export function formatDate(date: Date | string | null | undefined, locale = 'en-
   }).format(value)
 }
 
+/** Date + time with AM/PM (e.g. Jul 10, 2026, 2:48 PM). Date-only strings stay date-only. */
+export function formatDateTime(date: Date | string | null | undefined, locale = 'en-PH'): string {
+  if (date == null || date === '') return '—'
+  if (typeof date === 'string') {
+    const trimmed = date.trim()
+    // Pure calendar dates have no clock time — don't invent midnight/AM/PM.
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return formatDate(trimmed, locale)
+  }
+  const value = typeof date === 'string' ? new Date(date) : date
+  if (Number.isNaN(value.getTime())) return '—'
+  return new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(value)
+}
+
 /**
  * Normalize API date/datetime values for `<input type="date" />` (YYYY-MM-DD).
  * Full ISO strings like `2026-07-10T00:00:00.000Z` are invalid in date inputs and appear blank.

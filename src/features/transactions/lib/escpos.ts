@@ -94,6 +94,39 @@ export class EscPosBuilder {
     return this
   }
 
+  /**
+   * Print a 1-bit raster bitmap (GS v 0).
+   * `dots` is row-major, width×height, true = black dot.
+   */
+  raster(dots: boolean[], width: number, height: number): this {
+    if (width <= 0 || height <= 0 || dots.length < width * height) return this
+
+    const widthBytes = Math.ceil(width / 8)
+    const data = new Uint8Array(widthBytes * height)
+
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        if (!dots[y * width + x]) continue
+        const byteIndex = y * widthBytes + (x >> 3)
+        data[byteIndex] |= 0x80 >> (x & 7)
+      }
+    }
+
+    // GS v 0 m xL xH yL yH [data]
+    this.chunks.push(
+      GS,
+      0x76,
+      0x30,
+      0x00,
+      widthBytes & 0xff,
+      (widthBytes >> 8) & 0xff,
+      height & 0xff,
+      (height >> 8) & 0xff,
+    )
+    for (const byte of data) this.chunks.push(byte)
+    return this
+  }
+
   toUint8Array(): Uint8Array {
     return Uint8Array.from(this.chunks)
   }
@@ -127,9 +160,17 @@ function encodeEscPosText(value: string): Uint8Array {
 }
 
 export function padColumns(left: string, right: string, width: number): string {
-  const safeLeft = truncate(left, Math.max(1, width - right.length - 1))
-  const spaces = Math.max(1, width - safeLeft.length - right.length)
-  return `${safeLeft}${' '.repeat(spaces)}${right}`
+  const safeRight = truncate(right, width)
+  const leftMax = Math.max(0, width - safeRight.length - 1)
+  const safeLeft = leftMax > 0 ? truncate(left, leftMax) : ''
+  const spaces = Math.max(0, width - safeLeft.length - safeRight.length)
+  if (!safeLeft) {
+    return `${' '.repeat(spaces)}${safeRight}`
+  }
+  if (spaces === 0) {
+    return `${safeLeft}${safeRight}`.slice(0, width)
+  }
+  return `${safeLeft}${' '.repeat(spaces)}${safeRight}`
 }
 
 export function truncate(value: string, max: number): string {

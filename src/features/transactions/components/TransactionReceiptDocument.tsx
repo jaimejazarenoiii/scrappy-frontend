@@ -1,15 +1,32 @@
+import { BrandLogo } from '@/components/common/BrandLogo'
 import { formatCurrency } from '@/utils/format-currency'
-import { formatDate } from '@/utils/format-date'
+import { formatDateTime } from '@/utils/format-date'
 
 import { TransactionDirectionBadge } from './TransactionDirectionBadge'
+import type { ReceiptLocationSummary } from '../lib/transaction-receipt-location'
 import type { TransactionReceipt } from '../types/transaction.types'
 
 interface TransactionReceiptDocumentProps {
   receipt: TransactionReceipt
+  /** Resolved assigned employee display names (from transaction detail). */
+  assignedEmployeeNames?: string[]
+  location?: ReceiptLocationSummary | null
+  partyContactNumber?: string | null
+  notes?: string | null
 }
 
-export function TransactionReceiptDocument({ receipt }: TransactionReceiptDocumentProps) {
+export function TransactionReceiptDocument({
+  receipt,
+  assignedEmployeeNames = [],
+  location = null,
+  partyContactNumber = null,
+  notes = null,
+}: TransactionReceiptDocumentProps) {
   const direction = receipt.directionLabel
+  const issuedBy = receipt.paidByDisplayName.trim() || '—'
+  const employees = assignedEmployeeNames.map((name) => name.trim()).filter(Boolean)
+  const contact = partyContactNumber?.trim() ?? ''
+  const noteText = notes?.trim() ?? ''
 
   return (
     <article className="transaction-receipt-document bg-card mx-auto max-w-md space-y-0 overflow-hidden rounded-xl border shadow-sm print:max-w-none print:border-0 print:shadow-none">
@@ -27,7 +44,7 @@ export function TransactionReceiptDocument({ receipt }: TransactionReceiptDocume
       <section className="space-y-3 px-6 py-5 text-sm">
         <div className="flex items-start justify-between gap-3">
           <span className="text-muted-foreground print:text-black">Date</span>
-          <span className="text-right font-medium">{formatDate(receipt.transactionDate)}</span>
+          <span className="text-right font-medium">{formatDateTime(receipt.transactionDate)}</span>
         </div>
         <div className="flex items-start justify-between gap-3">
           <span className="text-muted-foreground print:text-black">Type</span>
@@ -40,16 +57,55 @@ export function TransactionReceiptDocument({ receipt }: TransactionReceiptDocume
           <span className="text-muted-foreground print:text-black">Party</span>
           <span className="max-w-[60%] text-right font-medium text-balance">
             {receipt.partyName}
+            {contact ? (
+              <span className="text-muted-foreground mt-0.5 block text-xs font-normal print:text-black">
+                {contact}
+              </span>
+            ) : null}
           </span>
         </div>
         <div className="flex items-start justify-between gap-3">
-          <span className="text-muted-foreground print:text-black">Paid by</span>
-          <span className="max-w-[60%] text-right font-medium">{receipt.paidByDisplayName}</span>
+          <span className="text-muted-foreground print:text-black">Location</span>
+          <span className="max-w-[60%] text-right font-medium text-balance">
+            {location ? (
+              <>
+                <span>
+                  {location.typeLabel}: {location.primary}
+                </span>
+                {location.details.map((detail) => (
+                  <span
+                    key={detail}
+                    className="text-muted-foreground mt-0.5 block text-xs font-normal print:text-black"
+                  >
+                    {detail}
+                  </span>
+                ))}
+              </>
+            ) : (
+              '—'
+            )}
+          </span>
+        </div>
+        <div className="flex items-start justify-between gap-3">
+          <span className="text-muted-foreground print:text-black">Employees</span>
+          <span className="max-w-[60%] text-right font-medium text-balance">
+            {employees.length ? employees.join(', ') : '—'}
+          </span>
+        </div>
+        <div className="flex items-start justify-between gap-3">
+          <span className="text-muted-foreground print:text-black">Issued by</span>
+          <span className="max-w-[60%] text-right font-medium text-balance">{issuedBy}</span>
         </div>
         <div className="flex items-start justify-between gap-3">
           <span className="text-muted-foreground print:text-black">Paid at</span>
-          <span className="text-right font-medium">{formatDate(receipt.paidAt)}</span>
+          <span className="text-right font-medium">{formatDateTime(receipt.paidAt)}</span>
         </div>
+        {noteText ? (
+          <div className="flex items-start justify-between gap-3">
+            <span className="text-muted-foreground print:text-black">Notes</span>
+            <span className="max-w-[60%] text-right font-medium text-balance">{noteText}</span>
+          </div>
+        ) : null}
       </section>
 
       <div className="border-y border-dashed px-6 py-2 print:border-black">
@@ -90,9 +146,12 @@ export function TransactionReceiptDocument({ receipt }: TransactionReceiptDocume
 
       <footer className="bg-muted/40 border-t border-dashed px-6 py-5 text-center print:border-black print:bg-transparent">
         <p className="text-sm">Thank you for your business</p>
-        <p className="mt-3 font-[family-name:var(--font-display)] text-sm font-semibold">
-          Powered by Scrappy
-        </p>
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <BrandLogo className="size-10" plate="dark" alt="Scrappy" />
+          <p className="font-[family-name:var(--font-display)] text-sm font-semibold">
+            Powered by Scrappy
+          </p>
+        </div>
         <p className="text-muted-foreground mt-0.5 text-xs print:text-black">
           Scrap trading operations
         </p>
