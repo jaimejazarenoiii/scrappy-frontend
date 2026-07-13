@@ -61,6 +61,8 @@ export const ROUTES = {
   reportsExpenses: '/reports/expenses',
   reportsPayroll: '/reports/payroll',
   reportsAttendance: '/reports/attendance',
+  activityLogs: '/activity-logs',
+  activityLogDetail: '/activity-logs/:id',
 } as const
 
 export const buildRoute = {
@@ -88,4 +90,5 @@ export const buildRoute = {
   tripEdit: (id: string) => `/trips/${id}/edit`,
   expenseDetail: (id: string) => `/expenses/${id}`,
   expenseEdit: (id: string) => `/expenses/${id}/edit`,
+  activityLogDetail: (id: string) => `/activity-logs/${id}`,
 } as const

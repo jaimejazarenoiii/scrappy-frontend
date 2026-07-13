@@ -99,6 +99,9 @@ export const PERMISSIONS = {
     view: 'reports.view',
     export: 'reports.export',
   },
+  activityLogs: {
+    view: 'activityLogs.view',
+  },
 } as const
 
 export type PermissionKey =
@@ -117,3 +120,4 @@ export type PermissionKey =
   | (typeof PERMISSIONS.expenses)[keyof typeof PERMISSIONS.expenses]
   | (typeof PERMISSIONS.analytics)[keyof typeof PERMISSIONS.analytics]
   | (typeof PERMISSIONS.reports)[keyof typeof PERMISSIONS.reports]
+  | (typeof PERMISSIONS.activityLogs)[keyof typeof PERMISSIONS.activityLogs]

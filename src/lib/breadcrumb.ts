@@ -15,6 +15,7 @@ export type BreadcrumbEntityType =
   | 'transaction'
   | 'trip'
   | 'expense'
+  | 'activity-log'
   | 'employee'
   | 'branch'
   | 'warehouse'
@@ -44,6 +45,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   receipt: 'Receipt',
   analytics: 'Analytics',
   reports: 'Reports',
+  'activity-logs': 'Activity logs',
   transactions: 'Transactions',
   trips: 'Trips',
   expenses: 'Expenses',
@@ -57,6 +59,7 @@ const ENTITY_PARENTS: Record<string, BreadcrumbEntityType> = {
   transactions: 'transaction',
   trips: 'trip',
   expenses: 'expense',
+  'activity-logs': 'activity-log',
   employees: 'employee',
   branches: 'branch',
   warehouses: 'warehouse',

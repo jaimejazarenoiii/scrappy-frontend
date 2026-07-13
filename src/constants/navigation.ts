@@ -10,6 +10,7 @@ import {
   MapPin,
   Receipt,
   Route,
+  ScrollText,
   Truck,
   Wallet,
   Warehouse,
@@ -123,5 +124,12 @@ export const navigationItems: NavigationItem[] = [
     href: ROUTES.reports,
     icon: FileText,
     anyOf: [PERMISSIONS.reports.view],
+  },
+  {
+    id: 'activity-logs',
+    label: 'Activity logs',
+    href: ROUTES.activityLogs,
+    icon: ScrollText,
+    anyOf: [PERMISSIONS.activityLogs.view],
   },
 ]

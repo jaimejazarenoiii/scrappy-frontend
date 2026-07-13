@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useLocation } from 'react-router'
 
 import { useAttendance } from '@/features/attendance/hooks/useAttendance'
+import { useActivityLog } from '@/features/activity-logs/hooks/useActivityLogs'
 import { useBranch } from '@/features/branches/hooks/useBranch'
 import { useCashAdvance } from '@/features/cash-advances/hooks/useCashAdvance'
 import { useEmployee } from '@/features/employees/hooks/useEmployee'
@@ -117,6 +118,16 @@ function resolveEntityLabel(
       }
       return 'Expense details'
     }
+    case 'activity-log': {
+      const log = data as {
+        action?: string
+        description?: string
+      }
+      if (log.description) {
+        return log.description.length > 40 ? `${log.description.slice(0, 40)}…` : log.description
+      }
+      return log.action ?? 'Activity log'
+    }
     case 'employee': {
       const employee = data as {
         id: string
@@ -153,6 +164,7 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
   const transactionQuery = useTransaction(entityType === 'transaction' ? entityId : undefined)
   const tripQuery = useTrip(entityType === 'trip' ? entityId : undefined)
   const expenseQuery = useExpense(entityType === 'expense' ? entityId : undefined)
+  const activityLogQuery = useActivityLog(entityType === 'activity-log' ? entityId : undefined)
   const payrollEmployeeQuery = useEmployee(
     entityType === 'payroll' && payrollQuery.data?.employeeId
       ? payrollQuery.data.employeeId
@@ -171,6 +183,7 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
     (entityType === 'transaction' && transactionQuery.isLoading) ||
     (entityType === 'trip' && tripQuery.isLoading) ||
     (entityType === 'expense' && expenseQuery.isLoading) ||
+    (entityType === 'activity-log' && activityLogQuery.isLoading) ||
     (entityType === 'employee' && employeeQuery.isLoading) ||
     (entityType === 'branch' && branchQuery.isLoading) ||
     (entityType === 'warehouse' && warehouseQuery.isLoading) ||
@@ -190,6 +203,7 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
     if (entityType === 'transaction') return transactionQuery.data
     if (entityType === 'trip') return tripQuery.data
     if (entityType === 'expense') return expenseQuery.data
+    if (entityType === 'activity-log') return activityLogQuery.data
     if (entityType === 'employee') return employeeQuery.data
     if (entityType === 'branch') return branchQuery.data
     if (entityType === 'warehouse') return warehouseQuery.data
@@ -204,6 +218,7 @@ export function useBreadcrumbTrail(): BreadcrumbItem[] {
     transactionQuery.data,
     tripQuery.data,
     expenseQuery.data,
+    activityLogQuery.data,
     payrollEmployeeQuery.data,
     employeeQuery.data,
     branchQuery.data,

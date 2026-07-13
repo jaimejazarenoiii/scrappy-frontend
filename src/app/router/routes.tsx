@@ -103,6 +103,12 @@ const TripReportsPage = lazy(() => import('@/features/reports/pages/TripReportsP
 const ExpenseReportsPage = lazy(() => import('@/features/reports/pages/ExpenseReportsPage'))
 const PayrollReportsPage = lazy(() => import('@/features/reports/pages/PayrollReportsPage'))
 const AttendanceReportsPage = lazy(() => import('@/features/reports/pages/AttendanceReportsPage'))
+const ActivityLogsListPage = lazy(
+  () => import('@/features/activity-logs/pages/ActivityLogsListPage'),
+)
+const ActivityLogDetailPage = lazy(
+  () => import('@/features/activity-logs/pages/ActivityLogDetailPage'),
+)
 const LandingPage = lazy(() => import('@/features/landing/pages/LandingPage'))
 const ChangePasswordPage = lazy(() => import('@/features/users/pages/ChangePasswordPage'))
 
@@ -531,6 +537,19 @@ export const router = createBrowserRouter([
                       {
                         path: ROUTES.reportsAttendance,
                         element: <AttendanceReportsPage />,
+                      },
+                    ],
+                  },
+                  {
+                    element: <PermissionGuard permissions={[PERMISSIONS.activityLogs.view]} />,
+                    children: [
+                      {
+                        path: ROUTES.activityLogs,
+                        element: <ActivityLogsListPage />,
+                      },
+                      {
+                        path: ROUTES.activityLogDetail,
+                        element: <ActivityLogDetailPage />,
                       },
                     ],
                   },

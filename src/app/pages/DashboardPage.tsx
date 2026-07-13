@@ -7,6 +7,7 @@ import {
   Plus,
   Receipt,
   Route,
+  ScrollText,
   UserRoundCheck,
 } from 'lucide-react'
 import { useEffect } from 'react'
@@ -354,6 +355,15 @@ export default function DashboardPage() {
               href={ROUTES.reports}
               icon={FileText}
               cta="Open reports"
+            />
+          </PermissionGate>
+          <PermissionGate permission={PERMISSIONS.activityLogs.view}>
+            <ExploreCard
+              title="Activity logs"
+              description="Company audit trail of auth and business operations."
+              href={ROUTES.activityLogs}
+              icon={ScrollText}
+              cta="Open activity logs"
             />
           </PermissionGate>
         </div>
