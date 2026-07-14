@@ -1,7 +1,6 @@
 import { Camera, ImagePlus, Loader2, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
-import { CameraCaptureDialog } from '@/components/common/CameraCaptureDialog'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -26,6 +25,8 @@ interface UploadState {
   progress: number
 }
 
+const ACCEPTED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
+
 export function TransactionPhotosManager({
   transactionId,
   disabled = false,
@@ -35,8 +36,8 @@ export function TransactionPhotosManager({
   const accessToken = useAuthStore((state) => state.accessToken)
   const [deletingAttachment, setDeletingAttachment] = useState<TransactionAttachment | null>(null)
   const [uploads, setUploads] = useState<UploadState[]>([])
-  const [cameraOpen, setCameraOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
 
   const deleteAttachment = useDeleteTransactionAttachment(transactionId)
 
@@ -49,6 +50,10 @@ export function TransactionPhotosManager({
   }, [uploads])
 
   async function uploadFile(file: File) {
+    if (!ACCEPTED_IMAGE_TYPES.has(file.type) && !file.type.startsWith('image/')) {
+      return
+    }
+
     const previewUrl = URL.createObjectURL(file)
     setUploads((prev) => [...prev, { fileName: file.name, previewUrl, progress: 0 }])
 
@@ -80,6 +85,9 @@ export function TransactionPhotosManager({
 
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
+    }
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = ''
     }
   }
 
@@ -120,7 +128,7 @@ export function TransactionPhotosManager({
             variant="outline"
             disabled={disabled || isUploading}
             onClick={() => {
-              setCameraOpen(true)
+              cameraInputRef.current?.click()
             }}
           >
             <Camera className="size-4" />
@@ -138,15 +146,19 @@ export function TransactionPhotosManager({
             void handleFilesSelected(event.target.files)
           }}
         />
+        {/* Opens the device camera app on mobile; no in-app preview. */}
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="sr-only"
+          disabled={disabled}
+          onChange={(event) => {
+            void handleFilesSelected(event.target.files)
+          }}
+        />
       </div>
-
-      <CameraCaptureDialog
-        open={cameraOpen}
-        onOpenChange={setCameraOpen}
-        title="Capture transaction photo"
-        description="Use your camera to photograph materials, receipts, or the site."
-        onCapture={uploadFile}
-      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {uploads.map((upload) => (
