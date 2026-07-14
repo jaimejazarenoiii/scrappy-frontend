@@ -4,7 +4,7 @@ import { EmptyState } from '@/components/feedback/EmptyState'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatDate } from '@/utils/format-date'
+import { formatDateTime } from '@/utils/format-date'
 
 import type { TripTimelineEvent } from '../types/trip.types'
 
@@ -66,7 +66,7 @@ export function TripWorkflowTimeline({
             <div className="flex flex-wrap items-start justify-between gap-2">
               <p className="font-medium">{event.actionLabel}</p>
               <time className="text-muted-foreground text-sm" dateTime={event.occurredAt}>
-                {formatDate(event.occurredAt)}
+                {formatDateTime(event.occurredAt)}
               </time>
             </div>
             {event.actorDisplayName ? (

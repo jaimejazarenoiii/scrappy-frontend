@@ -1,4 +1,4 @@
-import { formatDate } from '@/utils/format-date'
+import { formatDateTime } from '@/utils/format-date'
 
 import type { TripDetail } from '../types/trip.types'
 
@@ -21,7 +21,7 @@ export function TripRouteSummary({ trip }: TripRouteSummaryProps) {
         <p className="text-muted-foreground text-sm">Scheduled start</p>
         <p className="font-medium">
           {trip.scheduledStart ? (
-            <time dateTime={trip.scheduledStart}>{formatDate(trip.scheduledStart)}</time>
+            <time dateTime={trip.scheduledStart}>{formatDateTime(trip.scheduledStart)}</time>
           ) : (
             '—'
           )}
@@ -31,7 +31,7 @@ export function TripRouteSummary({ trip }: TripRouteSummaryProps) {
         <p className="text-muted-foreground text-sm">Actual start</p>
         <p className="font-medium">
           {trip.actualStart ? (
-            <time dateTime={trip.actualStart}>{formatDate(trip.actualStart)}</time>
+            <time dateTime={trip.actualStart}>{formatDateTime(trip.actualStart)}</time>
           ) : (
             '—'
           )}
@@ -41,7 +41,7 @@ export function TripRouteSummary({ trip }: TripRouteSummaryProps) {
         <p className="text-muted-foreground text-sm">Actual completion</p>
         <p className="font-medium">
           {trip.actualEnd ? (
-            <time dateTime={trip.actualEnd}>{formatDate(trip.actualEnd)}</time>
+            <time dateTime={trip.actualEnd}>{formatDateTime(trip.actualEnd)}</time>
           ) : (
             '—'
           )}

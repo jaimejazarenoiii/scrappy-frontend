@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PERMISSIONS } from '@/constants/permissions'
 import { buildRoute, ROUTES } from '@/constants/routes'
 import { PermissionGate } from '@/features/authorization/components/PermissionGate'
-import { formatDate } from '@/utils/format-date'
+import { formatDateTime } from '@/utils/format-date'
 
 import { TripMembersPanel } from '../components/TripMembersPanel'
 import { TripLoadSection } from '../components/TripLoadSection'
@@ -111,8 +111,10 @@ export default function TripDetailPage() {
               <DescriptionItem label="Status">
                 <TripStatusBadge status={trip.status} />
               </DescriptionItem>
-              <DescriptionItem label="Created">{formatDate(trip.createdAt)}</DescriptionItem>
-              <DescriptionItem label="Last updated">{formatDate(trip.updatedAt)}</DescriptionItem>
+              <DescriptionItem label="Created">{formatDateTime(trip.createdAt)}</DescriptionItem>
+              <DescriptionItem label="Last updated">
+                {formatDateTime(trip.updatedAt)}
+              </DescriptionItem>
               {trip.notes ? <DescriptionItem label="Notes">{trip.notes}</DescriptionItem> : null}
               {trip.cancellationReason ? (
                 <DescriptionItem label="Cancellation reason">

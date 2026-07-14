@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { buildRoute } from '@/constants/routes'
 import { TransactionDirectionBadge } from '@/features/transactions/components/TransactionDirectionBadge'
 import { TransactionStatusBadge } from '@/features/transactions/components/TransactionStatusBadge'
-import { formatDate } from '@/utils/format-date'
+import { formatDateTime } from '@/utils/format-date'
 
 import { useTripTransactions } from '../hooks/useTripTransactions'
 import type { TripDetail } from '../types/trip.types'
@@ -59,7 +59,7 @@ export function TripTransactionsPanel({ trip }: TripTransactionsPanelProps) {
                     {transaction.transactionNumber ?? transaction.partyName}
                   </p>
                   <p className="text-muted-foreground text-sm">
-                    {formatDate(transaction.transactionDate)} ·{' '}
+                    {formatDateTime(transaction.transactionDate)} ·{' '}
                     <span className="tabular-nums">{transaction.totalAmount.toFixed(2)}</span>
                   </p>
                 </div>

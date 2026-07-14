@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TransactionDirectionBadge } from '@/features/transactions/components/TransactionDirectionBadge'
 import { TransactionStatusBadge } from '@/features/transactions/components/TransactionStatusBadge'
-import { formatDate } from '@/utils/format-date'
+import { formatDateTime } from '@/utils/format-date'
 
 import { useSearchLinkableTransactions } from '../hooks/useTripTransactions'
 import { useLinkTripTransaction } from '../hooks/useTripTransactionMutations'
@@ -96,7 +96,7 @@ export function TripTransactionAssignDialog({
                       {transaction.transactionNumber ?? transaction.partyName}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      {formatDate(transaction.transactionDate)} ·{' '}
+                      {formatDateTime(transaction.transactionDate)} ·{' '}
                       <span className="tabular-nums">{transaction.totalAmount.toFixed(2)}</span>
                     </p>
                   </div>
