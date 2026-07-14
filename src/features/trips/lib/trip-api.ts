@@ -11,6 +11,7 @@ import type {
   TripVehicleSummary,
   UpdateTripInput,
 } from '../types/trip.types'
+import { asNullableOdometer, resolveTripDistance } from './trip-odometer'
 
 /** Raw list row shape from `GET /trips` (Backend P007). */
 export interface TripSummaryApi {
@@ -24,6 +25,12 @@ export interface TripSummaryApi {
   origin: string
   destination: string
   notes: string | null
+  /** Present on list/detail after start; Decimal may arrive as string. */
+  startingOdometer?: number | string | null
+  /** Present on list/detail after complete; Decimal may arrive as string. */
+  endingOdometer?: number | string | null
+  /** Computed as ending − starting when both readings exist (may be omitted). */
+  distance?: number | string | null
   vehicle: TripVehicleSummary | null
   createdAt?: string
   updatedAt?: string
@@ -51,9 +58,6 @@ export type TripDetailApi = TripSummaryApi &
     actualCompletedAt: string | null
     actualEndAt: string | null
     vehicleId: string | null
-    startingOdometer: number | null
-    endingOdometer: number | null
-    distance: number | null
     cancellationReason: string | null
     cancelledAt: string | null
     cancelledByUserId: string | null
@@ -113,8 +117,15 @@ function pickActualEnd(raw: TripSummaryApi): string | null {
   )
 }
 
+function asNullableNumber(value: unknown): number | null {
+  return asNullableOdometer(value)
+}
+
 export function normalizeTripSummary(raw: TripSummaryApi): TripSummary {
   const vehicle = raw.vehicle ?? null
+  const detail = raw as TripDetailApi
+  const startingOdometer = asNullableNumber(raw.startingOdometer ?? detail.startingOdometer)
+  const endingOdometer = asNullableNumber(raw.endingOdometer ?? detail.endingOdometer)
 
   return {
     id: raw.id,
@@ -126,18 +137,22 @@ export function normalizeTripSummary(raw: TripSummaryApi): TripSummary {
     scheduledStart: pickScheduledStart(raw),
     actualStart: pickActualStart(raw),
     actualEnd: pickActualEnd(raw),
-    vehicleId: vehicle?.id ?? (raw as TripDetailApi).vehicleId ?? null,
+    vehicleId: vehicle?.id ?? detail.vehicleId ?? null,
     vehicle,
-    startingOdometer: (raw as TripDetailApi).startingOdometer ?? null,
-    endingOdometer: (raw as TripDetailApi).endingOdometer ?? null,
-    distance: (raw as TripDetailApi).distance ?? null,
+    startingOdometer,
+    endingOdometer,
+    distance: resolveTripDistance(
+      startingOdometer,
+      endingOdometer,
+      raw.distance ?? detail.distance,
+    ),
     notes: raw.notes,
-    cancellationReason: (raw as TripDetailApi).cancellationReason ?? null,
-    cancelledAt: (raw as TripDetailApi).cancelledAt ?? null,
-    cancelledByUserId: (raw as TripDetailApi).cancelledByUserId ?? null,
-    scheduledByUserId: (raw as TripDetailApi).scheduledByUserId ?? null,
-    startedByUserId: (raw as TripDetailApi).startedByUserId ?? null,
-    completedByUserId: (raw as TripDetailApi).completedByUserId ?? null,
+    cancellationReason: detail.cancellationReason ?? null,
+    cancelledAt: detail.cancelledAt ?? null,
+    cancelledByUserId: detail.cancelledByUserId ?? null,
+    scheduledByUserId: detail.scheduledByUserId ?? null,
+    startedByUserId: detail.startedByUserId ?? null,
+    completedByUserId: detail.completedByUserId ?? null,
     loadEnabled: raw.loadEnabled !== false,
     strictLoadValidation: raw.strictLoadValidation === true,
     createdAt: raw.createdAt ?? new Date(0).toISOString(),

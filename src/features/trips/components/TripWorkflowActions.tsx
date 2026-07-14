@@ -104,6 +104,7 @@ export function TripWorkflowActions({ trip }: TripWorkflowActionsProps) {
           if (!open) closeDialog()
         }}
         isLoading={completeMutation.isPending}
+        startingOdometer={trip.startingOdometer}
         onSubmit={(values) => {
           void completeMutation.mutateAsync({ endingOdometer: values.endingOdometer })
         }}

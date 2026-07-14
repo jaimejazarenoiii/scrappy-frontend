@@ -59,6 +59,7 @@ interface TripBase {
   vehicle: TripVehicleSummary | null
   startingOdometer: number | null
   endingOdometer: number | null
+  /** ending − starting when both readings exist; may be derived client-side if API omits it. */
   distance: number | null
   notes: string | null
   cancellationReason: string | null

@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { FormField } from '@/components/common/FormField'
@@ -13,12 +14,16 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-import { tripCompleteSchema, type TripCompleteFormValues } from '../validation/trip-complete.schema'
+import {
+  createTripCompleteSchema,
+  type TripCompleteFormValues,
+} from '../validation/trip-complete.schema'
 
 interface CompleteTripDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   isLoading?: boolean
+  startingOdometer?: number | null
   onSubmit: (values: TripCompleteFormValues) => void
 }
 
@@ -26,17 +31,29 @@ export function CompleteTripDialog({
   open,
   onOpenChange,
   isLoading = false,
+  startingOdometer = null,
   onSubmit,
 }: CompleteTripDialogProps) {
+  const schema = useMemo(() => createTripCompleteSchema(startingOdometer), [startingOdometer])
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<TripCompleteFormValues>({
-    resolver: zodResolver(tripCompleteSchema),
-    defaultValues: { endingOdometer: 0 },
+    resolver: zodResolver(schema),
+    defaultValues: {
+      endingOdometer: startingOdometer ?? 0,
+    },
   })
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        endingOdometer: startingOdometer ?? 0,
+      })
+    }
+  }, [open, reset, startingOdometer])
 
   return (
     <Dialog
@@ -57,7 +74,10 @@ export function CompleteTripDialog({
           <DialogHeader>
             <DialogTitle>Complete trip?</DialogTitle>
             <DialogDescription>
-              Record the ending odometer reading to complete this trip.
+              Record the ending odometer reading to complete this trip
+              {startingOdometer != null
+                ? ` (started at ${startingOdometer.toLocaleString('en-PH', { maximumFractionDigits: 3 })}).`
+                : '.'}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -70,7 +90,7 @@ export function CompleteTripDialog({
               <Input
                 id="endingOdometer"
                 type="number"
-                min={0}
+                min={startingOdometer ?? 0}
                 step="0.1"
                 {...register('endingOdometer')}
               />
