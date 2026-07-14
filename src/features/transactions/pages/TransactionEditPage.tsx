@@ -501,7 +501,10 @@ export default function TransactionEditPage() {
 
         {id ? (
           <>
-            <TripLoadValidationBanner warnings={tripLoadWarningsQuery.data?.warnings ?? []} />
+            <TripLoadValidationBanner
+              warnings={tripLoadWarningsQuery.warnings}
+              strict={tripLoadWarningsQuery.strictLoadValidation}
+            />
             <TransactionItemsEditor transactionId={id} disabled={!draftEditingAllowed} />
             <TransactionPhotosManager transactionId={id} disabled={!draftEditingAllowed} />
           </>

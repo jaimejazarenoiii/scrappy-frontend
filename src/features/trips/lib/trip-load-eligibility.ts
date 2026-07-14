@@ -5,27 +5,27 @@ import {
   isStartedStatus,
 } from './trip-workflow'
 import type { TripDetail } from '../types/trip.types'
-import type { TripLoadProgressRow } from '../types/trip-load.types'
+import type { TripLoadSummaryItem } from '../types/trip-load.types'
+import { indicatorForSummaryItem } from '../types/trip-load.types'
 
-/** Display hints only — authorization is enforced by the backend and PermissionGate. */
-
-export function shouldShowTripLoadSection(trip: Pick<TripDetail, 'tripLoadEnabled'>): boolean {
-  return trip.tripLoadEnabled
+/** Feature is always on; section is always shown on trip detail. */
+export function shouldShowTripLoadSection(): boolean {
+  return true
 }
 
-export function isTripLoadEditable(trip: Pick<TripDetail, 'status' | 'tripLoadEnabled'>): boolean {
-  return trip.tripLoadEnabled && isDraftStatus(trip.status)
+export function isTripLoadEditable(trip: Pick<TripDetail, 'status'>): boolean {
+  return isDraftStatus(trip.status)
 }
 
-export function shouldShowProgressView(
-  trip: Pick<TripDetail, 'status' | 'tripLoadEnabled'>,
-): boolean {
-  if (!trip.tripLoadEnabled) return false
+export function shouldShowProgressView(trip: Pick<TripDetail, 'status'>): boolean {
   return (
     isStartedStatus(trip.status) || isCompletedStatus(trip.status) || isCancelledStatus(trip.status)
   )
 }
 
-export function hasTripLoadAlertRows(rows: TripLoadProgressRow[]): boolean {
-  return rows.some((row) => row.indicatorStatus === 'WARNING' || row.indicatorStatus === 'EXCEEDED')
+export function hasTripLoadAlertRows(items: TripLoadSummaryItem[]): boolean {
+  return items.some((item) => {
+    const status = indicatorForSummaryItem(item)
+    return status === 'WARNING' || status === 'EXCEEDED'
+  })
 }

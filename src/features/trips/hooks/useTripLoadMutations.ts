@@ -4,13 +4,36 @@ import { toast } from 'sonner'
 import type { NormalizedApiError } from '@/lib/axios'
 
 import { TripLoadService } from '../services/trip-load.service'
-import type { CreateTripLoadItemInput, UpdateTripLoadItemInput } from '../types/trip-load.types'
+import type {
+  CreateTripLoadInput,
+  CreateTripLoadItemInput,
+  EnableTripLoadInput,
+  TripLoadSettings,
+  UpdateTripLoadItemInput,
+} from '../types/trip-load.types'
+import type { TripDetail } from '../types/trip.types'
 import { tripKeys, tripLoadKeys } from './trip-keys'
 
 function invalidateTripLoad(queryClient: ReturnType<typeof useQueryClient>, tripId: string) {
   void queryClient.invalidateQueries({ queryKey: tripLoadKeys.detail(tripId) })
   void queryClient.invalidateQueries({ queryKey: tripLoadKeys.progress(tripId) })
   void queryClient.invalidateQueries({ queryKey: tripKeys.detail(tripId) })
+  void queryClient.invalidateQueries({ queryKey: tripKeys.all })
+}
+
+function patchTripFlags(
+  queryClient: ReturnType<typeof useQueryClient>,
+  tripId: string,
+  flags: { loadEnabled: boolean; strictLoadValidation: boolean },
+) {
+  queryClient.setQueryData(tripKeys.detail(tripId), (prev: TripDetail | undefined) => {
+    if (!prev) return prev
+    return {
+      ...prev,
+      loadEnabled: flags.loadEnabled,
+      strictLoadValidation: flags.strictLoadValidation,
+    }
+  })
 }
 
 function handleMutationError(error: NormalizedApiError, fallback: string) {
@@ -21,11 +44,32 @@ function handleMutationError(error: NormalizedApiError, fallback: string) {
   toast.error(error.message || fallback)
 }
 
+export function useCreateTripLoad(tripId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (input: CreateTripLoadInput) => TripLoadService.createLoad(tripId, input),
+    onSuccess: () => {
+      invalidateTripLoad(queryClient, tripId)
+      toast.success('Trip load created')
+    },
+    onError: (error: NormalizedApiError) => {
+      handleMutationError(error, 'Could not create trip load')
+    },
+  })
+}
+
 export function useAddTripLoadItem(tripId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (input: CreateTripLoadItemInput) => TripLoadService.addItem(tripId, input),
+    mutationFn: async (input: CreateTripLoadItemInput) => {
+      const existing = await TripLoadService.getLoad(tripId)
+      if (!existing) {
+        return TripLoadService.createLoad(tripId, { items: [input] })
+      }
+      return TripLoadService.addItem(tripId, input)
+    },
     onSuccess: () => {
       invalidateTripLoad(queryClient, tripId)
       toast.success('Load item added')
@@ -63,6 +107,73 @@ export function useDeleteTripLoadItem(tripId: string) {
     },
     onError: (error: NormalizedApiError) => {
       handleMutationError(error, 'Could not remove load item')
+    },
+  })
+}
+
+export function useDeleteTripLoad(tripId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => TripLoadService.deleteLoad(tripId),
+    onSuccess: (flags) => {
+      patchTripFlags(queryClient, tripId, flags)
+      invalidateTripLoad(queryClient, tripId)
+      toast.success('Trip load cleared')
+    },
+    onError: (error: NormalizedApiError) => {
+      handleMutationError(error, 'Could not delete trip load')
+    },
+  })
+}
+
+export function useEnableTripLoad(tripId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (input: EnableTripLoadInput = {}) => TripLoadService.enable(tripId, input),
+    onSuccess: (flags) => {
+      patchTripFlags(queryClient, tripId, flags)
+      invalidateTripLoad(queryClient, tripId)
+      toast.success(
+        flags.strictLoadValidation
+          ? 'Strict load validation enabled'
+          : 'Load validation set to warn only',
+      )
+    },
+    onError: (error: NormalizedApiError) => {
+      handleMutationError(error, 'Could not update load settings')
+    },
+  })
+}
+
+export function useDisableTripLoad(tripId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => TripLoadService.disable(tripId),
+    onSuccess: (flags) => {
+      patchTripFlags(queryClient, tripId, flags)
+      invalidateTripLoad(queryClient, tripId)
+      toast.success('Trip load disabled and cleared')
+    },
+    onError: (error: NormalizedApiError) => {
+      handleMutationError(error, 'Could not disable trip load')
+    },
+  })
+}
+
+export function useUpdateTripLoadSettings() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (input: Partial<TripLoadSettings>) => TripLoadService.updateSettings(input),
+    onSuccess: (settings) => {
+      queryClient.setQueryData(tripLoadKeys.settings(), settings)
+      toast.success('Trip load settings saved')
+    },
+    onError: (error: NormalizedApiError) => {
+      toast.error(error.message || 'Could not save trip load settings')
     },
   })
 }

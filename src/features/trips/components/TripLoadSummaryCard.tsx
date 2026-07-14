@@ -1,31 +1,30 @@
 import { DescriptionItem, DescriptionList } from '@/components/common/DescriptionList'
+import { StatusBadge } from '@/components/common/StatusBadge'
 import { formatDateTime } from '@/utils/format-date'
 
-import type { TripLoadSummary } from '../types/trip-load.types'
+import type { TripLoad } from '../types/trip-load.types'
 
 interface TripLoadSummaryCardProps {
-  summary: TripLoadSummary
+  load: TripLoad
+  strictLoadValidation: boolean
 }
 
-function formatWeight(value: number | null, unit: string | null): string {
-  if (value == null) return '—'
-  const formatted = new Intl.NumberFormat('en-PH', { maximumFractionDigits: 2 }).format(value)
-  return unit ? `${formatted} ${unit}` : formatted
-}
+export function TripLoadSummaryCard({ load, strictLoadValidation }: TripLoadSummaryCardProps) {
+  const totalQty = load.items.reduce((sum, item) => sum + item.quantity, 0)
 
-export function TripLoadSummaryCard({ summary }: TripLoadSummaryCardProps) {
   return (
     <DescriptionList className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <DescriptionItem label="Total items">{summary.totalItems}</DescriptionItem>
-      <DescriptionItem label="Loaded weight">
-        {formatWeight(summary.totalLoadedWeight, summary.weightUnit)}
+      <DescriptionItem label="Total items">{load.items.length}</DescriptionItem>
+      <DescriptionItem label="Total quantity">
+        {new Intl.NumberFormat('en-PH', { maximumFractionDigits: 2 }).format(totalQty)}
       </DescriptionItem>
-      <DescriptionItem label="Remaining weight">
-        {formatWeight(summary.remainingWeight, summary.weightUnit)}
+      <DescriptionItem label="Validation">
+        <StatusBadge
+          label={strictLoadValidation ? 'Strict (block)' : 'Warn only'}
+          tone={strictLoadValidation ? 'archived' : 'neutral'}
+        />
       </DescriptionItem>
-      <DescriptionItem label="Last updated">
-        {formatDateTime(summary.lastUpdatedAt)}
-      </DescriptionItem>
+      <DescriptionItem label="Last updated">{formatDateTime(load.updatedAt)}</DescriptionItem>
     </DescriptionList>
   )
 }

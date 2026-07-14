@@ -34,8 +34,11 @@ export interface PaginationMeta {
   totalPages: number
 }
 
-/** `meta` is `{}` for non-paginated responses and `PaginationMeta` for paginated ones. */
-export type ApiMeta = PaginationMeta | Record<string, never>
+/**
+ * `meta` holds pagination for list responses, optional soft warnings (e.g. trip-load),
+ * or is empty for simple responses.
+ */
+export type ApiMeta = Partial<PaginationMeta> & Record<string, unknown>
 
 export interface ApiEnvelope<T> {
   success: boolean

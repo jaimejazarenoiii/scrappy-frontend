@@ -31,10 +31,14 @@ export function useCreateTransactionDraft() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (input: CreateTransactionInput) => TransactionService.create(input),
-    onSuccess: (transaction: TransactionDetail) => {
+    onSuccess: ({ transaction, warnings }) => {
       void queryClient.invalidateQueries({ queryKey: transactionKeys.all })
       queryClient.setQueryData(transactionKeys.detail(transaction.id), transaction)
-      toast.success('Transaction draft created')
+      if (warnings.length > 0) {
+        toast.warning(warnings[0]?.message ?? 'Transaction created with trip load warnings')
+      } else {
+        toast.success('Transaction draft created')
+      }
     },
     onError: (error: NormalizedApiError) => {
       handleMutationError(error, queryClient, 'Could not create transaction draft')

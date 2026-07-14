@@ -130,7 +130,7 @@ export default function TransactionCreatePage() {
     }
 
     const created = await createDraft.mutateAsync(input)
-    void navigate(buildRoute.transactionEdit(created.id))
+    void navigate(buildRoute.transactionEdit(created.transaction.id))
   })
 
   const assignedEmployeeIds = watch('assignedEmployeeIds')
@@ -310,7 +310,10 @@ export default function TransactionCreatePage() {
               </FormField>
             ) : null}
 
-            <TripLoadValidationBanner warnings={tripLoadWarningsQuery.data?.warnings ?? []} />
+            <TripLoadValidationBanner
+              warnings={tripLoadWarningsQuery.warnings}
+              strict={tripLoadWarningsQuery.strictLoadValidation}
+            />
 
             <FormField
               label="Assigned employees"

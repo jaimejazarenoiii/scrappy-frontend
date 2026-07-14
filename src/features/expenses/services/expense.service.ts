@@ -58,7 +58,7 @@ export const ExpenseService = {
       },
     )
     const page = unwrapList(response)
-    const reportMeta = parseExpenseReportMeta(response.data.meta as Record<string, unknown>)
+    const reportMeta = parseExpenseReportMeta(response.data.meta)
     return {
       ...page,
       ...reportMeta,

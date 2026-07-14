@@ -18,7 +18,6 @@ export const tripLoadKeys = {
   all: ['trips', 'load'] as const,
   details: () => ['trips', 'load', 'detail'] as const,
   detail: (tripId: string) => ['trips', 'load', 'detail', tripId] as const,
-  progress: (tripId: string) => ['trips', 'load', 'progress', tripId] as const,
-  validate: (tripId: string, itemsKey: string) =>
-    ['trips', 'load', 'validate', tripId, itemsKey] as const,
+  progress: (tripId: string) => ['trips', 'load', 'summary', tripId] as const,
+  settings: () => ['trips', 'load', 'settings'] as const,
 }

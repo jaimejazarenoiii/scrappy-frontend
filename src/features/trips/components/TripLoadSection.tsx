@@ -16,20 +16,21 @@ import { TripLoadEditableTable } from './TripLoadEditableTable'
 import { TripLoadEmptyState } from './TripLoadEmptyState'
 import { TripLoadItemDialog } from './TripLoadItemDialog'
 import { TripLoadProgressTable } from './TripLoadProgressTable'
-import { hasTripLoadAlertRows } from '../lib/trip-load-eligibility'
 import { TripLoadSectionSkeleton } from './TripLoadSectionSkeleton'
 import { TripLoadSummaryCard } from './TripLoadSummaryCard'
 import { TripLoadToolbar } from './TripLoadToolbar'
-import { useTripLoad, useTripLoadProgress } from '../hooks/useTripLoad'
+import { useTripLoad, useTripLoadSummary } from '../hooks/useTripLoad'
 import {
   useAddTripLoadItem,
+  useDeleteTripLoad,
   useDeleteTripLoadItem,
+  useEnableTripLoad,
   useUpdateTripLoadItem,
 } from '../hooks/useTripLoadMutations'
 import {
+  hasTripLoadAlertRows,
   isTripLoadEditable,
   shouldShowProgressView,
-  shouldShowTripLoadSection,
 } from '../lib/trip-load-eligibility'
 import { isStartedStatus } from '../lib/trip-workflow'
 import type { TripDetail } from '../types/trip.types'
@@ -57,15 +58,13 @@ function TripLoadResponsiveShell({
   const [expanded, setExpanded] = useState(defaultExpanded)
 
   useEffect(() => {
-    if (defaultExpanded) {
-      setExpanded(true)
-    }
+    if (defaultExpanded) setExpanded(true)
   }, [defaultExpanded])
 
   if (isDesktop) {
     return (
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between gap-4">
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-4">
           <CardTitle>{title}</CardTitle>
           {toolbar}
         </CardHeader>
@@ -95,42 +94,43 @@ function TripLoadResponsiveShell({
 }
 
 export function TripLoadSection({ trip }: TripLoadSectionProps) {
-  if (!shouldShowTripLoadSection(trip)) {
-    return null
-  }
-
-  return <TripLoadSectionContent trip={trip} />
-}
-
-function TripLoadSectionContent({ trip }: TripLoadSectionProps) {
-  const { has } = usePermissions()
+  const { hasAny } = usePermissions()
   const showProgress = shouldShowProgressView(trip)
   const editable = isTripLoadEditable(trip)
-  const canManage = has(PERMISSIONS.trips.loadManage) && editable
+  const canManage = editable && hasAny([PERMISSIONS.trips.loadManage, PERMISSIONS.trips.update])
 
   const loadQuery = useTripLoad(trip.id, !showProgress)
-  const progressQuery = useTripLoadProgress(trip.id, showProgress)
+  const summaryQuery = useTripLoadSummary(trip.id, showProgress || Boolean(loadQuery.data))
 
   const addItem = useAddTripLoadItem(trip.id)
   const deleteItem = useDeleteTripLoadItem(trip.id)
+  const deleteLoad = useDeleteTripLoad(trip.id)
+  const enableLoad = useEnableTripLoad(trip.id)
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<TripLoadItem | null>(null)
   const [itemToDelete, setItemToDelete] = useState<TripLoadItem | null>(null)
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
   const [dialogError, setDialogError] = useState<NormalizedApiError | null>(null)
 
   const updateItem = useUpdateTripLoadItem(trip.id, editingItem?.id ?? '')
 
-  const isLoading = showProgress ? progressQuery.isLoading : loadQuery.isLoading
-  const isError = showProgress ? progressQuery.isError : loadQuery.isError
-  const refetch = showProgress ? progressQuery.refetch : loadQuery.refetch
+  const isLoading = showProgress ? summaryQuery.isLoading : loadQuery.isLoading
+  const activeError = showProgress ? summaryQuery.error : loadQuery.error
+  const isHardError =
+    Boolean(activeError) && (activeError as NormalizedApiError | null)?.status !== 404
+  const refetch = showProgress ? summaryQuery.refetch : loadQuery.refetch
 
-  const progressRows = progressQuery.data?.rows ?? []
-  const loadItems = loadQuery.data?.items ?? []
-  const summary = loadQuery.data?.summary
-  const autoExpand = showProgress && hasTripLoadAlertRows(progressRows)
-
-  const isMutating = addItem.isPending || updateItem.isPending || deleteItem.isPending
+  const load = loadQuery.data
+  const summaryItems = summaryQuery.data?.items ?? []
+  const loadItems = load?.items ?? []
+  const autoExpand = showProgress && hasTripLoadAlertRows(summaryItems)
+  const isMutating =
+    addItem.isPending ||
+    updateItem.isPending ||
+    deleteItem.isPending ||
+    deleteLoad.isPending ||
+    enableLoad.isPending
 
   function openAddDialog() {
     setEditingItem(null)
@@ -146,50 +146,53 @@ function TripLoadSectionContent({ trip }: TripLoadSectionProps) {
 
   function handleDialogSubmit(values: TripLoadItemFormValues) {
     setDialogError(null)
-
-    if (editingItem) {
-      updateItem.mutate(
-        {
-          materialName: values.materialName.trim(),
-          quantity: values.quantity,
-          unit: values.unit,
-          notes: values.notes?.trim() ? values.notes.trim() : null,
-        },
-        {
-          onSuccess: () => {
-            setDialogOpen(false)
-            setEditingItem(null)
-          },
-          onError: (error) => {
-            setDialogError(error)
-          },
-        },
-      )
-      return
+    const payload = {
+      materialName: values.materialName.trim(),
+      quantity: values.quantity,
+      unit: values.unit,
+      notes: values.notes?.trim() ? values.notes.trim() : null,
     }
 
-    addItem.mutate(
-      {
-        materialName: values.materialName.trim(),
-        quantity: values.quantity,
-        unit: values.unit,
-        notes: values.notes?.trim() ? values.notes.trim() : null,
-      },
-      {
+    if (editingItem) {
+      updateItem.mutate(payload, {
         onSuccess: () => {
           setDialogOpen(false)
+          setEditingItem(null)
         },
         onError: (error) => {
           setDialogError(error)
         },
+      })
+      return
+    }
+
+    addItem.mutate(payload, {
+      onSuccess: () => {
+        setDialogOpen(false)
       },
-    )
+      onError: (error) => {
+        setDialogError(error)
+      },
+    })
   }
 
   const toolbar =
     canManage && !showProgress ? (
-      <PermissionGate permission={PERMISSIONS.trips.loadManage}>
-        <TripLoadToolbar onAddItem={openAddDialog} disabled={isMutating} />
+      <PermissionGate anyOf={[PERMISSIONS.trips.loadManage, PERMISSIONS.trips.update]}>
+        <TripLoadToolbar
+          onAddItem={openAddDialog}
+          disabled={isMutating}
+          hasLoad={Boolean(load)}
+          strictLoadValidation={trip.strictLoadValidation}
+          canManageSettings
+          onStrictChange={(strict) => {
+            enableLoad.mutate({ strictLoadValidation: strict })
+          }}
+          onClearLoad={() => {
+            setClearConfirmOpen(true)
+          }}
+          isClearing={deleteLoad.isPending}
+        />
       </PermissionGate>
     ) : null
 
@@ -197,10 +200,13 @@ function TripLoadSectionContent({ trip }: TripLoadSectionProps) {
 
   if (isLoading) {
     body = <TripLoadSectionSkeleton />
-  } else if (isError) {
+  } else if (isHardError) {
     body = (
       <div className="space-y-3">
-        <ErrorState title="Could not load trip load" description="Please try again." />
+        <ErrorState
+          title="Could not load trip load"
+          description={(activeError as NormalizedApiError | null)?.message ?? 'Please try again.'}
+        />
         <div className="flex justify-center">
           <Button
             type="button"
@@ -216,15 +222,17 @@ function TripLoadSectionContent({ trip }: TripLoadSectionProps) {
     )
   } else if (showProgress) {
     body =
-      progressRows.length === 0 ? (
+      summaryItems.length === 0 ? (
         <TripLoadEmptyState editable={false} readOnlyStarted={isStartedStatus(trip.status)} />
       ) : (
-        <TripLoadProgressTable rows={progressRows} />
+        <TripLoadProgressTable items={summaryItems} />
       )
   } else {
     body = (
       <>
-        {summary ? <TripLoadSummaryCard summary={summary} /> : null}
+        {load && loadItems.length > 0 ? (
+          <TripLoadSummaryCard load={load} strictLoadValidation={trip.strictLoadValidation} />
+        ) : null}
         {loadItems.length === 0 ? (
           <TripLoadEmptyState
             editable={canManage}
@@ -270,7 +278,7 @@ function TripLoadSectionContent({ trip }: TripLoadSectionProps) {
           if (!open) setItemToDelete(null)
         }}
         title="Remove load item?"
-        description="This material line will be removed from the trip load plan."
+        description="This material line will be removed from the trip load."
         confirmLabel="Remove"
         variant="destructive"
         isLoading={deleteItem.isPending}
@@ -280,6 +288,21 @@ function TripLoadSectionContent({ trip }: TripLoadSectionProps) {
             onSuccess: () => {
               setItemToDelete(null)
             },
+          })
+        }}
+      />
+
+      <ConfirmDialog
+        open={clearConfirmOpen}
+        onOpenChange={setClearConfirmOpen}
+        title="Clear trip load?"
+        description="All load items will be deleted. You can add a new load while the trip is still draft."
+        confirmLabel="Clear load"
+        variant="destructive"
+        isLoading={deleteLoad.isPending}
+        onConfirm={() => {
+          void deleteLoad.mutateAsync().then(() => {
+            setClearConfirmOpen(false)
           })
         }}
       />

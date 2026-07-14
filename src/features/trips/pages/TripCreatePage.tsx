@@ -38,7 +38,6 @@ export default function TripCreatePage() {
         scheduledStart: datetimeLocalToIso(values.scheduledStart),
         notes: blankToUndefined(values.notes),
         members: members.length > 0 ? members : undefined,
-        prepareTripLoad: values.prepareTripLoad,
       },
       {
         onSuccess: (trip) => {

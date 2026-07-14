@@ -1,7 +1,11 @@
 import { apiClient } from '@/lib/axios'
-import { unwrap, unwrapList } from '@/lib/api-envelope'
+import { unwrap, unwrapList, unwrapWithMeta } from '@/lib/api-envelope'
 import type { ApiEnvelope } from '@/types/api.types'
 import type { PaginatedResponse } from '@/types/pagination.types'
+import {
+  normalizeTripLoadOutboundWarnings,
+  type TripLoadOutboundWarning,
+} from '@/features/trips/types/trip-load.types'
 
 import type {
   CancelTransactionInput,
@@ -76,12 +80,18 @@ export const TransactionService = {
     return unwrap(response)
   },
 
-  async create(input: CreateTransactionInput): Promise<TransactionDetail> {
+  async create(
+    input: CreateTransactionInput,
+  ): Promise<{ transaction: TransactionDetail; warnings: TripLoadOutboundWarning[] }> {
     const response = await apiClient.post<ApiEnvelope<TransactionDetail>>(
       TRANSACTION_ENDPOINTS.base,
       input,
     )
-    return unwrap(response)
+    const { data, meta } = unwrapWithMeta(response)
+    return {
+      transaction: data,
+      warnings: normalizeTripLoadOutboundWarnings(meta.warnings),
+    }
   },
 
   async update(id: string, input: UpdateTransactionInput): Promise<TransactionDetail> {

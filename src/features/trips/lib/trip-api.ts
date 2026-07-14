@@ -29,6 +29,8 @@ export interface TripSummaryApi {
   updatedAt?: string
   deletedAt?: string | null
   memberCount?: number
+  loadEnabled?: boolean
+  strictLoadValidation?: boolean
 }
 
 export interface TripMemberApi {
@@ -49,7 +51,6 @@ export type TripDetailApi = TripSummaryApi &
     actualCompletedAt: string | null
     actualEndAt: string | null
     vehicleId: string | null
-    tripLoadEnabled?: boolean
     startingOdometer: number | null
     endingOdometer: number | null
     distance: number | null
@@ -137,7 +138,8 @@ export function normalizeTripSummary(raw: TripSummaryApi): TripSummary {
     scheduledByUserId: (raw as TripDetailApi).scheduledByUserId ?? null,
     startedByUserId: (raw as TripDetailApi).startedByUserId ?? null,
     completedByUserId: (raw as TripDetailApi).completedByUserId ?? null,
-    tripLoadEnabled: (raw as TripDetailApi).tripLoadEnabled === true,
+    loadEnabled: raw.loadEnabled !== false,
+    strictLoadValidation: raw.strictLoadValidation === true,
     createdAt: raw.createdAt ?? new Date(0).toISOString(),
     updatedAt: raw.updatedAt ?? raw.createdAt ?? new Date(0).toISOString(),
     deletedAt: raw.deletedAt ?? null,
@@ -207,10 +209,6 @@ export function toTripCreateBody(input: CreateTripInput): Record<string, unknown
       employeeId: member.employeeId,
       role: member.role,
     }))
-  }
-
-  if (input.prepareTripLoad === true) {
-    body.prepareTripLoad = true
   }
 
   return body

@@ -11,10 +11,21 @@ export function useTripLoad(tripId: string, enabled = true) {
   })
 }
 
-export function useTripLoadProgress(tripId: string, enabled = true) {
+export function useTripLoadSummary(tripId: string, enabled = true) {
   return useQuery({
     queryKey: tripLoadKeys.progress(tripId),
-    queryFn: () => TripLoadService.getProgress(tripId),
+    queryFn: () => TripLoadService.getSummary(tripId),
     enabled: Boolean(tripId) && enabled,
   })
 }
+
+export function useTripLoadSettings(enabled = true) {
+  return useQuery({
+    queryKey: tripLoadKeys.settings(),
+    queryFn: () => TripLoadService.getSettings(),
+    enabled,
+  })
+}
+
+/** @deprecated Use `useTripLoadSummary`. */
+export const useTripLoadProgress = useTripLoadSummary

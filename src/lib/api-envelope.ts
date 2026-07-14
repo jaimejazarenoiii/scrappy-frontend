@@ -3,9 +3,17 @@ import type { AxiosResponse } from 'axios'
 import type { ApiEnvelope, PaginationMeta } from '@/types/api.types'
 import type { PaginatedResponse } from '@/types/pagination.types'
 
-/** Unwraps a single-object envelope into its payload. */
+/** Unwraps envelope `data` for non-paginated responses. */
 export function unwrap<T>(response: AxiosResponse<ApiEnvelope<T>>): T {
   return response.data.data
+}
+
+/** Unwraps envelope and returns payload + meta (e.g. trip-load `warnings`). */
+export function unwrapWithMeta<T>(response: AxiosResponse<ApiEnvelope<T>>): {
+  data: T
+  meta: ApiEnvelope<T>['meta']
+} {
+  return { data: response.data.data, meta: response.data.meta }
 }
 
 /**

@@ -46,8 +46,10 @@ interface TripBase {
   companyId: string
   tripNumber: string | null
   status: TripStatus
-  /** True when Prepare Trip Load was enabled at creation. */
-  tripLoadEnabled: boolean
+  /** Always true per API — Trip Load feature is always available. */
+  loadEnabled: boolean
+  /** When true, outbound overselling is blocked (409); when false, warnings only. */
+  strictLoadValidation: boolean
   origin: string
   destination: string
   scheduledStart: string | null
@@ -93,8 +95,6 @@ export interface CreateTripInput {
   destination: string
   notes?: string | null
   members?: CreateTripMemberInput[]
-  /** Opt-in Trip Load planning (default false). */
-  prepareTripLoad?: boolean
 }
 
 /** `PATCH /trips/{tripId}` request body (planned). */

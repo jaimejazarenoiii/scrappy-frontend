@@ -5,18 +5,18 @@ import { DataTable } from '@/components/common/DataTable'
 import { Card } from '@/components/ui/card'
 
 import { RemainingQuantityBadge } from './RemainingQuantityBadge'
-import type { TripLoadProgressRow } from '../types/trip-load.types'
+import { indicatorForSummaryItem, type TripLoadSummaryItem } from '../types/trip-load.types'
 
 interface TripLoadProgressTableProps {
-  rows: TripLoadProgressRow[]
+  items: TripLoadSummaryItem[]
 }
 
 function formatQuantity(value: number, unit: string): string {
   return `${new Intl.NumberFormat('en-PH', { maximumFractionDigits: 2 }).format(value)} ${unit}`
 }
 
-export function TripLoadProgressTable({ rows }: TripLoadProgressTableProps) {
-  const columns = useMemo<ColumnDef<TripLoadProgressRow>[]>(
+export function TripLoadProgressTable({ items }: TripLoadProgressTableProps) {
+  const columns = useMemo<ColumnDef<TripLoadSummaryItem>[]>(
     () => [
       {
         accessorKey: 'materialName',
@@ -29,9 +29,9 @@ export function TripLoadProgressTable({ rows }: TripLoadProgressTableProps) {
         cell: ({ row }) => formatQuantity(row.original.loadedQuantity, row.original.unit),
       },
       {
-        id: 'sold',
-        header: 'Sold',
-        cell: ({ row }) => formatQuantity(row.original.soldQuantity, row.original.unit),
+        id: 'outbound',
+        header: 'Sold (outbound)',
+        cell: ({ row }) => formatQuantity(row.original.outboundQuantity, row.original.unit),
       },
       {
         id: 'remaining',
@@ -41,7 +41,9 @@ export function TripLoadProgressTable({ rows }: TripLoadProgressTableProps) {
       {
         id: 'status',
         header: 'Status',
-        cell: ({ row }) => <RemainingQuantityBadge status={row.original.indicatorStatus} />,
+        cell: ({ row }) => (
+          <RemainingQuantityBadge status={indicatorForSummaryItem(row.original)} />
+        ),
       },
     ],
     [],
@@ -50,7 +52,7 @@ export function TripLoadProgressTable({ rows }: TripLoadProgressTableProps) {
   return (
     <DataTable
       columns={columns}
-      data={rows}
+      data={items}
       getRowId={(row) => `${row.materialName}-${row.unit}`}
       emptyMessage="No load progress available."
       renderMobileCard={(row) => (
@@ -58,7 +60,7 @@ export function TripLoadProgressTable({ rows }: TripLoadProgressTableProps) {
           <div className="space-y-3">
             <div className="flex items-start justify-between gap-2">
               <p className="font-medium">{row.materialName}</p>
-              <RemainingQuantityBadge status={row.indicatorStatus} />
+              <RemainingQuantityBadge status={indicatorForSummaryItem(row)} />
             </div>
             <dl className="grid grid-cols-3 gap-2 text-sm">
               <div>
@@ -67,7 +69,7 @@ export function TripLoadProgressTable({ rows }: TripLoadProgressTableProps) {
               </div>
               <div>
                 <dt className="text-muted-foreground">Sold</dt>
-                <dd className="font-medium">{formatQuantity(row.soldQuantity, row.unit)}</dd>
+                <dd className="font-medium">{formatQuantity(row.outboundQuantity, row.unit)}</dd>
               </div>
               <div>
                 <dt className="text-muted-foreground">Remaining</dt>
