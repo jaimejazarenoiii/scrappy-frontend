@@ -9,7 +9,6 @@ import { PERMISSIONS } from '@/constants/permissions'
 import { usePermissions } from '@/features/authorization/hooks/usePermissions'
 import { blankToUndefined } from '@/utils/form-values'
 import { CompanyForm } from '../components/CompanyForm'
-import { TripLoadCompanySettingsCard } from '../components/TripLoadCompanySettingsCard'
 import { useCompany, useUpdateCompany } from '../hooks/useCompany'
 
 export default function CompanyPage() {
@@ -57,7 +56,6 @@ export default function CompanyPage() {
             })
           }}
         />
-        <TripLoadCompanySettingsCard />
       </div>
     </PageContainer>
   )

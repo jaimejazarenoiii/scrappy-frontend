@@ -19,13 +19,5 @@ export function useTripLoadSummary(tripId: string, enabled = true) {
   })
 }
 
-export function useTripLoadSettings(enabled = true) {
-  return useQuery({
-    queryKey: tripLoadKeys.settings(),
-    queryFn: () => TripLoadService.getSettings(),
-    enabled,
-  })
-}
-
 /** @deprecated Use `useTripLoadSummary`. */
 export const useTripLoadProgress = useTripLoadSummary

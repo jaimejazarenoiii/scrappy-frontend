@@ -7,8 +7,6 @@ import { TripLoadService } from '../services/trip-load.service'
 import type {
   CreateTripLoadInput,
   CreateTripLoadItemInput,
-  EnableTripLoadInput,
-  TripLoadSettings,
   UpdateTripLoadItemInput,
 } from '../types/trip-load.types'
 import type { TripDetail } from '../types/trip.types'
@@ -123,57 +121,6 @@ export function useDeleteTripLoad(tripId: string) {
     },
     onError: (error: NormalizedApiError) => {
       handleMutationError(error, 'Could not delete trip load')
-    },
-  })
-}
-
-export function useEnableTripLoad(tripId: string) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (input: EnableTripLoadInput = {}) => TripLoadService.enable(tripId, input),
-    onSuccess: (flags) => {
-      patchTripFlags(queryClient, tripId, flags)
-      invalidateTripLoad(queryClient, tripId)
-      toast.success(
-        flags.strictLoadValidation
-          ? 'Strict load validation enabled'
-          : 'Load validation set to warn only',
-      )
-    },
-    onError: (error: NormalizedApiError) => {
-      handleMutationError(error, 'Could not update load settings')
-    },
-  })
-}
-
-export function useDisableTripLoad(tripId: string) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: () => TripLoadService.disable(tripId),
-    onSuccess: (flags) => {
-      patchTripFlags(queryClient, tripId, flags)
-      invalidateTripLoad(queryClient, tripId)
-      toast.success('Trip load disabled and cleared')
-    },
-    onError: (error: NormalizedApiError) => {
-      handleMutationError(error, 'Could not disable trip load')
-    },
-  })
-}
-
-export function useUpdateTripLoadSettings() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (input: Partial<TripLoadSettings>) => TripLoadService.updateSettings(input),
-    onSuccess: (settings) => {
-      queryClient.setQueryData(tripLoadKeys.settings(), settings)
-      toast.success('Trip load settings saved')
-    },
-    onError: (error: NormalizedApiError) => {
-      toast.error(error.message || 'Could not save trip load settings')
     },
   })
 }

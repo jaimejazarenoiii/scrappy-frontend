@@ -24,7 +24,6 @@ import {
   useAddTripLoadItem,
   useDeleteTripLoad,
   useDeleteTripLoadItem,
-  useEnableTripLoad,
   useUpdateTripLoadItem,
 } from '../hooks/useTripLoadMutations'
 import {
@@ -105,7 +104,6 @@ export function TripLoadSection({ trip }: TripLoadSectionProps) {
   const addItem = useAddTripLoadItem(trip.id)
   const deleteItem = useDeleteTripLoadItem(trip.id)
   const deleteLoad = useDeleteTripLoad(trip.id)
-  const enableLoad = useEnableTripLoad(trip.id)
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<TripLoadItem | null>(null)
@@ -126,11 +124,7 @@ export function TripLoadSection({ trip }: TripLoadSectionProps) {
   const loadItems = load?.items ?? []
   const autoExpand = showProgress && hasTripLoadAlertRows(summaryItems)
   const isMutating =
-    addItem.isPending ||
-    updateItem.isPending ||
-    deleteItem.isPending ||
-    deleteLoad.isPending ||
-    enableLoad.isPending
+    addItem.isPending || updateItem.isPending || deleteItem.isPending || deleteLoad.isPending
 
   function openAddDialog() {
     setEditingItem(null)
@@ -183,11 +177,6 @@ export function TripLoadSection({ trip }: TripLoadSectionProps) {
           onAddItem={openAddDialog}
           disabled={isMutating}
           hasLoad={Boolean(load)}
-          strictLoadValidation={trip.strictLoadValidation}
-          canManageSettings
-          onStrictChange={(strict) => {
-            enableLoad.mutate({ strictLoadValidation: strict })
-          }}
           onClearLoad={() => {
             setClearConfirmOpen(true)
           }}
@@ -230,9 +219,7 @@ export function TripLoadSection({ trip }: TripLoadSectionProps) {
   } else {
     body = (
       <>
-        {load && loadItems.length > 0 ? (
-          <TripLoadSummaryCard load={load} strictLoadValidation={trip.strictLoadValidation} />
-        ) : null}
+        {load && loadItems.length > 0 ? <TripLoadSummaryCard load={load} /> : null}
         {loadItems.length === 0 ? (
           <TripLoadEmptyState
             editable={canManage}
