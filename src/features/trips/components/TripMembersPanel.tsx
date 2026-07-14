@@ -4,17 +4,14 @@ import { Users } from 'lucide-react'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { EmptyState } from '@/components/feedback/EmptyState'
-import { ErrorState } from '@/components/feedback/ErrorState'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
 import { PERMISSIONS } from '@/constants/permissions'
 import { PermissionGate } from '@/features/authorization/components/PermissionGate'
 import { useFormatRecordEmployee } from '@/features/employees/hooks/useFormatRecordEmployee'
 
 import { TripMemberAssignDialog } from './TripMemberAssignDialog'
 import { tripMemberRoleLabel } from '../lib/trip-member'
-import { useTripMembers } from '../hooks/useTripMembers'
 import { useRemoveTripMember } from '../hooks/useTripMemberMutations'
 import { useTripDialogStore } from '../hooks/useTripDialogStore'
 import { isTerminalTripStatus } from '../lib/trip-workflow'
@@ -31,12 +28,11 @@ function memberStatusLabel(status: string | null | undefined): string {
 
 export function TripMembersPanel({ trip }: TripMembersPanelProps) {
   const formatEmployee = useFormatRecordEmployee()
-  const membersQuery = useTripMembers(trip.id, trip)
   const removeMember = useRemoveTripMember(trip.id)
   const { activeDialog, openDialog, closeDialog } = useTripDialogStore()
   const [memberToRemove, setMemberToRemove] = useState<TripMember | null>(null)
 
-  const members = membersQuery.data ?? []
+  const members = trip.members
   const canManage = !isTerminalTripStatus(trip.status)
 
   return (
@@ -59,15 +55,7 @@ export function TripMembersPanel({ trip }: TripMembersPanelProps) {
         </PermissionGate>
       </CardHeader>
       <CardContent>
-        {membersQuery.isLoading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Skeleton key={index} className="h-10 w-full rounded-md" />
-            ))}
-          </div>
-        ) : membersQuery.isError ? (
-          <ErrorState title="Could not load members" description="Please try again." />
-        ) : members.length === 0 ? (
+        {members.length === 0 ? (
           <EmptyState
             icon={Users}
             title="No members assigned"

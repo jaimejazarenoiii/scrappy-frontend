@@ -4,18 +4,40 @@ import { toast } from 'sonner'
 import type { NormalizedApiError } from '@/lib/axios'
 
 import { TripService } from '../services/trip.service'
-import type { AssignMembersInput } from '../types/trip.types'
+import type { AssignMembersInput, TripDetail, TripMember } from '../types/trip.types'
 import { tripKeys } from './trip-keys'
 import { useTripDialogStore } from './useTripDialogStore'
+
+function mergeMembers(existing: TripMember[], incoming: TripMember[]): TripMember[] {
+  const byEmployeeId = new Map(existing.map((member) => [member.employeeId, member]))
+  for (const member of incoming) {
+    byEmployeeId.set(member.employeeId, member)
+  }
+  return [...byEmployeeId.values()]
+}
+
+function syncMembersCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  tripId: string,
+  members: TripMember[],
+) {
+  queryClient.setQueryData(tripKeys.members(tripId), members)
+  queryClient.setQueryData(tripKeys.detail(tripId), (prev: TripDetail | undefined) => {
+    if (!prev) return prev
+    return { ...prev, members }
+  })
+}
 
 export function useAddTripMembers(tripId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (input: AssignMembersInput) => TripService.addMembers(tripId, input),
-    onSuccess: () => {
+    onSuccess: (addedMembers) => {
+      const previous = queryClient.getQueryData<TripDetail>(tripKeys.detail(tripId))
+      const nextMembers = mergeMembers(previous?.members ?? [], addedMembers)
+      syncMembersCache(queryClient, tripId, nextMembers)
       void queryClient.invalidateQueries({ queryKey: tripKeys.detail(tripId) })
-      void queryClient.invalidateQueries({ queryKey: tripKeys.members(tripId) })
       useTripDialogStore.getState().closeDialog()
       toast.success('Members assigned')
     },
@@ -30,9 +52,11 @@ export function useRemoveTripMember(tripId: string) {
 
   return useMutation({
     mutationFn: (memberId: string) => TripService.removeMember(tripId, memberId),
-    onSuccess: () => {
+    onSuccess: (_result, memberId) => {
+      const previous = queryClient.getQueryData<TripDetail>(tripKeys.detail(tripId))
+      const nextMembers = (previous?.members ?? []).filter((member) => member.id !== memberId)
+      syncMembersCache(queryClient, tripId, nextMembers)
       void queryClient.invalidateQueries({ queryKey: tripKeys.detail(tripId) })
-      void queryClient.invalidateQueries({ queryKey: tripKeys.members(tripId) })
       toast.success('Member removed')
     },
     onError: (error: NormalizedApiError) => {

@@ -6,11 +6,13 @@ import type { ListQueryParams, PaginatedResponse } from '@/types/pagination.type
 
 import {
   normalizeTripDetail,
+  normalizeTripMember,
   normalizeTripSummary,
   toTripCreateBody,
   toTripListQueryParams,
   toTripUpdateBody,
   type TripDetailApi,
+  type TripMemberApi,
   type TripSummaryApi,
 } from '../lib/trip-api'
 
@@ -122,16 +124,21 @@ export const TripService = {
   },
 
   async listMembers(tripId: string): Promise<TripMember[]> {
-    const response = await apiClient.get<ApiEnvelope<TripMember[]>>(TRIP_ENDPOINTS.members(tripId))
-    return unwrap(response)
+    // Live API has no GET /members — members come from trip detail.
+    const detail = await this.get(tripId)
+    return detail.members
   },
 
   async addMembers(tripId: string, input: AssignMembersInput): Promise<TripMember[]> {
-    const response = await apiClient.post<ApiEnvelope<TripMember[]>>(
+    const response = await apiClient.post<ApiEnvelope<TripMemberApi[] | TripDetailApi>>(
       TRIP_ENDPOINTS.members(tripId),
       input,
     )
-    return unwrap(response)
+    const payload = unwrap(response)
+    if (Array.isArray(payload)) {
+      return payload.map((member) => normalizeTripMember(member, tripId))
+    }
+    return normalizeTripDetail(payload).members
   },
 
   async removeMember(tripId: string, memberId: string): Promise<void> {
