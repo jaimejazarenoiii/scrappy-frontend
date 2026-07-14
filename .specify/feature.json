@@ -1,1 +1,3 @@
-{ "feature_directory": "specs/010-reports" }
+{
+  "feature_directory": "specs/011-trip-load-ui"
+}

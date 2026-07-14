@@ -15,6 +15,7 @@ import { PermissionGate } from '@/features/authorization/components/PermissionGa
 import { formatDate } from '@/utils/format-date'
 
 import { TripMembersPanel } from '../components/TripMembersPanel'
+import { TripLoadSection } from '../components/TripLoadSection'
 import { TripOdometerSummary } from '../components/TripOdometerSummary'
 import { TripRouteSummary } from '../components/TripRouteSummary'
 import { TripStatusBadge } from '../components/TripStatusBadge'
@@ -137,6 +138,8 @@ export default function TripDetailPage() {
           <TripMembersPanel trip={trip} />
           <TripVehiclePanel trip={trip} />
         </div>
+
+        <TripLoadSection trip={trip} />
 
         <TripTransactionsPanel trip={trip} />
 

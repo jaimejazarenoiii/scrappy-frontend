@@ -10,13 +10,15 @@ import type {
   StartTripInput,
   TripDetail,
 } from '../types/trip.types'
-import { tripKeys } from './trip-keys'
+import { tripKeys, tripLoadKeys } from './trip-keys'
 import { useTripDialogStore } from './useTripDialogStore'
 
 function invalidateTripDetail(queryClient: ReturnType<typeof useQueryClient>, id: string) {
   void queryClient.invalidateQueries({ queryKey: tripKeys.all })
   void queryClient.invalidateQueries({ queryKey: tripKeys.detail(id) })
   void queryClient.invalidateQueries({ queryKey: tripKeys.timeline(id) })
+  void queryClient.invalidateQueries({ queryKey: tripLoadKeys.detail(id) })
+  void queryClient.invalidateQueries({ queryKey: tripLoadKeys.progress(id) })
 }
 
 function handleWorkflowError(

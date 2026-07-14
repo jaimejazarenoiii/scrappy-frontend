@@ -16,6 +16,7 @@ import { useFormatRecordEmployee } from '@/features/employees/hooks/useFormatRec
 import { useTrip } from '@/features/trips/hooks/useTrip'
 import { useAuthStore } from '@/store/auth.store'
 import { TransactionDirectionBadge } from '../components/TransactionDirectionBadge'
+import { TransactionItemsList } from '../components/TransactionItemsList'
 import { TransactionSettlementActions } from '../components/TransactionSettlementActions'
 import { TransactionSettlementSummary } from '../components/TransactionSettlementSummary'
 import { TransactionStatusBadge } from '../components/TransactionStatusBadge'
@@ -165,11 +166,7 @@ export default function TransactionDetailPage() {
               <DescriptionItem label="Assigned employees">
                 {assignedEmployeeLabels.length ? assignedEmployeeLabels.join(', ') : '—'}
               </DescriptionItem>
-              <DescriptionItem label="Items">{tx.items.length}</DescriptionItem>
               <DescriptionItem label="Photos">{tx.attachments.length}</DescriptionItem>
-              <DescriptionItem label="Total amount">
-                <span className="font-medium tabular-nums">{tx.totalAmount.toFixed(2)}</span>
-              </DescriptionItem>
               {tx.submittedAt ? (
                 <DescriptionItem label="Submitted">
                   {formatDate(tx.submittedAt)}
@@ -196,6 +193,8 @@ export default function TransactionDetailPage() {
               ) : null}
               <DescriptionItem label="Notes">{tx.notes?.trim() ? tx.notes : '—'}</DescriptionItem>
             </DescriptionList>
+
+            <TransactionItemsList items={tx.items} totalAmount={tx.totalAmount} />
 
             {isPaidStatus(tx.status) ? (
               <section className="space-y-3">

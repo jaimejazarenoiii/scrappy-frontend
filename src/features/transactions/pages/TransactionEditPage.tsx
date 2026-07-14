@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router'
 
@@ -21,9 +21,12 @@ import { TransactionDraftIndicator } from '../components/TransactionDraftIndicat
 import { TransactionDirectionBadge } from '../components/TransactionDirectionBadge'
 import { TransactionStatusBadge } from '../components/TransactionStatusBadge'
 import { TransactionItemsEditor } from '../components/TransactionItemsEditor'
+import { TripLoadValidationBanner } from '../components/TripLoadValidationBanner'
 import { TransactionPhotosManager } from '../components/TransactionPhotosManager'
 import { useDraftAutoSave } from '../hooks/useDraftAutoSave'
 import { useTransaction } from '../hooks/useTransaction'
+import { useTransactionItems } from '../hooks/useTransactionItems'
+import { useTripLoadTransactionWarnings } from '../hooks/useTripLoadTransactionWarnings'
 import {
   useUpdateTransactionDraft,
   useAutoSaveTransactionDraft,
@@ -106,6 +109,22 @@ export default function TransactionEditPage() {
 
   const tx = transactionQuery.data
   const draftEditingAllowed = tx?.status === 'DRAFT'
+
+  const itemsQuery = useTransactionItems(id ?? '')
+  const validationItems = useMemo(
+    () =>
+      (itemsQuery.data ?? []).map((item) => ({
+        materialName: item.materialName,
+        weight: item.weight,
+        unit: item.unit,
+      })),
+    [itemsQuery.data],
+  )
+  const tripLoadWarningsQuery = useTripLoadTransactionWarnings({
+    tripId: tripId ?? tx?.tripId ?? undefined,
+    locationType,
+    items: validationItems,
+  })
 
   useEffect(() => {
     if (!tx || tx.status === 'DRAFT') return
@@ -482,6 +501,7 @@ export default function TransactionEditPage() {
 
         {id ? (
           <>
+            <TripLoadValidationBanner warnings={tripLoadWarningsQuery.data?.warnings ?? []} />
             <TransactionItemsEditor transactionId={id} disabled={!draftEditingAllowed} />
             <TransactionPhotosManager transactionId={id} disabled={!draftEditingAllowed} />
           </>

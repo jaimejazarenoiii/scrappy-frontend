@@ -1,14 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, Plus, Trash2 } from 'lucide-react'
 import { useEffect } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useFieldArray, useForm, Controller } from 'react-hook-form'
 
 import { FormField } from '@/components/common/FormField'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { PERMISSIONS } from '@/constants/permissions'
+import { PermissionGate } from '@/features/authorization/components/PermissionGate'
 import { useEmployeeOptions } from '@/features/employees/hooks/useEmployeeOptions'
 import { useVehicles } from '@/features/vehicles/hooks/useVehicles'
 import type { NormalizedApiError } from '@/lib/axios'
@@ -50,6 +53,7 @@ export function TripForm({
   } = useForm<TripFormValues>({
     resolver: zodResolver(tripSchema),
     defaultValues: {
+      prepareTripLoad: defaultValues?.prepareTripLoad ?? false,
       origin: defaultValues?.origin ?? '',
       destination: defaultValues?.destination ?? '',
       scheduledStart: defaultValues?.scheduledStart ?? '',
@@ -135,6 +139,37 @@ export function TripForm({
       <FormField label="Notes" htmlFor="notes" error={errors.notes?.message}>
         <Textarea id="notes" rows={4} {...register('notes')} />
       </FormField>
+
+      {mode === 'create' ? (
+        <PermissionGate anyOf={[PERMISSIONS.trips.loadManage, PERMISSIONS.trips.create]}>
+          <div className="rounded-lg border p-4">
+            <Controller
+              name="prepareTripLoad"
+              control={control}
+              render={({ field }) => (
+                <label htmlFor="prepareTripLoad" className="flex cursor-pointer items-start gap-3">
+                  <Checkbox
+                    id="prepareTripLoad"
+                    checked={field.value}
+                    disabled={isSubmitting}
+                    aria-describedby="prepareTripLoadHelp"
+                    onChange={(event) => {
+                      field.onChange(event.target.checked)
+                    }}
+                  />
+                  <span className="space-y-1">
+                    <span className="block font-medium">Prepare Trip Load</span>
+                    <span id="prepareTripLoadHelp" className="text-muted-foreground block text-sm">
+                      Optional. Enable to plan materials and quantities before the trip starts.
+                      Leave off to create a standard trip without load tracking.
+                    </span>
+                  </span>
+                </label>
+              )}
+            />
+          </div>
+        </PermissionGate>
+      ) : null}
 
       {mode === 'create' ? (
         <div className="space-y-3">

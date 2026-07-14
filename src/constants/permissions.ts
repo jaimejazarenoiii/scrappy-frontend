@@ -84,6 +84,8 @@ export const PERMISSIONS = {
     start: 'trips.start',
     complete: 'trips.complete',
     cancel: 'trips.cancel',
+    loadView: 'trips.loadView',
+    loadManage: 'trips.loadManage',
   },
   expenses: {
     view: 'expenses.view',

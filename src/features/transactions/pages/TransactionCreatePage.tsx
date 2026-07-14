@@ -18,7 +18,9 @@ import { useBranchOptions } from '@/features/branches/hooks/useBranchOptions'
 import { useWarehouseOptions } from '@/features/warehouses/hooks/useWarehouseOptions'
 import { TransactionEmployeePicker } from '../components/TransactionEmployeePicker'
 import { TransactionTripPicker } from '../components/TransactionTripPicker'
+import { TripLoadValidationBanner } from '../components/TripLoadValidationBanner'
 import { useCreateTransactionDraft } from '../hooks/useTransactionMutations'
+import { useTripLoadTransactionWarnings } from '../hooks/useTripLoadTransactionWarnings'
 import {
   transactionDraftSchema,
   type TransactionDraftValues,
@@ -133,6 +135,12 @@ export default function TransactionCreatePage() {
 
   const assignedEmployeeIds = watch('assignedEmployeeIds')
   const tripId = watch('tripId')
+
+  const tripLoadWarningsQuery = useTripLoadTransactionWarnings({
+    tripId,
+    locationType,
+    items: [],
+  })
 
   return (
     <PageContainer maxWidth="lg">
@@ -301,6 +309,8 @@ export default function TransactionCreatePage() {
                 />
               </FormField>
             ) : null}
+
+            <TripLoadValidationBanner warnings={tripLoadWarningsQuery.data?.warnings ?? []} />
 
             <FormField
               label="Assigned employees"

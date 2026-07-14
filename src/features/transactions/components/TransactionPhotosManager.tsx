@@ -1,6 +1,7 @@
-import { ImagePlus, Loader2, Trash2 } from 'lucide-react'
+import { Camera, ImagePlus, Loader2, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
+import { CameraCaptureDialog } from '@/components/common/CameraCaptureDialog'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -34,6 +35,7 @@ export function TransactionPhotosManager({
   const accessToken = useAuthStore((state) => state.accessToken)
   const [deletingAttachment, setDeletingAttachment] = useState<TransactionAttachment | null>(null)
   const [uploads, setUploads] = useState<UploadState[]>([])
+  const [cameraOpen, setCameraOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const deleteAttachment = useDeleteTransactionAttachment(transactionId)
@@ -46,30 +48,34 @@ export function TransactionPhotosManager({
     }
   }, [uploads])
 
+  async function uploadFile(file: File) {
+    const previewUrl = URL.createObjectURL(file)
+    setUploads((prev) => [...prev, { fileName: file.name, previewUrl, progress: 0 }])
+
+    try {
+      await uploadAttachment.mutateAsync({
+        file,
+        onProgress: (progress) => {
+          setUploads((prev) =>
+            prev.map((upload) =>
+              upload.fileName === file.name && upload.previewUrl === previewUrl
+                ? { ...upload, progress }
+                : upload,
+            ),
+          )
+        },
+      })
+    } finally {
+      setUploads((prev) => prev.filter((upload) => upload.previewUrl !== previewUrl))
+      URL.revokeObjectURL(previewUrl)
+    }
+  }
+
   async function handleFilesSelected(files: FileList | null) {
     if (!files?.length || disabled) return
 
     for (const file of Array.from(files)) {
-      const previewUrl = URL.createObjectURL(file)
-      setUploads((prev) => [...prev, { fileName: file.name, previewUrl, progress: 0 }])
-
-      try {
-        await uploadAttachment.mutateAsync({
-          file,
-          onProgress: (progress) => {
-            setUploads((prev) =>
-              prev.map((upload) =>
-                upload.fileName === file.name && upload.previewUrl === previewUrl
-                  ? { ...upload, progress }
-                  : upload,
-              ),
-            )
-          },
-        })
-      } finally {
-        setUploads((prev) => prev.filter((upload) => upload.previewUrl !== previewUrl))
-        URL.revokeObjectURL(previewUrl)
-      }
+      await uploadFile(file)
     }
 
     if (fileInputRef.current) {
@@ -78,6 +84,7 @@ export function TransactionPhotosManager({
   }
 
   const attachments = attachmentsQuery.data ?? []
+  const isUploading = uploadAttachment.isPending
 
   return (
     <section className="space-y-4" aria-labelledby="transaction-photos-heading">
@@ -86,28 +93,44 @@ export function TransactionPhotosManager({
           <h2 id="transaction-photos-heading" className="text-lg font-semibold">
             Photos
           </h2>
-          <p className="text-muted-foreground text-sm">Upload supporting photos for this draft.</p>
+          <p className="text-muted-foreground text-sm">
+            Upload or capture supporting photos for this draft.
+          </p>
         </div>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          disabled={disabled || uploadAttachment.isPending}
-          onClick={() => {
-            fileInputRef.current?.click()
-          }}
-        >
-          {uploadAttachment.isPending ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <ImagePlus className="size-4" />
-          )}
-          Upload photos
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={disabled || isUploading}
+            onClick={() => {
+              fileInputRef.current?.click()
+            }}
+          >
+            {isUploading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <ImagePlus className="size-4" />
+            )}
+            Upload
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={disabled || isUploading}
+            onClick={() => {
+              setCameraOpen(true)
+            }}
+          >
+            <Camera className="size-4" />
+            Take photo
+          </Button>
+        </div>
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp"
           multiple
           className="sr-only"
           disabled={disabled}
@@ -116,6 +139,14 @@ export function TransactionPhotosManager({
           }}
         />
       </div>
+
+      <CameraCaptureDialog
+        open={cameraOpen}
+        onOpenChange={setCameraOpen}
+        title="Capture transaction photo"
+        description="Use your camera to photograph materials, receipts, or the site."
+        onCapture={uploadFile}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {uploads.map((upload) => (
@@ -166,7 +197,7 @@ export function TransactionPhotosManager({
 
       {!attachmentsQuery.isLoading && attachments.length === 0 && uploads.length === 0 ? (
         <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
-          No photos uploaded yet.
+          No photos yet. Upload from your device or take a photo with your camera.
         </p>
       ) : null}
 

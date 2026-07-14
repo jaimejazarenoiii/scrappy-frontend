@@ -6,11 +6,23 @@ import type { NormalizedApiError } from '@/lib/axios'
 import { TransactionService } from '../services/transaction.service'
 import type {
   CreateTransactionItemInput,
+  TransactionDetail,
   TransactionItem,
   UpdateTransactionItemInput,
 } from '../types/transaction.types'
+import { tripLoadKeys } from '@/features/trips/hooks/trip-keys'
 import { transactionItemsKeys } from './useTransactionItems'
 import { transactionKeys } from './useTransactions'
+
+function invalidateTripLoadProgress(
+  queryClient: ReturnType<typeof useQueryClient>,
+  transactionId: string,
+) {
+  const tx = queryClient.getQueryData<TransactionDetail>(transactionKeys.detail(transactionId))
+  if (tx?.tripId) {
+    void queryClient.invalidateQueries({ queryKey: tripLoadKeys.progress(tx.tripId) })
+  }
+}
 
 function handleError(error: NormalizedApiError, fallback: string) {
   toast.error(error.message || fallback)
@@ -25,6 +37,7 @@ export function useAddTransactionItem(transactionId: string) {
     onSuccess: (item: TransactionItem) => {
       void queryClient.invalidateQueries({ queryKey: transactionItemsKeys.list(transactionId) })
       void queryClient.invalidateQueries({ queryKey: transactionKeys.detail(transactionId) })
+      invalidateTripLoadProgress(queryClient, transactionId)
       queryClient.setQueryData(
         transactionItemsKeys.list(transactionId),
         (prev?: unknown) => prev ?? item,
@@ -46,6 +59,7 @@ export function useUpdateTransactionItem(transactionId: string, itemId: string) 
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: transactionItemsKeys.list(transactionId) })
       void queryClient.invalidateQueries({ queryKey: transactionKeys.detail(transactionId) })
+      invalidateTripLoadProgress(queryClient, transactionId)
       toast.success('Item updated')
     },
     onError: (error: NormalizedApiError) => {
@@ -62,6 +76,7 @@ export function useDeleteTransactionItem(transactionId: string, itemId: string) 
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: transactionItemsKeys.list(transactionId) })
       void queryClient.invalidateQueries({ queryKey: transactionKeys.detail(transactionId) })
+      invalidateTripLoadProgress(queryClient, transactionId)
       toast.success('Item removed')
     },
     onError: (error: NormalizedApiError) => {

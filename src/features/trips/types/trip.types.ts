@@ -46,6 +46,8 @@ interface TripBase {
   companyId: string
   tripNumber: string | null
   status: TripStatus
+  /** True when Prepare Trip Load was enabled at creation. */
+  tripLoadEnabled: boolean
   origin: string
   destination: string
   scheduledStart: string | null
@@ -91,6 +93,8 @@ export interface CreateTripInput {
   destination: string
   notes?: string | null
   members?: CreateTripMemberInput[]
+  /** Opt-in Trip Load planning (default false). */
+  prepareTripLoad?: boolean
 }
 
 /** `PATCH /trips/{tripId}` request body (planned). */

@@ -15,6 +15,7 @@ export const tripMemberInputSchema = z.object({
 })
 
 export const tripSchema = z.object({
+  prepareTripLoad: z.boolean(),
   origin: z.string().trim().min(1, 'Origin is required').max(500, 'Origin is too long'),
   destination: z
     .string()
