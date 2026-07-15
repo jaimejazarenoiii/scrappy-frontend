@@ -41,7 +41,7 @@ const OWNER_PERMISSIONS: string[] = [
 ]
 
 const MANAGER_PERMISSIONS: string[] = [
-  PERMISSIONS.company.view,
+  // No company/business page or activity logs — owner-only.
   ...Object.values(PERMISSIONS.user),
   ...Object.values(PERMISSIONS.employee),
   ...Object.values(PERMISSIONS.branch),
@@ -63,7 +63,6 @@ const MANAGER_PERMISSIONS: string[] = [
   ...Object.values(PERMISSIONS.expenses),
   ...Object.values(PERMISSIONS.analytics),
   ...Object.values(PERMISSIONS.reports),
-  ...Object.values(PERMISSIONS.activityLogs),
 ]
 
 const EMPLOYEE_PERMISSIONS: string[] = [
