@@ -12,6 +12,7 @@ import type { NormalizedApiError } from '@/lib/axios'
 import { blankToUndefined } from '@/utils/form-values'
 
 import { ExpenseForm } from '../components/ExpenseForm'
+import { ExpenseReceiptManager } from '../components/ExpenseReceiptManager'
 import { useExpense } from '../hooks/useExpense'
 import { useUpdateExpense } from '../hooks/useExpenseMutations'
 import { isEditableExpenseStatus } from '../lib/expense-status'
@@ -124,6 +125,12 @@ export default function ExpenseEditPage() {
               }}
               onSubmit={handleSubmit}
             />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <ExpenseReceiptManager expenseId={expense.id} />
           </CardContent>
         </Card>
       </div>

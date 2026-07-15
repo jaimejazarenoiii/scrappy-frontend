@@ -153,9 +153,8 @@ export const ExpenseService = {
   },
 
   async deleteAttachment(expenseId: string, attachmentId: string): Promise<{ deleted: true }> {
-    const response = await apiClient.delete<ApiEnvelope<{ deleted: true }>>(
-      EXPENSE_ENDPOINTS.attachment(expenseId, attachmentId),
-    )
-    return unwrap(response)
+    // API returns 204 No Content on success.
+    await apiClient.delete(EXPENSE_ENDPOINTS.attachment(expenseId, attachmentId))
+    return { deleted: true }
   },
 }
