@@ -84,6 +84,7 @@ const EMPLOYEE_PERMISSIONS: string[] = [
   PERMISSIONS.transactions.cancel,
   PERMISSIONS.trips.view,
   PERMISSIONS.trips.loadView,
+  PERMISSIONS.trips.loadManage,
 ]
 
 const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
