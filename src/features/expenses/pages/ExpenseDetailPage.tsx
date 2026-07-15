@@ -9,6 +9,7 @@ import { PageSkeleton } from '@/components/feedback/PageSkeleton'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ROUTES } from '@/constants/routes'
+import { useAuthStore } from '@/store/auth.store'
 import { formatCurrency } from '@/utils/format-currency'
 import { formatDate } from '@/utils/format-date'
 
@@ -27,6 +28,7 @@ export default function ExpenseDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const expenseQuery = useExpense(id)
+  const role = useAuthStore((state) => state.currentUser?.role)
 
   useEffect(() => {
     document.title = 'Expense details | Scrappy'
@@ -61,7 +63,7 @@ export default function ExpenseDetailPage() {
   }
 
   const expense = expenseQuery.data
-  const editable = isEditableExpenseStatus(expense.status)
+  const editable = isEditableExpenseStatus(expense.status, role)
 
   return (
     <PageContainer maxWidth="lg">

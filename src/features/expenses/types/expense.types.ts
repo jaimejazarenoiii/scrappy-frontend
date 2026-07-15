@@ -1,4 +1,4 @@
-export type ExpenseStatus = 'ACTIVE' | 'ARCHIVED'
+export type ExpenseStatus = 'DRAFT' | 'RECORDED' | 'CANCELLED'
 
 export type ExpenseReferenceType = 'COMPANY' | 'BRANCH' | 'WAREHOUSE' | 'VEHICLE' | 'TRIP'
 
@@ -89,6 +89,8 @@ export interface CreateExpenseInput {
   amount: number
   expenseDate: string
   notes?: string | null
+  /** Owner/Manager only — records the expense on create so analytics include it. */
+  recordImmediately?: boolean
 }
 
 export type UpdateExpenseInput = Partial<CreateExpenseInput>

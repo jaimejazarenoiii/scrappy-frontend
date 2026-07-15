@@ -53,7 +53,7 @@ interface ExpenseCategoryObjectApi {
   code?: string | null
 }
 
-const EXPENSE_STATUSES: ExpenseStatus[] = ['ACTIVE', 'ARCHIVED']
+const EXPENSE_STATUSES: ExpenseStatus[] = ['DRAFT', 'RECORDED', 'CANCELLED']
 const REFERENCE_TYPES: ExpenseReferenceType[] = [
   'COMPANY',
   'BRANCH',
@@ -66,7 +66,10 @@ export function normalizeExpenseStatus(status: string): ExpenseStatus {
   if ((EXPENSE_STATUSES as string[]).includes(status)) {
     return status as ExpenseStatus
   }
-  return 'ACTIVE'
+  // Legacy UI values from earlier frontend models.
+  if (status === 'ACTIVE') return 'RECORDED'
+  if (status === 'ARCHIVED') return 'CANCELLED'
+  return 'DRAFT'
 }
 
 export function normalizeReferenceType(type: string): ExpenseReferenceType {
@@ -209,13 +212,17 @@ export function toExpenseListQueryParams(params: ListQueryParams): Record<string
 }
 
 export function toExpenseCreateBody(input: CreateExpenseInput): Record<string, unknown> {
-  return {
+  const body: Record<string, unknown> = {
     category: input.category,
     description: mergeDescriptionWithNotes(input.description, input.notes),
     amount: input.amount,
     expenseDate: input.expenseDate,
     ...toExpenseContextPayload(input.referenceType, input.referenceId),
   }
+  if (input.recordImmediately === true) {
+    body.recordImmediately = true
+  }
+  return body
 }
 
 export function toExpenseUpdateBody(input: UpdateExpenseInput): Record<string, unknown> {

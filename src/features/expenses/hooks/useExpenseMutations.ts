@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { analyticsKeys } from '@/features/analytics/hooks/analytics-keys'
 import type { NormalizedApiError } from '@/lib/axios'
 
 import { ExpenseService } from '../services/expense.service'
@@ -9,6 +10,7 @@ import { expenseKeys } from './expense-keys'
 
 function invalidateExpenseQueries(queryClient: ReturnType<typeof useQueryClient>, id?: string) {
   void queryClient.invalidateQueries({ queryKey: expenseKeys.all })
+  void queryClient.invalidateQueries({ queryKey: analyticsKeys.all })
   if (id) {
     void queryClient.invalidateQueries({ queryKey: expenseKeys.detail(id) })
     void queryClient.invalidateQueries({ queryKey: expenseKeys.attachments(id) })
@@ -23,7 +25,7 @@ export function useCreateExpense() {
     onSuccess: (expense: ExpenseDetail) => {
       queryClient.setQueryData(expenseKeys.detail(expense.id), expense)
       invalidateExpenseQueries(queryClient, expense.id)
-      toast.success('Expense created')
+      toast.success(expense.status === 'RECORDED' ? 'Expense recorded' : 'Expense draft created')
     },
     onError: (error: NormalizedApiError) => {
       toast.error(error.message || 'Could not create expense')
@@ -46,6 +48,39 @@ export function useUpdateExpense(id: string) {
         void queryClient.invalidateQueries({ queryKey: expenseKeys.detail(id) })
       }
       toast.error(error.message || 'Could not update expense')
+    },
+  })
+}
+
+export function useRecordExpense() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => ExpenseService.record(id),
+    onSuccess: (expense: ExpenseDetail) => {
+      queryClient.setQueryData(expenseKeys.detail(expense.id), expense)
+      invalidateExpenseQueries(queryClient, expense.id)
+      toast.success('Expense recorded')
+    },
+    onError: (error: NormalizedApiError) => {
+      toast.error(error.message || 'Could not record expense')
+    },
+  })
+}
+
+export function useCancelExpense() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+      ExpenseService.cancel(id, reason),
+    onSuccess: (expense: ExpenseDetail) => {
+      queryClient.setQueryData(expenseKeys.detail(expense.id), expense)
+      invalidateExpenseQueries(queryClient, expense.id)
+      toast.success('Expense cancelled')
+    },
+    onError: (error: NormalizedApiError) => {
+      toast.error(error.message || 'Could not cancel expense')
     },
   })
 }

@@ -19,12 +19,17 @@ import { PERMISSIONS } from '@/constants/permissions'
 import { buildRoute, ROUTES } from '@/constants/routes'
 import { PermissionGate } from '@/features/authorization/components/PermissionGate'
 import { useListQuery } from '@/hooks/useListQuery'
+import { useAuthStore } from '@/store/auth.store'
 import { formatCurrency } from '@/utils/format-currency'
 import { formatDate } from '@/utils/format-date'
 
 import { ExpenseStatusBadge } from '../components/ExpenseStatusBadge'
 import { expenseReferenceTypeLabel, EXPENSE_REFERENCE_TYPE_OPTIONS } from '../lib/expense-reference'
-import { expenseStatusLabel, EXPENSE_STATUS_OPTIONS } from '../lib/expense-status'
+import {
+  expenseStatusLabel,
+  EXPENSE_STATUS_OPTIONS,
+  isEditableExpenseStatus,
+} from '../lib/expense-status'
 import { useExpenseCategories } from '../hooks/useExpenseCategories'
 import { useExpenseDashboard, useExpenses } from '../hooks/useExpenses'
 import { useExpenseListStore } from '../hooks/useExpenseListStore'
@@ -36,6 +41,7 @@ function expenseTitle(expense: ExpenseSummary): string {
 
 export default function ExpensesListPage() {
   const navigate = useNavigate()
+  const role = useAuthStore((state) => state.currentUser?.role)
   const { includeArchived, setIncludeArchived } = useExpenseListStore()
   const { params, setSearch, setPage, setSort, setFilter } = useListQuery({
     defaultSort: { field: 'expenseDate', direction: 'desc' },
@@ -131,7 +137,7 @@ export default function ExpensesListPage() {
               View
             </Button>
             <PermissionGate permission={PERMISSIONS.expenses.update}>
-              {row.original.status === 'ACTIVE' ? (
+              {isEditableExpenseStatus(row.original.status, role) ? (
                 <Button
                   type="button"
                   variant="ghost"
@@ -149,7 +155,7 @@ export default function ExpensesListPage() {
         ),
       },
     ],
-    [navigate],
+    [navigate, role],
   )
 
   const data = expensesQuery.data
@@ -363,7 +369,7 @@ export default function ExpensesListPage() {
                         View
                       </Button>
                       <PermissionGate permission={PERMISSIONS.expenses.update}>
-                        {expense.status === 'ACTIVE' ? (
+                        {isEditableExpenseStatus(expense.status, role) ? (
                           <Button
                             type="button"
                             variant="outline"

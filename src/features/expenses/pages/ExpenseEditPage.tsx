@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { buildRoute } from '@/constants/routes'
 import type { NormalizedApiError } from '@/lib/axios'
+import { useAuthStore } from '@/store/auth.store'
 import { blankToUndefined } from '@/utils/form-values'
 
 import { ExpenseForm } from '../components/ExpenseForm'
@@ -27,6 +28,7 @@ export default function ExpenseEditPage() {
   const navigate = useNavigate()
   const expenseQuery = useExpense(id)
   const updateExpense = useUpdateExpense(id ?? '')
+  const role = useAuthStore((state) => state.currentUser?.role)
   const [apiError, setApiError] = useState<NormalizedApiError | null>(null)
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function ExpenseEditPage() {
 
   const expense = expenseQuery.data
 
-  if (!isEditableExpenseStatus(expense.status)) {
+  if (!isEditableExpenseStatus(expense.status, role)) {
     return (
       <PageContainer maxWidth="lg">
         <div className="space-y-4">

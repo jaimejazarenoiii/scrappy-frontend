@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import {
   Dialog,
   DialogContent,
@@ -18,6 +20,8 @@ interface ConfirmDialogProps {
   onConfirm: () => void
   isLoading?: boolean
   variant?: 'default' | 'destructive'
+  confirmDisabled?: boolean
+  children?: ReactNode
 }
 
 export function ConfirmDialog({
@@ -30,6 +34,8 @@ export function ConfirmDialog({
   onConfirm,
   isLoading = false,
   variant = 'default',
+  confirmDisabled = false,
+  children,
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -38,6 +44,7 @@ export function ConfirmDialog({
           <DialogTitle>{title}</DialogTitle>
           {description ? <DialogDescription>{description}</DialogDescription> : null}
         </DialogHeader>
+        {children ? <div className="space-y-3">{children}</div> : null}
         <DialogFooter>
           <Button
             type="button"
@@ -53,7 +60,7 @@ export function ConfirmDialog({
             type="button"
             variant={variant === 'destructive' ? 'destructive' : 'default'}
             onClick={onConfirm}
-            disabled={isLoading}
+            disabled={isLoading || confirmDisabled}
           >
             {isLoading ? 'Working…' : confirmLabel}
           </Button>

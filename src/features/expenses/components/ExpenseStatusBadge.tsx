@@ -11,14 +11,15 @@ interface ExpenseStatusBadgeProps {
   status: string
 }
 
-export function ExpenseStatusBadge({ status }: ExpenseStatusBadgeProps) {
-  const knownStatus = status as ExpenseStatus
-  const label =
-    status === 'ACTIVE' || status === 'ARCHIVED'
-      ? expenseStatusLabel(knownStatus)
-      : formatExpenseStatusLabel(status)
-  const tone =
-    status === 'ACTIVE' || status === 'ARCHIVED' ? expenseStatusTone(knownStatus) : 'neutral'
+const KNOWN_STATUSES = new Set<ExpenseStatus>(['DRAFT', 'RECORDED', 'CANCELLED'])
 
-  return <StatusBadge label={label} tone={tone} />
+export function ExpenseStatusBadge({ status }: ExpenseStatusBadgeProps) {
+  if (KNOWN_STATUSES.has(status as ExpenseStatus)) {
+    const knownStatus = status as ExpenseStatus
+    return (
+      <StatusBadge label={expenseStatusLabel(knownStatus)} tone={expenseStatusTone(knownStatus)} />
+    )
+  }
+
+  return <StatusBadge label={formatExpenseStatusLabel(status)} tone="neutral" />
 }

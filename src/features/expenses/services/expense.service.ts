@@ -37,6 +37,8 @@ export const EXPENSE_ENDPOINTS = {
   dashboard: '/expenses/dashboard',
   categories: '/expenses/categories',
   detail: (expenseId: string) => `/expenses/${expenseId}`,
+  record: (expenseId: string) => `/expenses/${expenseId}/record`,
+  cancel: (expenseId: string) => `/expenses/${expenseId}/cancel`,
   archive: (expenseId: string) => `/expenses/${expenseId}/archive`,
   attachments: (expenseId: string) => `/expenses/${expenseId}/attachments`,
   attachment: (expenseId: string, attachmentId: string) =>
@@ -96,6 +98,22 @@ export const ExpenseService = {
     const response = await apiClient.patch<ApiEnvelope<ExpenseDetailApi>>(
       EXPENSE_ENDPOINTS.detail(expenseId),
       toExpenseUpdateBody(input),
+    )
+    return normalizeExpenseDetail(unwrap(response))
+  },
+
+  async record(expenseId: string, note?: string): Promise<ExpenseDetail> {
+    const response = await apiClient.post<ApiEnvelope<ExpenseDetailApi>>(
+      EXPENSE_ENDPOINTS.record(expenseId),
+      note ? { note } : {},
+    )
+    return normalizeExpenseDetail(unwrap(response))
+  },
+
+  async cancel(expenseId: string, reason: string): Promise<ExpenseDetail> {
+    const response = await apiClient.post<ApiEnvelope<ExpenseDetailApi>>(
+      EXPENSE_ENDPOINTS.cancel(expenseId),
+      { reason },
     )
     return normalizeExpenseDetail(unwrap(response))
   },
