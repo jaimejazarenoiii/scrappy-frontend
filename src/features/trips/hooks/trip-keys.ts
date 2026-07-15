@@ -3,7 +3,8 @@ import type { ListQueryParams } from '@/types/pagination.types'
 export const tripKeys = {
   all: ['trips'] as const,
   lists: () => ['trips', 'list'] as const,
-  list: (params: ListQueryParams) => ['trips', 'list', params] as const,
+  list: (params: ListQueryParams, scope: 'company' | 'mine' = 'company') =>
+    ['trips', 'list', scope, params] as const,
   details: () => ['trips', 'detail'] as const,
   detail: (id: string) => ['trips', 'detail', id] as const,
   dashboard: () => ['trips', 'dashboard'] as const,

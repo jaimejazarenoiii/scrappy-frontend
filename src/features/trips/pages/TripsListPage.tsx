@@ -18,7 +18,9 @@ import { PERMISSIONS } from '@/constants/permissions'
 import { buildRoute, ROUTES } from '@/constants/routes'
 import { PermissionGate } from '@/features/authorization/components/PermissionGate'
 import { useListQuery } from '@/hooks/useListQuery'
+import { useAuthStore } from '@/store/auth.store'
 import { formatDate } from '@/utils/format-date'
+import { isCompanyViewer } from '@/features/workforce/lib/workforce-roles'
 
 import { TripStatusBadge } from '../components/TripStatusBadge'
 import { tripStatusLabel, TRIP_STATUS_OPTIONS } from '../lib/trip-status'
@@ -31,6 +33,8 @@ function tripRouteLabel(trip: TripSummary): string {
 
 export default function TripsListPage() {
   const navigate = useNavigate()
+  const role = useAuthStore((state) => state.currentUser?.role)
+  const showCompanyDashboard = isCompanyViewer(role)
   const { params, setSearch, setPage, setSort, setFilter } = useListQuery({
     defaultSort: { field: 'scheduledStart', direction: 'desc' },
   })
@@ -129,7 +133,11 @@ export default function TripsListPage() {
       <div className="space-y-6">
         <PageHeader
           title="Trips"
-          description="Plan, schedule, and track business trips."
+          description={
+            showCompanyDashboard
+              ? 'Plan, schedule, and track business trips.'
+              : 'Trips you are assigned to as a team member.'
+          }
           actions={
             <PermissionGate permission={PERMISSIONS.trips.create}>
               <Button
@@ -145,13 +153,13 @@ export default function TripsListPage() {
           }
         />
 
-        {dashboardQuery.isLoading ? (
+        {showCompanyDashboard && dashboardQuery.isLoading ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {Array.from({ length: 5 }).map((_, index) => (
               <Skeleton key={index} className="h-20 rounded-lg" />
             ))}
           </div>
-        ) : dashboard ? (
+        ) : showCompanyDashboard && dashboard ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {(
               [
@@ -189,8 +197,12 @@ export default function TripsListPage() {
         ) : hasNoResults ? (
           <EmptyState
             icon={MapPin}
-            title="No trips yet"
-            description="Create a trip to plan routes, assign members, and link transactions."
+            title={showCompanyDashboard ? 'No trips yet' : 'No assigned trips'}
+            description={
+              showCompanyDashboard
+                ? 'Create a trip to plan routes, assign members, and link transactions.'
+                : 'When you are added to a trip, it will show up here.'
+            }
             action={
               <PermissionGate permission={PERMISSIONS.trips.create}>
                 <Button

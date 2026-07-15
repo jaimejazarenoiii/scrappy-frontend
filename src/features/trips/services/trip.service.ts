@@ -64,6 +64,18 @@ export const TripService = {
     }
   },
 
+  /** Assigned trips for the linked employee (`GET /trips/mine`). */
+  async listMine(params: ListQueryParams): Promise<PaginatedResponse<TripSummary>> {
+    const response = await apiClient.get<ApiEnvelope<TripSummaryApi[]>>(TRIP_ENDPOINTS.mine, {
+      params: toTripListQueryParams(params),
+    })
+    const page = unwrapList(response)
+    return {
+      ...page,
+      data: page.data.map(normalizeTripSummary),
+    }
+  },
+
   async get(tripId: string): Promise<TripDetail> {
     const response = await apiClient.get<ApiEnvelope<TripDetailApi>>(TRIP_ENDPOINTS.detail(tripId))
     return normalizeTripDetail(unwrap(response))
