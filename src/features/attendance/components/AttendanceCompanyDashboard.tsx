@@ -126,6 +126,23 @@ export function AttendanceCompanyDashboard({
         data={dashboard.employees}
         emptyMessage="No employees to display."
         getRowId={(row) => row.employeeId}
+        renderMobileCard={(employee) => (
+          <Card className="gap-3 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate font-medium">{formatEmployee(employee)}</p>
+                <p className="text-muted-foreground text-sm">
+                  In {formatDateTime(employee.timeInToday)} · Out{' '}
+                  {formatDateTime(employee.timeOutToday)}
+                </p>
+              </div>
+              <StatusBadge
+                label={attendanceDayStatusLabel(employee.status)}
+                tone={attendanceDayStatusTone(employee.status)}
+              />
+            </div>
+          </Card>
+        )}
       />
     </div>
   )

@@ -319,13 +319,66 @@ export default function ExpensesListPage() {
               </div>
             </FilterBar>
 
-            <Card>
+            <Card className="min-w-0 gap-0 overflow-hidden py-0">
               <DataTable
                 columns={columns}
                 data={data?.data ?? []}
                 isLoading={expensesQuery.isLoading}
                 sort={params.sort}
                 onSortChange={setSort}
+                getRowId={(row) => row.id}
+                renderMobileCard={(expense) => (
+                  <div className="space-y-3 border-b p-4 last:border-b-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">{expenseTitle(expense)}</p>
+                        <p className="text-muted-foreground line-clamp-2 text-sm">
+                          {expense.description}
+                        </p>
+                        <p className="text-muted-foreground mt-1 text-sm">
+                          {formatDate(expense.expenseDate)}
+                          {expense.category ? ` · ${expense.category}` : ''}
+                        </p>
+                      </div>
+                      <ExpenseStatusBadge status={expense.status} />
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="font-medium tabular-nums">
+                        {formatCurrency(expense.amount)}
+                      </span>
+                      <span className="text-muted-foreground text-sm">
+                        {expenseReferenceTypeLabel(expense.referenceType)}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          void navigate(buildRoute.expenseDetail(expense.id))
+                        }}
+                      >
+                        View
+                      </Button>
+                      <PermissionGate permission={PERMISSIONS.expenses.update}>
+                        {expense.status === 'ACTIVE' ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              void navigate(buildRoute.expenseEdit(expense.id))
+                            }}
+                          >
+                            Edit
+                          </Button>
+                        ) : null}
+                      </PermissionGate>
+                    </div>
+                  </div>
+                )}
               />
             </Card>
 

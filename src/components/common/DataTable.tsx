@@ -80,8 +80,9 @@ export function DataTable<TData>({
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
-      <div className="overflow-x-auto rounded-lg border">
+    <div className={cn('min-w-0 space-y-4', className)}>
+      {/* min-w-0 keeps horizontal scroll working inside flex + overflow-x-hidden layouts */}
+      <div className="w-full max-w-full min-w-0 overflow-x-auto overscroll-x-contain rounded-lg border">
         <table className="w-full min-w-[640px] text-sm">
           <thead className="bg-muted/50 sticky top-0">
             {table.getHeaderGroups().map((headerGroup) => (

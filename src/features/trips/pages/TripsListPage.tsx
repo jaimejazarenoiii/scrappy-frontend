@@ -230,13 +230,58 @@ export default function TripsListPage() {
               </Select>
             </FilterBar>
 
-            <Card>
+            <Card className="min-w-0 gap-0 overflow-hidden py-0">
               <DataTable
                 columns={columns}
                 data={data?.data ?? []}
                 isLoading={tripsQuery.isLoading}
                 sort={params.sort}
                 onSortChange={setSort}
+                getRowId={(row) => row.id}
+                renderMobileCard={(trip) => (
+                  <div className="space-y-3 border-b p-4 last:border-b-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">{trip.tripNumber ?? '—'}</p>
+                        <p className="text-muted-foreground text-sm break-words">
+                          {tripRouteLabel(trip)}
+                        </p>
+                        <p className="text-muted-foreground mt-1 text-sm">
+                          {trip.scheduledStart ? formatDate(trip.scheduledStart) : '—'}
+                          {trip.vehicle?.plateNumber ? ` · ${trip.vehicle.plateNumber}` : ''}
+                        </p>
+                      </div>
+                      <TripStatusBadge status={trip.status} />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          void navigate(buildRoute.tripDetail(trip.id))
+                        }}
+                      >
+                        View
+                      </Button>
+                      <PermissionGate permission={PERMISSIONS.trips.update}>
+                        {trip.status === 'DRAFT' ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              void navigate(buildRoute.tripEdit(trip.id))
+                            }}
+                          >
+                            Edit
+                          </Button>
+                        ) : null}
+                      </PermissionGate>
+                    </div>
+                  </div>
+                )}
               />
             </Card>
 

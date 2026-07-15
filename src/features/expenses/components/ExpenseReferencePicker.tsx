@@ -7,6 +7,7 @@ import { FormField } from '@/components/common/FormField'
 import { Pagination } from '@/components/common/Pagination'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Select } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useBranchOptions } from '@/features/branches/hooks/useBranchOptions'
@@ -111,7 +112,7 @@ function TripReferencePicker({
   )
 
   return (
-    <div className="space-y-4 rounded-lg border p-4">
+    <div className="min-w-0 space-y-4 rounded-lg border p-3 sm:p-4">
       <FilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Search trips…">
         <Select
           aria-label="Filter trips by status"
@@ -120,7 +121,7 @@ function TripReferencePicker({
             setStatus(event.target.value)
             setPage(1)
           }}
-          className="w-44"
+          className="w-full sm:w-44"
         >
           <option value="">All statuses</option>
           {TRIP_STATUS_OPTIONS.map((option) => (
@@ -139,15 +140,49 @@ function TripReferencePicker({
             columns={columns}
             data={tripsQuery.data?.data ?? []}
             isLoading={tripsQuery.isLoading}
+            getRowId={(row) => row.id}
+            renderMobileCard={(trip) => {
+              const selected = value === trip.id
+              return (
+                <Card className="gap-3 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">{trip.tripNumber ?? '—'}</p>
+                      <p className="text-muted-foreground text-sm break-words">
+                        {tripRouteLabel(trip)}
+                      </p>
+                      <p className="text-muted-foreground mt-1 text-sm">
+                        {trip.scheduledStart ? formatDate(trip.scheduledStart) : '—'}
+                      </p>
+                    </div>
+                    <TripStatusBadge status={trip.status} />
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="w-full"
+                    variant={selected ? 'default' : 'outline'}
+                    disabled={disabled}
+                    onClick={() => {
+                      onChange(trip.id)
+                    }}
+                  >
+                    {selected ? 'Selected' : 'Select'}
+                  </Button>
+                </Card>
+              )
+            }}
+            footer={
+              tripsQuery.data ? (
+                <Pagination
+                  page={page}
+                  pageSize={10}
+                  total={tripsQuery.data.total}
+                  onPageChange={setPage}
+                />
+              ) : null
+            }
           />
-          {tripsQuery.data ? (
-            <Pagination
-              page={page}
-              pageSize={10}
-              total={tripsQuery.data.total}
-              onPageChange={setPage}
-            />
-          ) : null}
         </>
       )}
 

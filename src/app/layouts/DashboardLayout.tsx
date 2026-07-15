@@ -14,7 +14,7 @@ export function DashboardLayout() {
         <div className="bg-muted/30 border-b px-4 py-2.5 md:px-6">
           <Breadcrumb />
         </div>
-        <main className="flex-1 overflow-x-hidden">
+        <main className="min-w-0 flex-1 overflow-x-hidden">
           <Outlet />
         </main>
         <Footer />

@@ -6,6 +6,7 @@ import { FilterBar } from '@/components/common/FilterBar'
 import { Pagination } from '@/components/common/Pagination'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Select } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TripStatusBadge } from '@/features/trips/components/TripStatusBadge'
@@ -118,7 +119,7 @@ export function TransactionTripPicker({
   const selectedTrip = data?.data.find((trip) => trip.id === value)
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       <FilterBar
         search={search}
         onSearchChange={(next) => {
@@ -131,7 +132,7 @@ export function TransactionTripPicker({
           aria-label="Filter by status"
           value={status}
           disabled={disabled}
-          className="w-40"
+          className="w-full sm:w-40"
           onChange={(event) => {
             setStatus(event.target.value)
             setPage(1)
@@ -162,12 +163,48 @@ export function TransactionTripPicker({
       ) : tripsQuery.isError ? (
         <ErrorState description="Could not load trips. Check that you have access to the trips list." />
       ) : (
-        <>
-          <DataTable columns={columns} data={data?.data ?? []} />
-          {data ? (
-            <Pagination page={page} pageSize={10} total={data.total} onPageChange={setPage} />
-          ) : null}
-        </>
+        <DataTable
+          columns={columns}
+          data={data?.data ?? []}
+          getRowId={(row) => row.id}
+          renderMobileCard={(trip) => {
+            const selected = trip.id === value
+            return (
+              <Card className="gap-3 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{trip.tripNumber ?? '—'}</p>
+                    <p className="text-muted-foreground text-sm break-words">
+                      {tripRouteLabel(trip)}
+                    </p>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      {trip.scheduledStart ? formatDate(trip.scheduledStart) : '—'}
+                      {trip.vehicle?.plateNumber ? ` · ${trip.vehicle.plateNumber}` : ''}
+                    </p>
+                  </div>
+                  <TripStatusBadge status={trip.status} />
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="w-full"
+                  variant={selected ? 'default' : 'outline'}
+                  disabled={disabled}
+                  onClick={() => {
+                    onChange(selected ? '' : trip.id)
+                  }}
+                >
+                  {selected ? 'Selected' : 'Select'}
+                </Button>
+              </Card>
+            )
+          }}
+          footer={
+            data ? (
+              <Pagination page={page} pageSize={10} total={data.total} onPageChange={setPage} />
+            ) : null
+          }
+        />
       )}
 
       {error ? <p className="text-destructive text-sm">{error}</p> : null}
