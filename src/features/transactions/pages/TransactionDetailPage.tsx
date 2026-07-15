@@ -1,8 +1,10 @@
-import { Edit3, FileText, Receipt } from 'lucide-react'
-import { useEffect, useMemo } from 'react'
+import { Download, Edit3, FileText, Receipt } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
+import { toast } from 'sonner'
 
 import { DescriptionItem, DescriptionList } from '@/components/common/DescriptionList'
+import { ImagePreviewDialog } from '@/components/common/ImagePreviewDialog'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/feedback/PageSkeleton'
@@ -15,6 +17,8 @@ import { PermissionGate } from '@/features/authorization/components/PermissionGa
 import { useFormatRecordEmployee } from '@/features/employees/hooks/useFormatRecordEmployee'
 import { useTrip } from '@/features/trips/hooks/useTrip'
 import { useAuthStore } from '@/store/auth.store'
+import { downloadImageFile } from '@/utils/download-image'
+import { formatDate } from '@/utils/format-date'
 import { TransactionDirectionBadge } from '../components/TransactionDirectionBadge'
 import { TransactionItemsList } from '../components/TransactionItemsList'
 import { TransactionSettlementActions } from '../components/TransactionSettlementActions'
@@ -22,12 +26,12 @@ import { TransactionSettlementSummary } from '../components/TransactionSettlemen
 import { TransactionStatusBadge } from '../components/TransactionStatusBadge'
 import { useTransaction } from '../hooks/useTransaction'
 import { transactionAttachmentImageUrl } from '../lib/transaction-attachment-url'
-import { formatDate } from '@/utils/format-date'
 import {
   formatTransactionDirectionAndParty,
   formatTransactionParty,
 } from '../lib/transaction-format'
 import { isDraftStatus, isPaidStatus } from '../lib/transaction-settlement'
+import type { TransactionAttachment } from '../types/transaction.types'
 
 function formatActorLabel(userId: string | null | undefined): string {
   if (!userId) return '—'
@@ -40,6 +44,8 @@ export default function TransactionDetailPage() {
   const formatEmployee = useFormatRecordEmployee()
   const transactionQuery = useTransaction(id)
   const accessToken = useAuthStore((state) => state.accessToken)
+  const [preview, setPreview] = useState<{ src: string; fileName: string } | null>(null)
+  const [downloadingId, setDownloadingId] = useState<string | null>(null)
 
   const tx = transactionQuery.data
   const linkedTripQuery = useTrip(
@@ -209,22 +215,63 @@ export default function TransactionDetailPage() {
                   Photos
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {tx.attachments.map((attachment) => (
-                    <figure key={attachment.id} className="overflow-hidden rounded-lg border">
-                      <img
-                        src={transactionAttachmentImageUrl(tx.id, attachment, accessToken)}
-                        alt={attachment.fileName}
-                        className="aspect-video w-full object-cover"
-                        loading="lazy"
-                      />
-                      <figcaption className="truncate px-3 py-2 text-sm">
-                        {attachment.fileName}
-                      </figcaption>
-                    </figure>
-                  ))}
+                  {tx.attachments.map((attachment: TransactionAttachment) => {
+                    const imageUrl = transactionAttachmentImageUrl(tx.id, attachment, accessToken)
+                    return (
+                      <figure key={attachment.id} className="overflow-hidden rounded-lg border">
+                        <button
+                          type="button"
+                          className="focus-visible:ring-ring block w-full focus-visible:ring-2 focus-visible:outline-none"
+                          aria-label={`View ${attachment.fileName}`}
+                          onClick={() => {
+                            setPreview({ src: imageUrl, fileName: attachment.fileName })
+                          }}
+                        >
+                          <img
+                            src={imageUrl}
+                            alt={attachment.fileName}
+                            className="aspect-video w-full object-cover transition-opacity hover:opacity-90"
+                            loading="lazy"
+                          />
+                        </button>
+                        <figcaption className="flex items-center justify-between gap-2 px-3 py-2">
+                          <span className="truncate text-sm">{attachment.fileName}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="shrink-0"
+                            aria-label={`Download ${attachment.fileName}`}
+                            disabled={downloadingId === attachment.id}
+                            onClick={() => {
+                              setDownloadingId(attachment.id)
+                              void downloadImageFile(imageUrl, attachment.fileName)
+                                .catch(() => {
+                                  toast.error('Could not download photo. Please try again.')
+                                })
+                                .finally(() => {
+                                  setDownloadingId(null)
+                                })
+                            }}
+                          >
+                            <Download className="size-4" />
+                          </Button>
+                        </figcaption>
+                      </figure>
+                    )
+                  })}
                 </div>
               </section>
             ) : null}
+
+            <ImagePreviewDialog
+              open={Boolean(preview)}
+              onOpenChange={(open) => {
+                if (!open) setPreview(null)
+              }}
+              src={preview?.src ?? null}
+              fileName={preview?.fileName ?? ''}
+            />
           </>
         )}
       </div>

@@ -1,10 +1,13 @@
-import { Camera, ImagePlus, Loader2, Trash2 } from 'lucide-react'
+import { Camera, Download, ImagePlus, Loader2, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
+import { ImagePreviewDialog } from '@/components/common/ImagePreviewDialog'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useAuthStore } from '@/store/auth.store'
+import { downloadImageFile } from '@/utils/download-image'
 
 import {
   useDeleteTransactionAttachment,
@@ -25,6 +28,11 @@ interface UploadState {
   progress: number
 }
 
+interface PreviewState {
+  src: string
+  fileName: string
+}
+
 const ACCEPTED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 
 export function TransactionPhotosManager({
@@ -35,7 +43,9 @@ export function TransactionPhotosManager({
   const uploadAttachment = useUploadTransactionAttachment(transactionId)
   const accessToken = useAuthStore((state) => state.accessToken)
   const [deletingAttachment, setDeletingAttachment] = useState<TransactionAttachment | null>(null)
+  const [preview, setPreview] = useState<PreviewState | null>(null)
   const [uploads, setUploads] = useState<UploadState[]>([])
+  const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
 
@@ -146,7 +156,6 @@ export function TransactionPhotosManager({
             void handleFilesSelected(event.target.files)
           }}
         />
-        {/* Opens the device camera app on mobile; no in-app preview. */}
         <input
           ref={cameraInputRef}
           type="file"
@@ -163,11 +172,19 @@ export function TransactionPhotosManager({
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {uploads.map((upload) => (
           <Card key={upload.previewUrl} className="gap-3 overflow-hidden p-3">
-            <img
-              src={upload.previewUrl}
-              alt={upload.fileName}
-              className="aspect-video w-full rounded-md object-cover"
-            />
+            <button
+              type="button"
+              className="focus-visible:ring-ring block w-full overflow-hidden rounded-md focus-visible:ring-2 focus-visible:outline-none"
+              onClick={() => {
+                setPreview({ src: upload.previewUrl, fileName: upload.fileName })
+              }}
+            >
+              <img
+                src={upload.previewUrl}
+                alt={upload.fileName}
+                className="aspect-video w-full object-cover transition-opacity hover:opacity-90"
+              />
+            </button>
             <div className="space-y-2">
               <p className="truncate text-sm font-medium">{upload.fileName}</p>
               <progress
@@ -180,31 +197,68 @@ export function TransactionPhotosManager({
           </Card>
         ))}
 
-        {attachments.map((attachment) => (
-          <Card key={attachment.id} className="gap-3 overflow-hidden p-3">
-            <img
-              src={transactionAttachmentImageUrl(transactionId, attachment, accessToken)}
-              alt={attachment.fileName}
-              className="aspect-video w-full rounded-md object-cover"
-              loading="lazy"
-            />
-            <div className="flex items-center justify-between gap-2">
-              <p className="truncate text-sm font-medium">{attachment.fileName}</p>
-              <Button
+        {attachments.map((attachment) => {
+          const imageUrl = transactionAttachmentImageUrl(transactionId, attachment, accessToken)
+          return (
+            <Card key={attachment.id} className="gap-3 overflow-hidden p-3">
+              <button
                 type="button"
-                variant="ghost"
-                size="sm"
-                disabled={disabled}
-                aria-label={`Remove ${attachment.fileName}`}
+                className="focus-visible:ring-ring block w-full overflow-hidden rounded-md focus-visible:ring-2 focus-visible:outline-none"
+                aria-label={`View ${attachment.fileName}`}
                 onClick={() => {
-                  setDeletingAttachment(attachment)
+                  setPreview({ src: imageUrl, fileName: attachment.fileName })
                 }}
               >
-                <Trash2 className="size-4" />
-              </Button>
-            </div>
-          </Card>
-        ))}
+                <img
+                  src={imageUrl}
+                  alt={attachment.fileName}
+                  className="aspect-video w-full object-cover transition-opacity hover:opacity-90"
+                  loading="lazy"
+                />
+              </button>
+              <div className="flex items-center justify-between gap-2">
+                <p className="truncate text-sm font-medium">{attachment.fileName}</p>
+                <div className="flex shrink-0 items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    aria-label={`Download ${attachment.fileName}`}
+                    disabled={downloadingId === attachment.id}
+                    onClick={() => {
+                      setDownloadingId(attachment.id)
+                      void downloadImageFile(imageUrl, attachment.fileName)
+                        .catch(() => {
+                          toast.error('Could not download photo. Please try again.')
+                        })
+                        .finally(() => {
+                          setDownloadingId(null)
+                        })
+                    }}
+                  >
+                    {downloadingId === attachment.id ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Download className="size-4" />
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={disabled}
+                    aria-label={`Remove ${attachment.fileName}`}
+                    onClick={() => {
+                      setDeletingAttachment(attachment)
+                    }}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )
+        })}
       </div>
 
       {!attachmentsQuery.isLoading && attachments.length === 0 && uploads.length === 0 ? (
@@ -212,6 +266,15 @@ export function TransactionPhotosManager({
           No photos yet. Upload from your device or take a photo with your camera.
         </p>
       ) : null}
+
+      <ImagePreviewDialog
+        open={Boolean(preview)}
+        onOpenChange={(open) => {
+          if (!open) setPreview(null)
+        }}
+        src={preview?.src ?? null}
+        fileName={preview?.fileName ?? ''}
+      />
 
       <ConfirmDialog
         open={Boolean(deletingAttachment)}
