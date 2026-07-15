@@ -6,7 +6,6 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent } from '@/components/ui/card'
 import { buildRoute, ROUTES } from '@/constants/routes'
 import type { NormalizedApiError } from '@/lib/axios'
-import { useAuthStore } from '@/store/auth.store'
 import { blankToUndefined } from '@/utils/form-values'
 
 import { ExpenseForm } from '../components/ExpenseForm'
@@ -16,7 +15,6 @@ import type { ExpenseFormValues } from '../validation/expense.schema'
 export default function ExpenseCreatePage() {
   const navigate = useNavigate()
   const createExpense = useCreateExpense()
-  const tenant = useAuthStore((state) => state.tenant)
   const [apiError, setApiError] = useState<NormalizedApiError | null>(null)
 
   useEffect(() => {
@@ -30,10 +28,7 @@ export default function ExpenseCreatePage() {
       {
         category: values.category,
         referenceType: values.referenceType,
-        referenceId:
-          values.referenceType === 'COMPANY'
-            ? (tenant?.companyId ?? values.referenceId)
-            : blankToUndefined(values.referenceId),
+        referenceId: blankToUndefined(values.referenceId),
         description: values.description.trim(),
         amount: values.amount,
         expenseDate: values.expenseDate,

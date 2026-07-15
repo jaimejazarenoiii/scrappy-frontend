@@ -31,9 +31,29 @@ interface ExpenseFormProps {
   apiError?: NormalizedApiError | null
 }
 
+/** Map API field paths to form field names used by ExpenseForm. */
+const EXPENSE_API_FIELD_ALIASES: Record<string, keyof ExpenseFormValues> = {
+  contextType: 'referenceType',
+  tripId: 'referenceId',
+  branchId: 'referenceId',
+  warehouseId: 'referenceId',
+  vehicleId: 'referenceId',
+}
+
 function toDateInputValue(value: string | undefined): string {
   if (!value) return ''
   return value.length >= 10 ? value.slice(0, 10) : value
+}
+
+function remapExpenseApiError(error: NormalizedApiError): NormalizedApiError {
+  if (!error.details?.length) return error
+  return {
+    ...error,
+    details: error.details.map((detail) => ({
+      ...detail,
+      path: detail.path ? (EXPENSE_API_FIELD_ALIASES[detail.path] ?? detail.path) : detail.path,
+    })),
+  }
 }
 
 export function ExpenseForm({
@@ -71,7 +91,7 @@ export function ExpenseForm({
 
   useEffect(() => {
     if (apiError) {
-      applyApiValidationErrors(apiError, setError)
+      applyApiValidationErrors(remapExpenseApiError(apiError), setError)
     }
   }, [apiError, setError])
 

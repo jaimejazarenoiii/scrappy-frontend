@@ -17,9 +17,15 @@ export interface ExpenseSummaryApi {
   category?: string | null
   categoryId?: string | null
   categoryName?: string | null
-  referenceType: string
+  /** API field; prefer over legacy `referenceType`. */
+  contextType?: string
+  referenceType?: string
   referenceId?: string | null
   referenceLabel?: string | null
+  branchId?: string | null
+  warehouseId?: string | null
+  vehicleId?: string | null
+  tripId?: string | null
   description: string
   amount: number
   expenseDate: string
@@ -108,6 +114,44 @@ export function normalizeExpenseCategory(api: ExpenseSummaryApi): string | null 
   return api.category ?? api.categoryName ?? null
 }
 
+function resolveContextType(api: ExpenseSummaryApi): ExpenseReferenceType {
+  return normalizeReferenceType(api.contextType ?? api.referenceType ?? 'COMPANY')
+}
+
+function resolveContextId(api: ExpenseSummaryApi): string | null {
+  if (api.referenceId) return api.referenceId
+  const contextType = resolveContextType(api)
+  if (contextType === 'BRANCH') return api.branchId ?? null
+  if (contextType === 'WAREHOUSE') return api.warehouseId ?? null
+  if (contextType === 'VEHICLE') return api.vehicleId ?? null
+  if (contextType === 'TRIP') return api.tripId ?? null
+  return null
+}
+
+/** Maps UI reference fields to POST/PATCH body expected by `/expenses`. */
+export function toExpenseContextPayload(
+  referenceType: ExpenseReferenceType,
+  referenceId?: string | null,
+): Record<string, unknown> {
+  const contextType = referenceType
+  const trimmedId = referenceId?.trim()
+  const id = trimmedId && trimmedId.length > 0 ? trimmedId : null
+  const body: Record<string, unknown> = { contextType }
+
+  if (contextType === 'BRANCH' && id) body.branchId = id
+  if (contextType === 'WAREHOUSE' && id) body.warehouseId = id
+  if (contextType === 'VEHICLE' && id) body.vehicleId = id
+  if (contextType === 'TRIP' && id) body.tripId = id
+
+  return body
+}
+
+function mergeDescriptionWithNotes(description: string, notes?: string | null): string {
+  const trimmedNotes = notes?.trim()
+  if (!trimmedNotes) return description
+  return `${description}\n\n${trimmedNotes}`
+}
+
 export function normalizeExpenseSummary(api: ExpenseSummaryApi): ExpenseSummary {
   return {
     id: api.id,
@@ -115,8 +159,8 @@ export function normalizeExpenseSummary(api: ExpenseSummaryApi): ExpenseSummary 
     expenseNumber: api.expenseNumber,
     status: normalizeExpenseStatus(api.status),
     category: normalizeExpenseCategory(api),
-    referenceType: normalizeReferenceType(api.referenceType),
-    referenceId: api.referenceId ?? null,
+    referenceType: resolveContextType(api),
+    referenceId: resolveContextId(api),
     referenceLabel: api.referenceLabel ?? null,
     description: api.description,
     amount: api.amount,
@@ -154,7 +198,9 @@ export function toExpenseListQueryParams(params: ListQueryParams): Record<string
   for (const [key, value] of Object.entries(filters)) {
     if (value) {
       // API list filter is `category` (name), not `categoryId`.
-      const queryKey = key === 'categoryId' ? 'category' : key
+      // API uses `contextType`, not UI `referenceType`.
+      const queryKey =
+        key === 'categoryId' ? 'category' : key === 'referenceType' ? 'contextType' : key
       query[queryKey] = value
     }
   }
@@ -165,23 +211,25 @@ export function toExpenseListQueryParams(params: ListQueryParams): Record<string
 export function toExpenseCreateBody(input: CreateExpenseInput): Record<string, unknown> {
   return {
     category: input.category,
-    referenceType: input.referenceType,
-    referenceId: input.referenceId ?? null,
-    description: input.description,
+    description: mergeDescriptionWithNotes(input.description, input.notes),
     amount: input.amount,
     expenseDate: input.expenseDate,
-    notes: input.notes ?? null,
+    ...toExpenseContextPayload(input.referenceType, input.referenceId),
   }
 }
 
 export function toExpenseUpdateBody(input: UpdateExpenseInput): Record<string, unknown> {
   const body: Record<string, unknown> = {}
   if (input.category !== undefined) body.category = input.category
-  if (input.referenceType !== undefined) body.referenceType = input.referenceType
-  if (input.referenceId !== undefined) body.referenceId = input.referenceId
-  if (input.description !== undefined) body.description = input.description
+  if (input.description !== undefined || input.notes !== undefined) {
+    const description = input.description ?? ''
+    body.description =
+      input.notes !== undefined ? mergeDescriptionWithNotes(description, input.notes) : description
+  }
   if (input.amount !== undefined) body.amount = input.amount
   if (input.expenseDate !== undefined) body.expenseDate = input.expenseDate
-  if (input.notes !== undefined) body.notes = input.notes
+  if (input.referenceType !== undefined) {
+    Object.assign(body, toExpenseContextPayload(input.referenceType, input.referenceId))
+  }
   return body
 }
