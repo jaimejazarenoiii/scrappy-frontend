@@ -50,8 +50,22 @@ export function TransactionAnalyticsSection({ enabled = true }: TransactionAnaly
         <div className="space-y-6">
           <AnalyticsKpiGrid>
             <AnalyticsKpiCard label="Transactions" value={data.transactionCount.toLocaleString()} />
-            <AnalyticsKpiCard label="Inbound" value={data.inboundCount.toLocaleString()} />
-            <AnalyticsKpiCard label="Outbound" value={data.outboundCount.toLocaleString()} />
+            <AnalyticsKpiCard
+              label="Sales"
+              value={formatCurrency(data.outboundAmount)}
+              trend={{
+                label: `Money in · ${data.outboundCount.toLocaleString()} outbound`,
+                direction: 'neutral',
+              }}
+            />
+            <AnalyticsKpiCard
+              label="Purchases"
+              value={formatCurrency(data.inboundAmount)}
+              trend={{
+                label: `Money out · ${data.inboundCount.toLocaleString()} inbound`,
+                direction: 'neutral',
+              }}
+            />
             <AnalyticsKpiCard label="Total amount" value={formatCurrency(data.totalAmount)} />
             <AnalyticsKpiCard label="Average value" value={formatCurrency(data.averageValue)} />
           </AnalyticsKpiGrid>

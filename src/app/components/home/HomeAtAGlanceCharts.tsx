@@ -111,11 +111,12 @@ export function HomeAtAGlanceCharts({ enabled }: HomeAtAGlanceChartsProps) {
 
   const inboundToday = txToday?.inboundCount ?? companyToday?.inboundTransactionCount ?? 0
   const outboundToday = txToday?.outboundCount ?? companyToday?.outboundTransactionCount ?? 0
-  const salesToday = txToday?.totalAmount ?? companyToday?.totalTransactionAmount ?? 0
+  const salesToday = txToday?.outboundAmount ?? companyToday?.outboundAmount ?? 0
+  const purchasesToday = txToday?.inboundAmount ?? companyToday?.inboundAmount ?? 0
 
   const inboundOutboundChart = [
-    { name: 'Inbound', value: inboundToday },
-    { name: 'Outbound', value: outboundToday },
+    { name: 'Buys (inbound)', value: inboundToday },
+    { name: 'Sells (outbound)', value: outboundToday },
   ].filter((row) => row.value > 0)
 
   const monthDirectionChart = inboundOutboundMonthChart(txMonth)
@@ -184,19 +185,29 @@ export function HomeAtAGlanceCharts({ enabled }: HomeAtAGlanceChartsProps) {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2">
               <AnalyticsKpiCard
                 className="justify-center sm:col-span-2 lg:col-span-2 lg:row-span-2"
-                label="Total sales today"
+                label="Sales today"
                 value={<span className="text-3xl md:text-4xl">{formatCurrency(salesToday)}</span>}
+                trend={{ label: 'Money in from selling scrap (outbound)', direction: 'neutral' }}
                 highlight
               />
-              <AnalyticsKpiCard label="Inbound" value={inboundToday.toLocaleString()} />
-              <AnalyticsKpiCard label="Outbound" value={outboundToday.toLocaleString()} />
+              <AnalyticsKpiCard
+                label="Purchases today"
+                value={formatCurrency(purchasesToday)}
+                trend={{ label: 'Money out buying scrap (inbound)', direction: 'neutral' }}
+              />
               <AnalyticsKpiCard
                 label="Expenses"
                 value={formatCurrency(companyToday?.totalExpenses ?? 0)}
+                trend={{ label: 'Money out', direction: 'neutral' }}
               />
               <AnalyticsKpiCard
                 label="Net operational"
                 value={formatCurrency(companyToday?.netOperationalAmount ?? 0)}
+                trend={{ label: 'Sales − purchases − expenses − payroll', direction: 'neutral' }}
+              />
+              <AnalyticsKpiCard
+                label="Transactions today"
+                value={(txToday?.transactionCount ?? inboundToday + outboundToday).toLocaleString()}
               />
             </div>
 
@@ -204,15 +215,17 @@ export function HomeAtAGlanceCharts({ enabled }: HomeAtAGlanceChartsProps) {
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:items-stretch">
               {inboundOutboundChart.length > 0 ? (
                 <AnalyticsChart
-                  title="Inbound vs outbound"
+                  title="Buys vs sells (count)"
                   kind="donut"
                   data={inboundOutboundChart}
                   chartClassName="h-52"
                 />
               ) : (
-                <AnalyticsKpiCard label="Inbound vs outbound" value="No transactions today" />
+                <AnalyticsKpiCard label="Buys vs sells" value="No transactions today" />
               )}
               <div className="grid grid-cols-2 gap-3">
+                <AnalyticsKpiCard label="Buys (inbound)" value={inboundToday.toLocaleString()} />
+                <AnalyticsKpiCard label="Sells (outbound)" value={outboundToday.toLocaleString()} />
                 <AnalyticsKpiCard
                   label="Active trips"
                   value={(companyToday?.activeTripCount ?? 0).toLocaleString()}
@@ -220,13 +233,6 @@ export function HomeAtAGlanceCharts({ enabled }: HomeAtAGlanceChartsProps) {
                 <AnalyticsKpiCard
                   label="Active vehicles"
                   value={(companyToday?.activeVehicleCount ?? 0).toLocaleString()}
-                />
-                <AnalyticsKpiCard
-                  className="col-span-2"
-                  label="Transactions today"
-                  value={(
-                    txToday?.transactionCount ?? inboundToday + outboundToday
-                  ).toLocaleString()}
                 />
               </div>
             </div>
@@ -237,8 +243,17 @@ export function HomeAtAGlanceCharts({ enabled }: HomeAtAGlanceChartsProps) {
               This month
             </h3>
 
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <AnalyticsKpiCard label="Sales" value={formatCurrency(txMonth?.totalAmount ?? 0)} />
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+              <AnalyticsKpiCard
+                label="Sales"
+                value={formatCurrency(txMonth?.outboundAmount ?? 0)}
+                trend={{ label: 'Money in (outbound)', direction: 'neutral' }}
+              />
+              <AnalyticsKpiCard
+                label="Purchases"
+                value={formatCurrency(txMonth?.inboundAmount ?? 0)}
+                trend={{ label: 'Money out (inbound)', direction: 'neutral' }}
+              />
               <AnalyticsKpiCard
                 label="Expenses"
                 value={formatCurrency(expensesMonth?.totalAmount ?? 0)}
@@ -256,7 +271,7 @@ export function HomeAtAGlanceCharts({ enabled }: HomeAtAGlanceChartsProps) {
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {monthDirectionChart ? (
                 <AnalyticsChart
-                  title="Inbound vs outbound"
+                  title="Buys vs sells (count)"
                   kind="bar"
                   data={monthDirectionChart}
                   chartClassName="h-52"
@@ -325,8 +340,8 @@ function inboundOutboundMonthChart(
 ) {
   if (!txMonth) return null
   const data = [
-    { name: 'Inbound', value: txMonth.inboundCount },
-    { name: 'Outbound', value: txMonth.outboundCount },
+    { name: 'Buys (inbound)', value: txMonth.inboundCount },
+    { name: 'Sells (outbound)', value: txMonth.outboundCount },
   ].filter((row) => row.value > 0)
   return data.length > 0 ? data : null
 }

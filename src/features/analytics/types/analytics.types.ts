@@ -108,6 +108,10 @@ export interface CompanyAnalytics extends AnalyticsMetadata {
   inboundTransactionCount: number
   outboundTransactionCount: number
   totalTransactionAmount: number
+  /** Money paid out buying scrap (inbound transactions). */
+  inboundAmount: number
+  /** Money received selling scrap (outbound transactions). */
+  outboundAmount: number
   totalExpenses: number
   totalPayroll: number
   netOperationalAmount: number
@@ -123,6 +127,10 @@ export interface TransactionAnalytics extends AnalyticsMetadata {
   outboundCount: number
   transactionCount: number
   totalAmount: number
+  /** Money paid out buying scrap (inbound transactions). */
+  inboundAmount: number
+  /** Money received selling scrap (outbound transactions). */
+  outboundAmount: number
   averageValue: number
   topMaterials: RankingRow[]
   mostActiveEmployees: EntityRankingRow[]

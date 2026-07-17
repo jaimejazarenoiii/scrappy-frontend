@@ -39,22 +39,35 @@ export function CompanyOverviewSection() {
         <div className="space-y-4">
           <AnalyticsKpiGrid>
             <AnalyticsKpiCard
-              label="Inbound transactions"
-              value={formatCount(data.inboundTransactionCount)}
+              label="Sales"
+              value={formatCurrency(data.outboundAmount)}
+              trend={{
+                label: `Money in · ${formatCount(data.outboundTransactionCount)} outbound`,
+                direction: 'neutral',
+              }}
             />
             <AnalyticsKpiCard
-              label="Outbound transactions"
-              value={formatCount(data.outboundTransactionCount)}
+              label="Purchases"
+              value={formatCurrency(data.inboundAmount)}
+              trend={{
+                label: `Money out · ${formatCount(data.inboundTransactionCount)} inbound`,
+                direction: 'neutral',
+              }}
             />
             <AnalyticsKpiCard
               label="Total transaction amount"
               value={formatCurrency(data.totalTransactionAmount)}
+              trend={{ label: 'Sales + purchases combined', direction: 'neutral' }}
             />
             <AnalyticsKpiCard label="Total expenses" value={formatCurrency(data.totalExpenses)} />
             <AnalyticsKpiCard label="Total payroll" value={formatCurrency(data.totalPayroll)} />
             <AnalyticsKpiCard
               label="Net operational amount"
               value={formatCurrency(data.netOperationalAmount)}
+              trend={{
+                label: 'Sales − purchases − expenses − payroll',
+                direction: 'neutral',
+              }}
               highlight
             />
             <AnalyticsKpiCard

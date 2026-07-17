@@ -206,6 +206,8 @@ export function normalizeCompanyAnalytics(raw: Record<string, unknown>): Company
       raw.outboundTransactionCount ?? raw.totalOutboundTransactions,
     ),
     totalTransactionAmount: asNumber(raw.totalTransactionAmount),
+    inboundAmount: asNumber(raw.inboundAmount),
+    outboundAmount: asNumber(raw.outboundAmount),
     totalExpenses: asNumber(raw.totalExpenses),
     totalPayroll: asNumber(raw.totalPayroll),
     netOperationalAmount: asNumber(raw.netOperationalAmount),
@@ -222,6 +224,8 @@ export function normalizeTransactionAnalytics(raw: Record<string, unknown>): Tra
     outboundCount: asNumber(raw.outboundCount ?? raw.totalOutbound),
     transactionCount: asNumber(raw.transactionCount),
     totalAmount: asNumber(raw.totalAmount ?? raw.totalTransactionAmount),
+    inboundAmount: asNumber(raw.inboundAmount),
+    outboundAmount: asNumber(raw.outboundAmount),
     averageValue: asNumber(raw.averageValue ?? raw.averageTransactionValue),
     topMaterials: asArray<Record<string, unknown>>(raw.topMaterials).map(normalizeRankingRow),
     mostActiveEmployees: asArray<Record<string, unknown>>(raw.mostActiveEmployees).map(
