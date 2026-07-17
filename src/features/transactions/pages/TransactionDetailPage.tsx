@@ -14,11 +14,14 @@ import { Button } from '@/components/ui/button'
 import { PERMISSIONS } from '@/constants/permissions'
 import { buildRoute } from '@/constants/routes'
 import { PermissionGate } from '@/features/authorization/components/PermissionGate'
+import { useBranch } from '@/features/branches/hooks/useBranch'
 import { useFormatRecordEmployee } from '@/features/employees/hooks/useFormatRecordEmployee'
+import { useFormatUserActor } from '@/features/employees/hooks/useFormatUserActor'
 import { useTrip } from '@/features/trips/hooks/useTrip'
+import { useWarehouse } from '@/features/warehouses/hooks/useWarehouse'
 import { useAuthStore } from '@/store/auth.store'
 import { downloadImageFile } from '@/utils/download-image'
-import { formatDate } from '@/utils/format-date'
+import { formatDateTime } from '@/utils/format-date'
 import { TransactionDirectionBadge } from '../components/TransactionDirectionBadge'
 import { TransactionItemsList } from '../components/TransactionItemsList'
 import { TransactionSettlementActions } from '../components/TransactionSettlementActions'
@@ -33,15 +36,11 @@ import {
 import { isDraftStatus, isPaidStatus } from '../lib/transaction-settlement'
 import type { TransactionAttachment } from '../types/transaction.types'
 
-function formatActorLabel(userId: string | null | undefined): string {
-  if (!userId) return '—'
-  return `User ${userId.slice(0, 8)}…`
-}
-
 export default function TransactionDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const formatEmployee = useFormatRecordEmployee()
+  const formatActorLabel = useFormatUserActor()
   const transactionQuery = useTransaction(id)
   const accessToken = useAuthStore((state) => state.accessToken)
   const [preview, setPreview] = useState<{ src: string; fileName: string } | null>(null)
@@ -52,6 +51,12 @@ export default function TransactionDetailPage() {
     tx?.locationType === 'TRIP' ? (tx.tripId ?? undefined) : undefined,
   )
   const linkedTrip = linkedTripQuery.data
+  const linkedBranchQuery = useBranch(
+    tx?.locationType === 'BRANCH' ? (tx.branchId ?? undefined) : undefined,
+  )
+  const linkedWarehouseQuery = useWarehouse(
+    tx?.locationType === 'WAREHOUSE' ? (tx.warehouseId ?? undefined) : undefined,
+  )
 
   useEffect(() => {
     if (!tx) {
@@ -69,8 +74,14 @@ export default function TransactionDetailPage() {
   const locationLabel = useMemo(() => {
     if (!tx) return undefined
 
-    if (tx.locationType === 'BRANCH') return tx.branchId ?? '—'
-    if (tx.locationType === 'WAREHOUSE') return tx.warehouseId ?? '—'
+    if (tx.locationType === 'BRANCH') {
+      if (!tx.branchId) return '—'
+      return linkedBranchQuery.data?.name ?? 'Branch'
+    }
+    if (tx.locationType === 'WAREHOUSE') {
+      if (!tx.warehouseId) return '—'
+      return linkedWarehouseQuery.data?.name ?? 'Warehouse'
+    }
 
     if (tx.locationType === 'TRIP') {
       if (linkedTrip) {
@@ -84,7 +95,7 @@ export default function TransactionDetailPage() {
       return `${tx.outsideLocationName} · ${tx.outsideAddress}`
     }
     return tx.outsideLocationName ?? tx.outsideAddress ?? '—'
-  }, [tx, linkedTrip])
+  }, [tx, linkedTrip, linkedBranchQuery.data, linkedWarehouseQuery.data])
 
   return (
     <PageContainer maxWidth="lg">
@@ -156,7 +167,7 @@ export default function TransactionDetailPage() {
                 {tx.partyContactNumber ?? '—'}
               </DescriptionItem>
               <DescriptionItem label="Transaction date">
-                {formatDate(tx.transactionDate)}
+                {formatDateTime(tx.transactionDate)}
               </DescriptionItem>
               <DescriptionItem label="Location">
                 {tx.locationType === 'TRIP' && tx.tripId ? (
@@ -175,14 +186,14 @@ export default function TransactionDetailPage() {
               <DescriptionItem label="Photos">{tx.attachments.length}</DescriptionItem>
               {tx.submittedAt ? (
                 <DescriptionItem label="Submitted">
-                  {formatDate(tx.submittedAt)}
+                  {formatDateTime(tx.submittedAt)}
                   {tx.submittedByUserId ? ` · ${formatActorLabel(tx.submittedByUserId)}` : null}
                 </DescriptionItem>
               ) : null}
               {isPaidStatus(tx.status) ? (
                 <>
                   <DescriptionItem label="Paid at">
-                    {tx.paidAt ? formatDate(tx.paidAt) : '—'}
+                    {tx.paidAt ? formatDateTime(tx.paidAt) : '—'}
                   </DescriptionItem>
                   <DescriptionItem label="Paid by">
                     {formatActorLabel(tx.paidByUserId)}

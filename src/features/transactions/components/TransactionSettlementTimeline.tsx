@@ -4,7 +4,8 @@ import { EmptyState } from '@/components/feedback/EmptyState'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatDate } from '@/utils/format-date'
+import { useFormatUserActor } from '@/features/employees/hooks/useFormatUserActor'
+import { formatDateTime } from '@/utils/format-date'
 
 import type { SettlementTimelineEvent } from '../types/transaction.types'
 
@@ -21,6 +22,8 @@ export function TransactionSettlementTimeline({
   isError = false,
   onRetry,
 }: TransactionSettlementTimelineProps) {
+  const formatActorLabel = useFormatUserActor()
+
   if (isLoading) {
     return (
       <div className="space-y-3" aria-busy="true">
@@ -56,28 +59,32 @@ export function TransactionSettlementTimeline({
 
   return (
     <ol className="relative space-y-4 border-s ps-6" aria-label="Settlement timeline">
-      {events.map((event) => (
-        <li key={event.id} className="relative">
-          <span
-            className="bg-primary absolute -start-[calc(0.5rem+1px)] top-2 size-2.5 rounded-full"
-            aria-hidden
-          />
-          <div className="rounded-lg border p-4">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <p className="font-medium">{event.actionLabel}</p>
-              <time className="text-muted-foreground text-sm" dateTime={event.occurredAt}>
-                {formatDate(event.occurredAt)}
-              </time>
+      {events.map((event) => {
+        const actorLabel =
+          event.actorDisplayName ?? (event.actorUserId ? formatActorLabel(event.actorUserId) : null)
+        return (
+          <li key={event.id} className="relative">
+            <span
+              className="bg-primary absolute -start-[calc(0.5rem+1px)] top-2 size-2.5 rounded-full"
+              aria-hidden
+            />
+            <div className="rounded-lg border p-4">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <p className="font-medium">{event.actionLabel}</p>
+                <time className="text-muted-foreground text-sm" dateTime={event.occurredAt}>
+                  {formatDateTime(event.occurredAt)}
+                </time>
+              </div>
+              {actorLabel ? (
+                <p className="text-muted-foreground mt-1 text-sm">By {actorLabel}</p>
+              ) : null}
+              {event.notes ? (
+                <p className="text-muted-foreground mt-2 text-sm">{event.notes}</p>
+              ) : null}
             </div>
-            {event.actorDisplayName ? (
-              <p className="text-muted-foreground mt-1 text-sm">By {event.actorDisplayName}</p>
-            ) : null}
-            {event.notes ? (
-              <p className="text-muted-foreground mt-2 text-sm">{event.notes}</p>
-            ) : null}
-          </div>
-        </li>
-      ))}
+          </li>
+        )
+      })}
     </ol>
   )
 }

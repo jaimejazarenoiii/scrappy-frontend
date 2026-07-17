@@ -1,21 +1,18 @@
 import { DescriptionItem, DescriptionList } from '@/components/common/DescriptionList'
-import { formatDate } from '@/utils/format-date'
+import { useFormatUserActor } from '@/features/employees/hooks/useFormatUserActor'
+import { formatDateTime } from '@/utils/format-date'
 
 import { TransactionDirectionBadge } from './TransactionDirectionBadge'
 import { formatTransactionParty } from '../lib/transaction-format'
 import { isPaidStatus } from '../lib/transaction-settlement'
 import type { TransactionDetail } from '../types/transaction.types'
 
-function formatActorLabel(userId: string | null): string {
-  if (!userId) return '—'
-  return `User ${userId.slice(0, 8)}…`
-}
-
 interface TransactionSettlementSummaryProps {
   transaction: TransactionDetail
 }
 
 export function TransactionSettlementSummary({ transaction }: TransactionSettlementSummaryProps) {
+  const formatActorLabel = useFormatUserActor()
   return (
     <DescriptionList>
       <DescriptionItem label="Transaction number">
@@ -26,14 +23,14 @@ export function TransactionSettlementSummary({ transaction }: TransactionSettlem
       </DescriptionItem>
       <DescriptionItem label="Party">{formatTransactionParty(transaction)}</DescriptionItem>
       <DescriptionItem label="Transaction date">
-        {formatDate(transaction.transactionDate)}
+        {formatDateTime(transaction.transactionDate)}
       </DescriptionItem>
       <DescriptionItem label="Total amount">
         <span className="font-medium tabular-nums">{transaction.totalAmount.toFixed(2)}</span>
       </DescriptionItem>
       {transaction.submittedAt ? (
         <DescriptionItem label="Submitted">
-          {formatDate(transaction.submittedAt)}
+          {formatDateTime(transaction.submittedAt)}
           {transaction.submittedByUserId
             ? ` · ${formatActorLabel(transaction.submittedByUserId)}`
             : null}
@@ -42,7 +39,7 @@ export function TransactionSettlementSummary({ transaction }: TransactionSettlem
       {isPaidStatus(transaction.status) ? (
         <>
           <DescriptionItem label="Paid at">
-            {transaction.paidAt ? formatDate(transaction.paidAt) : '—'}
+            {transaction.paidAt ? formatDateTime(transaction.paidAt) : '—'}
           </DescriptionItem>
           <DescriptionItem label="Paid by">
             {formatActorLabel(transaction.paidByUserId)}

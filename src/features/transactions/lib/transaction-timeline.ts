@@ -1,10 +1,5 @@
 import type { SettlementTimelineEvent, TransactionDetail } from '../types/transaction.types'
 
-function formatActorLabel(userId: string | null | undefined): string | null {
-  if (!userId) return null
-  return `User ${userId.slice(0, 8)}…`
-}
-
 /** Builds a chronological settlement timeline from authoritative transaction lifecycle fields. */
 export function buildSettlementTimeline(
   transaction: TransactionDetail,
@@ -24,7 +19,7 @@ export function buildSettlementTimeline(
       action: 'READY_FOR_PAYMENT',
       actionLabel: 'Ready for payment',
       actorUserId: transaction.submittedByUserId,
-      actorDisplayName: formatActorLabel(transaction.submittedByUserId),
+      actorDisplayName: null,
       occurredAt: transaction.submittedAt,
       notes: null,
     })
@@ -36,7 +31,7 @@ export function buildSettlementTimeline(
       action: 'PAID',
       actionLabel: 'Paid',
       actorUserId: transaction.paidByUserId,
-      actorDisplayName: formatActorLabel(transaction.paidByUserId),
+      actorDisplayName: null,
       occurredAt: transaction.paidAt,
       notes: null,
     })
@@ -48,7 +43,7 @@ export function buildSettlementTimeline(
       action: 'CANCELLED',
       actionLabel: 'Cancelled',
       actorUserId: transaction.cancelledByUserId,
-      actorDisplayName: formatActorLabel(transaction.cancelledByUserId),
+      actorDisplayName: null,
       occurredAt: transaction.cancelledAt,
       notes: transaction.cancellationReason,
     })
@@ -60,7 +55,7 @@ export function buildSettlementTimeline(
       action: 'REOPENED',
       actionLabel: 'Reopened',
       actorUserId: transaction.reopenedByUserId,
-      actorDisplayName: formatActorLabel(transaction.reopenedByUserId),
+      actorDisplayName: null,
       occurredAt: transaction.reopenedAt,
       notes: transaction.reopenReason,
     })
