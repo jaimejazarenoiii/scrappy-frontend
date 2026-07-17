@@ -76,7 +76,7 @@ function DesktopSidebar() {
   return (
     <aside
       className={cn(
-        'bg-sidebar text-sidebar-foreground hidden border-r md:flex md:flex-col',
+        'bg-sidebar text-sidebar-foreground sticky top-0 hidden h-dvh border-r md:flex md:flex-col',
         collapsed ? 'w-16' : 'w-64',
       )}
     >
@@ -124,7 +124,9 @@ function MobileSidebar() {
           <SheetTitle className="sr-only">Scrappy</SheetTitle>
           <BrandLogo className="size-8" withWordmark plate="dark" />
         </SheetHeader>
-        <NavItems onNavigate={closeMobileNav} />
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <NavItems onNavigate={closeMobileNav} />
+        </div>
       </SheetContent>
     </Sheet>
   )
